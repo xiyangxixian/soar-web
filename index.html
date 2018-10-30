@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <title>soar web</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript" src="./js/jquery.min.js"></script>
+    <script type="text/javascript" src="./js/vue.min.js"></script>
+    <script type="text/javascript" src="./js/vue.min.js"></script>
+    <script type="text/javascript" src="./js/vue-router.js"></script>
+    <script type="text/javascript" src="./js/codemirror.js"></script>
+    <script type="text/javascript" src="./js/sql.js"></script>
+    <script type="text/javascript" src="./js/markdown.js"></script>
+    <script type="text/javascript" src="./js/placeholder.js"></script>
+    <link rel="stylesheet" href="./css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="./css/codemirror.css"/>
+    <style>
+      .w-100{width: 100px !important;}
+      .w-150{width: 150px !important;}
+      .ml-20{margin-left:20px !important;}
+      .mt-20{margin-top:20px !important;}
+      .mb-20{margin-bottom:20px !important;}
+      .CodeMirror{height:100%; padding:10px;}
+      .show-content{height:100%;border:1px solid #ddd;}
+      .placegolder,pre.CodeMirror-placeholder{color: #999;}
+      .placegolder{font-size:16px; font-family: monospace;display:inline-block;padding:4px 0px;}
+    </style>
+  </head>
+  <body>
+    <div style="width:1200px;margin:auto;" id="vue-app">
+      <header style="margin:20px 0px;">
+        <ul class="nav nav-tabs">
+          <li role="presentation" class="active"><a href="#">sql分析</a></li>
+          <li role="presentation"><a href="#">soar配置</a></li>
+        </ul>
+      </header>
+      <div class="content">
+        <div class=" form-inline">
+          <div class="form-group">
+            <label>配置模板：</label>
+            <select class="form-control w-150">
+              <option value="1">配置1</option>
+              <option value="2">配置2</option>
+              <option value="3">配置3</option>
+            </select>
+          </div>
+          <div class="form-group ml-20">
+            <span class="btn btn-primary">SQL评估</span>
+            <span class="btn btn-primary">美化</span>
+            <span class="btn btn-primary">压缩</span>
+            <span class="btn btn-primary">指纹</span>
+            <span class="btn btn-primary">语法检查</span>
+            <span class="btn btn-primary">Alter合并</span>
+            <span class="btn btn-primary">EXP解析</span>
+          </div>
+        </div>
+        <div class="mt-20 container" style="height:600px;margin-left:0px;margin-right:0px;">
+          <div class="row" style="height:100%;">
+            <div class="col-md-6" style="padding-left:0px;height:100%;">
+              <div class="show-content"><textarea placeholder="输入SQL语句 ..." id="sql-edit" style="display:none"></textarea></div></div>
+              <div class="col-md-6" style="padding-right:0px;height:100%;">
+                <div class="show-content" style="height:100%; padding:10px;" id="soar-content"><span class="placegolder">soar结果展示 ...</span></div>
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+     new Vue({
+       el:'#vue-app',
+       methods:''
+     });
+    </script>
+    <script>
+      window.sqlEditor = CodeMirror.fromTextArea(document.getElementById("sql-edit"), {
+        mode: 'text/x-mysql',
+        styleActiveLine:true
+      });
+    </script>
+  </body>
+</html>
