@@ -24,6 +24,8 @@
       .show-content{height:100%;border:1px solid #ddd;}
       .placegolder,pre.CodeMirror-placeholder{color: #999;}
       .placegolder{font-size:16px; font-family: monospace;display:inline-block;padding:4px 0px;}
+      .show-content h1, .show-content h2, .show-content h3{margin-top:0px !important;margin-bottom:0px !important;}
+      .show-content h2{font-size:inherit !important;}
     </style>
   </head>
   <body>
@@ -45,13 +47,13 @@
             </select>
           </div>
           <div class="form-group ml-20">
-            <span class="btn btn-primary">SQL评估</span>
-            <span class="btn btn-primary">美化</span>
-            <span class="btn btn-primary">压缩</span>
-            <span class="btn btn-primary">指纹</span>
-            <span class="btn btn-primary">语法检查</span>
-            <span class="btn btn-primary">Alter合并</span>
-            <span class="btn btn-primary">EXP解析</span>
+            <span class="btn btn-primary" v-on:click="sqlAnalysis(1)">SQL评估</span>
+            <span class="btn btn-primary" v-on:click="sqlAnalysis(2)">美化</span>
+            <span class="btn btn-primary" v-on:click="sqlAnalysis(3)">压缩</span>
+            <span class="btn btn-primary" v-on:click="sqlAnalysis(4)">指纹</span>
+            <span class="btn btn-primary" v-on:click="sqlAnalysis(5)">语法检查</span>
+            <span class="btn btn-primary" v-on:click="sqlAnalysis(6)">Alter合并</span>
+            <span class="btn btn-primary" v-on:click="sqlAnalysis(7)">EXP解析</span>
           </div>
         </div>
         <div class="mt-20 container" style="height:600px;margin-left:0px;margin-right:0px;">
@@ -68,7 +70,13 @@
     <script>
      new Vue({
        el:'#vue-app',
-       methods:''
+       methods:{
+         sqlAnalysis:function(type){
+           $.get('soar-res.txt', function(res){
+             $('#soar-content').html(markdown.toHTML(res));
+           });
+         }
+       }
      });
     </script>
     <script>
