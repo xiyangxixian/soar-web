@@ -5,12 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script type="text/javascript" src="./js/jquery.min.js"></script>
+    <script type="text/javascript" src="./js/page.js"></script>
     <script type="text/javascript" src="./js/vue.min.js"></script>
-    <script type="text/javascript" src="./js/vue.min.js"></script>
-    <script type="text/javascript" src="./js/vue-router.js"></script>
     <script type="text/javascript" src="./js/codemirror.js"></script>
     <script type="text/javascript" src="./js/sql.js"></script>
-    <script type="text/javascript" src="./js/markdown.js"></script>
+    <script type="text/javascript" src="./js/showdown.js"></script>
     <script type="text/javascript" src="./js/placeholder.js"></script>
     <link rel="stylesheet" href="./css/bootstrap.min.css"/>
     <link rel="stylesheet" href="./css/codemirror.css"/>
@@ -24,16 +23,32 @@
       .show-content{height:100%;border:1px solid #ddd;}
       .placegolder,pre.CodeMirror-placeholder{color: #999;}
       .placegolder{font-size:16px; font-family: monospace;display:inline-block;padding:4px 0px;}
-      .show-content h1, .show-content h2, .show-content h3{margin-top:0px !important;margin-bottom:0px !important;}
-      .show-content h2{font-size:inherit !important;}
+      
+      .show-markdown h1, .show-markdown h2, .show-markdown h3{margin-top:0px !important;margin-bottom:0px !important;}
+      .show-markdown h2{font-size:20px !important;margin:30px 0px 20px 0px !important;padding-bottom: 5px;border-bottom: 1px solid #919699;}
+      .show-markdown h1{font-size:24px !important;margin:20px 0px !important;}
+      .show-markdown h3{font-size:16px !important;margin:16px 0px !important;}
+      .show-markdown h4{font-size:14px !important;}
+      .show-markdown p{margin-bottom: 10px !important;}
+      
+      .show-markdown h1,.show-markdown h2,.show-markdown h3,.show-markdown h4,.show-markdown h5,.show-markdown h6 {
+        font-family: "Myriad Pro","Lucida Grande",Lucida,Verdana,sans-serif;
+      }
+      
+      .show-markdown{overflow-x:auto;}
+      .show-markdown table td, .show-markdown table th {font-size: 12px;border-bottom: 1px solid #919699;border-right: 1px solid #919699;}
+      .show-markdown table{border-top: 1px solid #919699;border-left: 1px solid #919699;border-spacing: 0;}
+      .show-markdown table th {padding: 4px 8px;background: #E2E2E2;}
+      .show-markdown table td {padding: 8px;vertical-align: top;}
+      [v-cloak]{display:none;}
     </style>
   </head>
   <body>
-    <div style="width:1200px;margin:auto;" id="vue-app">
+    <div style="width:1200px;margin:auto;" id="vue-app" v-cloak>
       <header style="margin:20px 0px;">
         <ul class="nav nav-tabs">
-          <li role="presentation" class="active"><a href="#">sql分析</a></li>
-          <li role="presentation"><a href="#">soar配置</a></li>
+          <li role="presentation" class="active"><a href="javascript:;">sql分析</a></li>
+          <li role="presentation"><a href="javascript:;">soar配置</a></li>
         </ul>
       </header>
       <div class="content">
@@ -58,22 +73,28 @@
         </div>
         <div class="mt-20 container" style="height:600px;margin-left:0px;margin-right:0px;">
           <div class="row" style="height:100%;">
-            <div class="col-md-6" style="padding-left:0px;height:100%;">
-              <div class="show-content"><textarea placeholder="输入SQL语句 ..." id="sql-edit" style="display:none"></textarea></div></div>
-              <div class="col-md-6" style="padding-right:0px;height:100%;">
-                <div class="show-content" style="height:100%; padding:10px;" id="soar-content"><span class="placegolder">soar结果展示 ...</span></div>
-              </div>
+            <div class="col-md-5" style="padding-left:0px;height:100%;">
+              <div class="show-content"><textarea placeholder="输入SQL语句 ..." id="sql-edit" style="display:none"></textarea></div>
+            </div>
+            <div class="col-md-7" style="padding-right:0px;height:100%;">
+              <div class="show-content show-markdown" style="height:100%; padding:10px;" id="soar-content"><span class="placegolder">soar结果展示 ...</span></div>
+            </div>
           </div>
         </div>
       </div>
+      <div class="content">
+        
+      </div>
     </div>
     <script>
+    var converter = new showdown.Converter();
+    converter.setOption('tables', true);
      new Vue({
        el:'#vue-app',
        methods:{
          sqlAnalysis:function(type){
            $.get('soar-res.txt', function(res){
-             $('#soar-content').html(markdown.toHTML(res));
+             $('#soar-content').html(converter.makeHtml(res));
            });
          }
        }
