@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script type="text/javascript" src="./js/jquery.min.js"></script>
     <script type="text/javascript" src="./js/page.js"></script>
+    <script type="text/javascript" src="./lib/layui/layui.all.js"></script>
     <script type="text/javascript" src="./js/vue.min.js"></script>
     <script type="text/javascript" src="./js/codemirror.js"></script>
     <script type="text/javascript" src="./js/sql.js"></script>
@@ -88,7 +89,7 @@
       <div class="content" v-show="router=='/config'">
         <div class=" form-inline mb-20">
           <div class="form-group">
-            <span class="btn btn-primary" v-on:click="">添加配置</span>
+            <span class="btn btn-primary" v-on:click="soarEdit(-1)">添加配置</span>
           </div>
         </div>
         <table class="table table-bordered table-hover">
@@ -109,12 +110,47 @@
               <td class="text-center">{{item.testDsn||'--'}}</td>
               <td class="text-center">
                 <span class="glyphicon glyphicon-pencil ponter"></span>
-                <span v-show="index!=0" class="glyphicon glyphicon-trash ponter"></span>
+                <span v-show="index!=0" class="glyphicon glyphicon-trash ponter" v-on:click="soarEdit(index)"></span>
               </td>
             </tr>
           </tbody>
         </table>
       </div>
+      <div id="soar-edit-tpl" style="display:none">
+        <div class="mt-20" style="overflow-x:hidden;padding-left:16px;">
+          <form class="form-horizontal">
+            <div class="form-group">
+              <label class="col-md-4 control-label">线上环境数据库配置(online-dsn)</label>
+              <div class="col-md-7">
+                <input type="text" class="form-control" placeholder="user:password@host:port/database">
+              </div>
+              <div class="col-md-1"></div>
+            </div>
+            <div class="form-group">
+              <label class="col-md-4 control-label">测试环境数据库配置(test-dsn)</label>
+              <div class="col-md-7">
+                <input type="text" class="form-control" placeholder="">
+              </div>
+              <div class="col-md-1"></div>
+            </div>
+            <div class="form-group">
+              <label class="col-md-4 control-label">允许线上环境当作测试环境(allow-online-as-test)</label>
+              <div class="col-md-7">
+                <label class="radio-inline">
+                  <input type="radio" name="allow-online-as-test" value="false"> 默认
+                </label>
+                <label class="radio-inline">
+                  <input type="radio" name="allow-online-as-test" value="true"> 是
+                </label>
+                <label class="radio-inline">
+                  <input type="radio" name="allow-online-as-test" value="false"> 否
+                </label>
+              </div>
+              <div class="col-md-1"></div>
+            </div>
+          </form>
+        </div>
+      <div>
     </div>
     <script>
       (function (){
@@ -141,7 +177,8 @@
           el:'#vue-app',
           data:{
             router:'',
-            configs: []
+            configs: [],
+            itemConfig:{}
           },
           methods:{
             sqlAnalysis:function(type){
@@ -151,6 +188,19 @@
             },
             clear:function(){
               $('#soar-content').html('<span class="placegolder">soar结果展示 ...</span>');
+            },
+            soarEdit:function (){
+              layer.open({
+                type: 1,
+                title: 'soar 配置编辑',
+                area : ['1000px' , '600px'],
+                content: $('#soar-edit-tpl'),
+                cancel:function (){
+                  $('#soar-edit-tpl').hide();
+                }
+              });
+            },
+            soarSave:function(){
             }
           }
         });
