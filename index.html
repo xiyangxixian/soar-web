@@ -40,6 +40,8 @@
       .show-markdown table{border-top: 1px solid #919699;border-left: 1px solid #919699;border-spacing: 0;}
       .show-markdown table th {padding: 4px 8px;background: #E2E2E2;}
       .show-markdown table td {padding: 8px;vertical-align: top;}
+      
+      .ponter{cursor: pointer}
       [v-cloak]{display:none;}
     </style>
   </head>
@@ -47,11 +49,11 @@
     <div style="width:1200px;margin:auto;" id="vue-app" v-cloak>
       <header style="margin:20px 0px;">
         <ul class="nav nav-tabs">
-          <li role="presentation" class="active"><a href="javascript:;">sql分析</a></li>
-          <li role="presentation"><a href="javascript:;">soar配置</a></li>
+          <li role="presentation" v-bind:class="{active:router=='/analysis'}"><a href="#/analysis">sql分析</a></li>
+          <li role="presentation" v-bind:class="{active:router=='/config'}"><a href="#/config">soar配置</a></li>
         </ul>
       </header>
-      <div class="content">
+      <div class="content" v-show="router=='/analysis'">
         <div class=" form-inline">
           <div class="form-group">
             <label>配置模板：</label>
@@ -69,6 +71,7 @@
             <span class="btn btn-primary" v-on:click="sqlAnalysis(5)">语法检查</span>
             <span class="btn btn-primary" v-on:click="sqlAnalysis(6)">Alter合并</span>
             <span class="btn btn-primary" v-on:click="sqlAnalysis(7)">EXP解析</span>
+            <span class="btn btn-danger ml-20" v-on:click="clear()">清空</span>
           </div>
         </div>
         <div class="mt-20 container" style="height:600px;margin-left:0px;margin-right:0px;">
@@ -82,29 +85,98 @@
           </div>
         </div>
       </div>
-      <div class="content">
-        
+      <div class="content" v-show="router=='/config'">
+        <div class=" form-inline mb-20">
+          <div class="form-group">
+            <span class="btn btn-primary" v-on:click="">添加配置</span>
+          </div>
+        </div>
+        <table class="table table-bordered table-hover">
+          <thead>
+            <tr>
+              <th class="text-center" width="18%">编号</th>
+              <th class="text-center" width="18%">模板名称</th>
+              <th class="text-center" width="23%">online-dsn</th>
+              <th class="text-center" width="23%">test-dsn</th>
+              <th class="text-center" width="18%">操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item, index) in configs">
+              <td class="text-center">{{index+1}}</td>
+              <td class="text-center">{{item.name||'-'}}</td>
+              <td class="text-center">{{item.onlineDsn||'--'}}</td>
+              <td class="text-center">{{item.testDsn||'--'}}</td>
+              <td class="text-center">
+                <span class="glyphicon glyphicon-pencil ponter"></span>
+                <span v-show="index!=0" class="glyphicon glyphicon-trash ponter"></span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
     <script>
-    var converter = new showdown.Converter();
-    converter.setOption('tables', true);
-     new Vue({
-       el:'#vue-app',
-       methods:{
-         sqlAnalysis:function(type){
-           $.get('soar-res.txt', function(res){
-             $('#soar-content').html(converter.makeHtml(res));
-           });
-         }
-       }
-     });
-    </script>
-    <script>
-      window.sqlEditor = CodeMirror.fromTextArea(document.getElementById("sql-edit"), {
-        mode: 'text/x-mysql',
-        styleActiveLine:true
-      });
+      (function (){
+        function getSoarConfig(){
+          var configs = localStorage.getItem('soar_config');
+          try {
+            if (configs) configs = JSON.parse(configs);
+          } catch (e) {
+            configs = null;
+          }
+          if (!$.isArray(configs) || configs.length == 0) {
+            configs = []; 
+            configs.push({
+              name:'默认模板',
+              onlineDsn:'',
+              testDsn:''
+            });
+            localStorage.setItem('soar_config', JSON.stringify(configs));
+          }
+          return configs;
+        }
+        
+        var vueApp = new Vue({
+          el:'#vue-app',
+          data:{
+            router:'',
+            configs: []
+          },
+          methods:{
+            sqlAnalysis:function(type){
+              $.post('soar-res.txt', {sql:window.sqlEditor.getValue()}, function(res){
+                $('#soar-content').html(converter.makeHtml(res));
+              });
+            },
+            clear:function(){
+              $('#soar-content').html('<span class="placegolder">soar结果展示 ...</span>');
+            }
+          }
+        });
+        
+        var converter = new showdown.Converter();
+        converter.setOption('tables', true);
+        window.sqlEditor = CodeMirror.fromTextArea(document.getElementById("sql-edit"), {
+          mode: 'text/x-mysql',
+          styleActiveLine:true
+        });
+        
+        if (window.location.pathname != '' || window.location.pathname != '/') page.base(window.location.pathname + '#');
+        page('/analysis', function (ctx){
+          vueApp.router = '/analysis';
+          vueApp.configs = getSoarConfig();
+        });
+        page('/config', function (){
+          vueApp.router = '/config';
+          vueApp.configs = getSoarConfig();
+
+        });
+        page('*', function (ctx){
+            page.redirect('/analysis');
+        });
+        page.start();
+      })();
     </script>
   </body>
 </html>
