@@ -17,6 +17,7 @@
     <style>
       .w-100{width: 100px !important;}
       .w-150{width: 150px !important;}
+      .w-200{width: 200px !important;}
       .ml-20{margin-left:20px !important;}
       .mt-20{margin-top:20px !important;}
       .mb-20{margin-bottom:20px !important;}
@@ -58,10 +59,8 @@
         <div class=" form-inline">
           <div class="form-group">
             <label>配置模板：</label>
-            <select class="form-control w-150">
-              <option value="1">配置1</option>
-              <option value="2">配置2</option>
-              <option value="3">配置3</option>
+            <select class="form-control w-200" v-model="curConfig">
+              <option v-for="(item, index) in configs" v-bind:value="index">{{item.name}}</option>
             </select>
           </div>
           <div class="form-group ml-20">
@@ -137,13 +136,13 @@
               <label class="col-md-4 control-label">允许线上环境当作测试环境(allow-online-as-test)</label>
               <div class="col-md-7">
                 <label class="radio-inline">
-                  <input type="radio" name="allow-online-as-test" value="false"> 默认
+                  <input type="radio" name="allow-online-as-test" ng-model="itemConfig['allow-online-as-test']"> 默认
                 </label>
                 <label class="radio-inline">
-                  <input type="radio" name="allow-online-as-test" value="true"> 是
+                  <input type="radio" name="allow-online-as-test" ng-model="itemConfig['allow-online-as-test']"> 是
                 </label>
                 <label class="radio-inline">
-                  <input type="radio" name="allow-online-as-test" value="false"> 否
+                  <input type="radio" name="allow-online-as-test" ng-model="itemConfig['allow-online-as-test']"> 否
                 </label>
               </div>
               <div class="col-md-1"></div>
@@ -178,6 +177,7 @@
           data:{
             router:'',
             configs: [],
+            curConfig: 0,
             itemConfig:{}
           },
           methods:{
@@ -220,7 +220,6 @@
         page('/config', function (){
           vueApp.router = '/config';
           vueApp.configs = getSoarConfig();
-
         });
         page('*', function (ctx){
             page.redirect('/analysis');
