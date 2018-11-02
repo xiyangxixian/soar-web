@@ -4,6 +4,7 @@
     <title>soar web</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--js 库文件-->
     <script type="text/javascript" src="./js/jquery.min.js"></script>
     <script type="text/javascript" src="./js/page.js"></script>
     <script type="text/javascript" src="./lib/layui/layui.all.js"></script>
@@ -12,9 +13,11 @@
     <script type="text/javascript" src="./js/sql.js"></script>
     <script type="text/javascript" src="./js/showdown.js"></script>
     <script type="text/javascript" src="./js/placeholder.js"></script>
+    <!--css库文件-->
     <link rel="stylesheet" href="./css/bootstrap.min.css"/>
     <link rel="stylesheet" href="./css/codemirror.css"/>
     <style>
+      /*公共样式*/
       .w-100{width: 100px !important;}
       .w-150{width: 150px !important;}
       .w-200{width: 200px !important;}
@@ -27,7 +30,10 @@
       .show-content{height:100%;border:1px solid #ddd;}
       .placegolder,pre.CodeMirror-placeholder{color: #999;}
       .placegolder{font-size:16px; font-family: monospace;display:inline-block;padding:4px 0px;}
+      .ponter{cursor: pointer}
+      [v-cloak]{display:none;}
       
+      /*markdown 样式*/
       .show-markdown h1, .show-markdown h2, .show-markdown h3{margin-top:0px !important;margin-bottom:0px !important;}
       .show-markdown h2{font-size:20px !important;margin:30px 0px 20px 0px !important;padding-bottom: 5px;border-bottom: 1px solid #919699;}
       .show-markdown h1{font-size:24px !important;margin:20px 0px !important;}
@@ -45,18 +51,19 @@
       .show-markdown table th {padding: 4px 8px;background: #E2E2E2;}
       .show-markdown table td {padding: 8px;vertical-align: top;}
       
-      .ponter{cursor: pointer}
-      [v-cloak]{display:none;}
     </style>
   </head>
   <body>
     <div style="width:1200px;margin:auto;" id="vue-app" v-cloak>
+      <!--导航-->
       <header style="margin:20px 0px;">
         <ul class="nav nav-tabs">
           <li role="presentation" v-bind:class="{active:router=='/analysis'}"><a href="#/analysis">sql分析</a></li>
           <li role="presentation" v-bind:class="{active:router=='/config'}"><a href="#/config">soar配置</a></li>
         </ul>
       </header>
+      <!--导航-->
+      <!--sql 分析页面-->
       <div class="content" v-show="router=='/analysis'">
         <div class=" form-inline">
           <div class="form-group">
@@ -65,6 +72,7 @@
               <option v-for="(item, index) in configs" v-bind:value="index">{{item.name}}</option>
             </select>
           </div>
+          <!--sql 选项菜单-->
           <div class="form-group ml-20">
             <span class="btn btn-primary" v-on:click="sqlAnalysis(1)">SQL评估</span>
             <span class="btn btn-primary" v-on:click="sqlAnalysis(2)">美化</span>
@@ -72,21 +80,25 @@
             <span class="btn btn-primary" v-on:click="sqlAnalysis(4)">指纹</span>
             <span class="btn btn-primary" v-on:click="sqlAnalysis(5)">语法检查</span>
             <span class="btn btn-primary" v-on:click="sqlAnalysis(6)">Alter合并</span>
-            <span class="btn btn-primary" v-on:click="sqlAnalysis(7)">EXP解析</span>
+            <!--<span class="btn btn-primary" v-on:click="sqlAnalysis(7)">EXP解析</span>-->
             <span class="btn btn-danger ml-20" v-on:click="clear()">清空</span>
           </div>
         </div>
         <div class="mt-20 container" style="height:600px;margin-left:0px;margin-right:0px;">
           <div class="row" style="height:100%;">
+            <!--sql 语句输入-->
             <div class="col-md-5" style="padding-left:0px;height:100%;">
               <div class="show-content"><textarea placeholder="输入SQL语句 ..." id="sql-edit" style="display:none"></textarea></div>
             </div>
+            <!--服务器返回展示-->
             <div class="col-md-7" style="padding-right:0px;height:100%;">
               <div class="show-content show-markdown" style="height:100%; padding:10px;" id="soar-content"><span class="placegolder">soar结果展示 ...</span></div>
             </div>
           </div>
         </div>
       </div>
+      <!--sql 分析页面-->
+      <!--soar 配置页面-->
       <div class="content" v-show="router=='/config'">
         <div class=" form-inline mb-20">
           <div class="form-group">
@@ -95,6 +107,7 @@
             <span class="btn btn-primary">导入配置</span>
           </div>
         </div>
+        <!--soar 配置列表-->
         <table class="table table-bordered table-hover">
           <thead>
             <tr>
@@ -119,7 +132,10 @@
             </tr>
           </tbody>
         </table>
+        <!--soar 配置列表-->
       </div>
+      <!--soar 配置页面-->
+      <!--soar 配置编辑弹窗-->
       <div id="soar-edit-tpl" style="display:none">
         <div class="mt-20" style="overflow-x:hidden;padding-left:16px;">
           <form class="form-horizontal">
@@ -198,13 +214,19 @@
           </form>
         </div>
       </div>
+      <!--soar 配置编辑弹窗-->
     </div>
     <script>
       (function (){
+        // 设置soar 配置默认选项
         var defaultConfig = {
           'allow-online-as-test' : '',
           'sampling':''
         };
+        //请求的api
+        var api = 'soar-markdown.txt';
+        
+        //获取soar 配置项列表， 如果没有则初始化一条默认，配置
         function getSoarConfig(){
           var configs = localStorage.getItem('soar_config');
           try {
@@ -224,6 +246,7 @@
           return configs;
         }
         
+        //存储soar配置项列表
         function saveSoarConfig(configs){
           localStorage.setItem('soar_config', JSON.stringify(configs));
         }
@@ -238,6 +261,7 @@
             editId:-1
           },
           methods:{
+            //根据sql分析选项， 进行补贴的展示
             sqlAnalysis:function(type){
               var query = window.sqlEditor.getValue();
               if (!query) {
@@ -245,12 +269,15 @@
                 return false;
               }
               var data = {};
+              //默认当做html展示
               var curFormat = function (res){
                 $('#soar-content').html(res);
               };
+              //markdown转html展示
               var markdownFormat = function (res){
                 $('#soar-content').html(converter.makeHtml(res));
               };
+              //用富文本框展示sql 并且高亮显示
               var textEditFormat = function(res){
                 $('#soar-content').html('<textarea id="sql-show"></textarea></span>');
                 var editor = CodeMirror.fromTextArea($('#soar-content #sql-show')[0], {
@@ -261,23 +288,29 @@
                 editor.setValue(res.trim());
               };
               switch(type){
-                case 1:
+                case 1://sql 分析评估
                   curFormat = markdownFormat;
                   break;
-                case 2:
+                case 2://sql 梅花
                   curFormat = textEditFormat;
                   data['report-type'] = 'pretty';
                   break;
-                case 3:
+                case 3://压缩
                   curFormat = textEditFormat;
                   data['report-type'] = 'compress';
                   break;
-                case 4:
+                case 4://指纹
                   curFormat = textEditFormat;
                   data['report-type'] = 'fingerprint';
                   break;
-                case 5:
+                case 5://语法检查
+                  curFormat = textEditFormat;
                   data['only-syntax-check'] = 'true';
+                  break;
+                case 6: //alret 合并
+                  curFormat = textEditFormat;
+                  data['report-type'] = 'rewrite';
+                  data['rewrite-rules'] = 'mergealter';
                   break;
               }
               data.query = query;
@@ -286,7 +319,8 @@
                 if(i == 'name') continue;
                 if (config[i]) data[i] = config[i];
               }
-              $.post('soar-markdown.txt', data, function(res){
+              //提交请求， 根据具体api酌情修改
+              $.post(api, data, function(res){
                 var json;
                 try {
                   json = JSON.parse(res);
@@ -300,14 +334,17 @@
                 }
               });
             },
+            //清除结果展示
             clear:function(){
               $('#soar-content').html('<span class="placegolder">soar结果展示 ...</span>');
             },
+            //初始化配置
             initConfig:function (){
               for(var i in defaultConfig){
                 if (!this.itemConfig[i]) this.itemConfig[i] = defaultConfig[i];
               }
             },
+            //soar 编辑弹窗打开
             soarEdit:function (id){
               this.itemConfig = {};
               if (id >= 0) this.itemConfig = $.extend(this.itemConfig, this.configs[id]);
@@ -323,6 +360,7 @@
               });
               this.editId = id;
             },
+            //soar 配置编辑帮助提示弹窗打开
             showHelp:function(key){
               switch(key) {
                 case 'blacklist':
@@ -332,6 +370,7 @@
                   break
               }
             },
+            //保存配置
             soarSave:function(){
               if (!this.itemConfig['name']) {
                 layer.msg('配置名称不能为空', {time:1000});
@@ -353,12 +392,14 @@
               layer.msg('保存成功', {time:1000});
               return true;
             },
+            //删除配置
             soarDel:function(id){
               layer.confirm('确定删除？', function(index){
                 vueApp.configs.splice(id, 1);
                 layer.close(index);
               });
             },
+            //复制配置项
             soarCopy:function(id){
               layer.prompt({title:'请输入模板名称'},function(value, index){
                 vueApp.editId = -1;
@@ -372,6 +413,7 @@
           }
         });
         
+        //初始化sql编辑器
         var converter = new showdown.Converter();
         converter.setOption('tables', true);
         window.sqlEditor = CodeMirror.fromTextArea(document.getElementById("sql-edit"), {
@@ -379,15 +421,20 @@
           styleActiveLine:true
         });
         
+        //前端录音初始化目录
         if (window.location.pathname != '' || window.location.pathname != '/') page.base(window.location.pathname + '#');
+        
+        //sql分析页面回调
         page('/analysis', function (ctx){
           vueApp.router = '/analysis';
           vueApp.configs = getSoarConfig();
         });
+        //soar配置页面回调
         page('/config', function (){
           vueApp.router = '/config';
           vueApp.configs = getSoarConfig();
         });
+        //默认路由
         page('*', function (ctx){
             page.redirect('/analysis');
         });
