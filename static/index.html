@@ -18,6 +18,8 @@
       .w-100{width: 100px !important;}
       .w-150{width: 150px !important;}
       .w-200{width: 200px !important;}
+      .ml-5{margin-left:5px !important;}
+      .mr-5{margin-right:5px !important;}
       .ml-20{margin-left:20px !important;}
       .mt-20{margin-top:20px !important;}
       .mb-20{margin-bottom:20px !important;}
@@ -95,7 +97,7 @@
           <thead>
             <tr>
               <th class="text-center" width="18%">编号</th>
-              <th class="text-center" width="18%">模板名称</th>
+              <th class="text-center" width="18%">配置名称</th>
               <th class="text-center" width="23%">online-dsn</th>
               <th class="text-center" width="23%">test-dsn</th>
               <th class="text-center" width="18%">操作</th>
@@ -105,11 +107,12 @@
             <tr v-for="(item, index) in configs">
               <td class="text-center">{{index+1}}</td>
               <td class="text-center">{{item.name||'-'}}</td>
-              <td class="text-center">{{item.onlineDsn||'--'}}</td>
-              <td class="text-center">{{item.testDsn||'--'}}</td>
+              <td class="text-center">{{item['online-dsn']||'--'}}</td>
+              <td class="text-center">{{item['test-dsn']||'--'}}</td>
               <td class="text-center">
-                <span class="glyphicon glyphicon-pencil ponter"></span>
-                <span v-show="index!=0" class="glyphicon glyphicon-trash ponter" v-on:click="soarEdit(index)"></span>
+                <span class="glyphicon glyphicon-pencil ponter" v-on:click="soarEdit(index)"></span>
+                <span v-show="index!=0" class="ml-5 glyphicon glyphicon-trash ponter" v-on:click="soarDel(index)"></span>
+                <span class="ml-5 glyphicon glyphicon-copy ponter"v-on:click="soarCopy(index)" title="点击复制"></span>
               </td>
             </tr>
           </tbody>
@@ -118,6 +121,13 @@
       <div id="soar-edit-tpl" style="display:none">
         <div class="mt-20" style="overflow-x:hidden;padding-left:16px;">
           <form class="form-horizontal">
+            <div class="form-group">
+              <label class="col-md-4 control-label">配置名称</label>
+              <div class="col-md-7">
+                <input type="text" class="form-control" v-model="itemConfig['name']">
+              </div>
+              <div class="col-md-1"></div>
+            </div>
             <div class="form-group">
               <label class="col-md-4 control-label">线上环境数据库配置(online-dsn)</label>
               <div class="col-md-7">
@@ -150,10 +160,10 @@
             <div class="form-group">
               <label class="col-md-4 control-label">黑名单列表(blacklist)</label>
               <div class="col-md-7">
-                <textarea class="form-control" placeholder="blacklist中的SQL不会被评审，可以是指纹，也可以是正则" v-model="itemConfig['blacklist']"></textarea>
+                <textarea rows="3" class="form-control" placeholder="blacklist中的SQL不会被评审，可以是指纹，也可以是正则， 一行一个" v-model="itemConfig['blacklist']"></textarea>
               </div>
               <div class="col-md-1">
-                <span v-on:click="showHelp('blacklist')" class="glyphicon glyphicon-question-sign"></span>
+                <span v-on:click="showHelp('blacklist')" class="glyphicon glyphicon-question-sign ponter" style="color:#f0ad4e"></span>
               </div>
             </div>
             <div class="form-group">
@@ -179,13 +189,11 @@
               </div>
               <div class="col-md-1"></div>
             </div>
-            
             <div class="form-group">
               <div class="col-md-offset-4 col-md-8">
                 <span v-on:click="soarSave()" class="btn btn-primary">提&nbsp;&nbsp;&nbsp;&nbsp;交</span>
               </div>
             </div>
-            
           </form>
         </div>
       <div>
@@ -194,7 +202,7 @@
       (function (){
         var defaultConfig = {
           'allow-online-as-test' : '',
-          'only-syntax-check' : ''
+          'sampling':''
         };
         function getSoarConfig(){
           var configs = localStorage.getItem('soar_config');
@@ -206,13 +214,17 @@
           if (!$.isArray(configs) || configs.length == 0) {
             configs = []; 
             configs.push({
-              name:'默认模板',
-              onlineDsn:'',
-              testDsn:''
+              'name': '默认配置',
+              'online-dsn':'',
+              'test-dsn':''
             });
             localStorage.setItem('soar_config', JSON.stringify(configs));
           }
           return configs;
+        }
+        
+        function saveSoarConfig(configs){
+          localStorage.setItem('soar_config', JSON.stringify(configs));
         }
         
         var vueApp = new Vue({
@@ -221,10 +233,17 @@
             router:'',
             configs: [],
             curConfig: 0,
-            itemConfig:{}
+            itemConfig:{},
+            editId:-1
           },
           methods:{
             sqlAnalysis:function(type){
+              var query = window.sqlEditor.getValue();
+              if (!query) layer.msg('');
+              
+              var data = {};
+              data.query;
+              
               $.post('soar-res.txt', {sql:window.sqlEditor.getValue()}, function(res){
                 $('#soar-content').html(converter.makeHtml(res));
               });
@@ -232,37 +251,74 @@
             clear:function(){
               $('#soar-content').html('<span class="placegolder">soar结果展示 ...</span>');
             },
-            soarEdit:function (){
-              initConfig();
+            initConfig:function (){
+              for(var i in defaultConfig){
+                if (!this.itemConfig[i]) this.itemConfig[i] = defaultConfig[i];
+              }
+            },
+            soarEdit:function (id){
+              this.itemConfig = {};
+              if (id >= 0) this.itemConfig = $.extend(this.itemConfig, this.configs[id]);
+              this.initConfig();
               layer.open({
                 type: 1,
                 title: 'soar 配置编辑',
-                area : ['1000px' , '600px'],
+                area : ['1000px' , '500px'],
                 content: $('#soar-edit-tpl'),
                 cancel:function (){
                   $('#soar-edit-tpl').hide();
                 }
               });
+              this.editId = id;
             },
             showHelp:function(key){
               switch(key) {
                 case 'blacklist':
-                  layer.open();
+                  layer.open({
+                    'content' :'# 这是一个黑名单例子\n## 不评审常见的SET， SHOW， SELECT CONST等完美请求\n^set.*\n^show.*\n^select \?$\n^\/\*.*\*\/$\n^drop.*\n^lock.*\n^unlock.*'.replace(/\n/g,'<br>')
+                  });
                   break
               }
             },
             soarSave:function(){
-              console.log(vueApp.itemConfig['allow-online-as-test']);
+              if (!this.itemConfig['name']) {
+                layer.msg('配置名称不能为空', {time:1000});
+                return false;
+              }
+              for(var i=0;i<this.configs.length;i++){
+                var item = this.configs[i];
+                if (item.name==this.itemConfig['name'] && this.editId != i) {
+                  layer.msg('配置名称不能重复', {time:1000});
+                  return false;
+                }
+              }
+              if (this.editId < 0) {
+                this.configs.push(this.itemConfig);
+              } else {
+                Vue.set(this.configs, this.editId, $.extend({}, this.itemConfig));
+              }
+              saveSoarConfig(this.configs);
+              layer.msg('保存成功', {time:1000});
+              return true;
+            },
+            soarDel:function(id){
+              layer.confirm('确定删除？', function(index){
+                vueApp.configs.splice(id, 1);
+                layer.close(index);
+              });
+            },
+            soarCopy:function(id){
+              layer.prompt({title:'请输入模板名称'},function(value, index){
+                vueApp.editId = -1;
+                vueApp.itemConfig = {};
+                vueApp.itemConfig = $.extend(vueApp.itemConfig, vueApp.configs[id]);
+                vueApp.initConfig();
+                vueApp.itemConfig.name = value;
+                if (vueApp.soarSave()) layer.close(index);
+              });
             }
           }
         });
-        vueApp.soarEdit(-1);
-        
-        function initConfig(){
-          for(var i in defaultConfig){
-            if (!vueApp[i]) vueApp.itemConfig[i] = defaultConfig[i];
-          }
-        };
         
         var converter = new showdown.Converter();
         converter.setOption('tables', true);
