@@ -128,7 +128,7 @@
             <div class="form-group">
               <label class="col-md-4 control-label">测试环境数据库配置(test-dsn)</label>
               <div class="col-md-7">
-                <input type="text" class="form-control" placeholder="">
+                <input type="text" class="form-control" placeholder="user:password@host:port/database">
               </div>
               <div class="col-md-1"></div>
             </div>
@@ -136,23 +136,80 @@
               <label class="col-md-4 control-label">允许线上环境当作测试环境(allow-online-as-test)</label>
               <div class="col-md-7">
                 <label class="radio-inline">
-                  <input type="radio" name="allow-online-as-test" ng-model="itemConfig['allow-online-as-test']"> 默认
+                  <input type="radio" name="allow-online-as-test" value="" v-model="itemConfig['allow-online-as-test']"> 默认
                 </label>
                 <label class="radio-inline">
-                  <input type="radio" name="allow-online-as-test" ng-model="itemConfig['allow-online-as-test']"> 是
+                  <input type="radio" name="allow-online-as-test" value="true" v-model="itemConfig['allow-online-as-test']"> 是
                 </label>
                 <label class="radio-inline">
-                  <input type="radio" name="allow-online-as-test" ng-model="itemConfig['allow-online-as-test']"> 否
+                  <input type="radio" name="allow-online-as-test" value="false" v-model="itemConfig['allow-online-as-test']"> 否
                 </label>
               </div>
               <div class="col-md-1"></div>
             </div>
+            <div class="form-group">
+              <label class="col-md-4 control-label">黑名单列表(blacklist)</label>
+              <div class="col-md-7">
+                <input type="text" class="form-control" placeholder="blacklist中的SQL不会被评审，可以是指纹，也可以是正则">
+              </div>
+              <div class="col-md-1"></div>
+            </div>
+            <div class="form-group">
+              <label class="col-md-4 control-label">只做语法检查不输出优化建议(only-syntax-check)</label>
+              <div class="col-md-7">
+                <label class="radio-inline">
+                  <input type="radio" name="only-syntax-check" value="" v-model="itemConfig['only-syntax-check']"> 默认
+                </label>
+                <label class="radio-inline">
+                  <input type="radio" name="only-syntax-check" value="true" v-model="itemConfig['only-syntax-check']"> 是
+                </label>
+                <label class="radio-inline">
+                  <input type="radio" name="only-syntax-check" value="false" v-model="itemConfig['only-syntax-check']"> 否
+                </label>
+              </div>
+              <div class="col-md-1"></div>
+            </div>
+            
+            <div class="form-group">
+              <label class="col-md-4 control-label">是否开启数据采样(sampling)</label>
+              <div class="col-md-7">
+                <label class="radio-inline">
+                  <input type="radio" name="only-syntax-check" value="" v-model="itemConfig['sampling']"> 默认
+                </label>
+                <label class="radio-inline">
+                  <input type="radio" name="only-syntax-check" value="true" v-model="itemConfig['sampling']"> 是
+                </label>
+                <label class="radio-inline">
+                  <input type="radio" name="only-syntax-check" value="false" v-model="itemConfig['sampling']"> 否
+                </label>
+              </div>
+              <div class="col-md-1"></div>
+            </div>
+            
+            <div class="form-group">
+              <label class="col-md-4 control-label">允许的数据库引擎(table-allow-engines)</label>
+              <div class="col-md-7">
+                <input type="text" class="form-control" placeholder="默认为 InnoDB">
+              </div>
+              <div class="col-md-1"></div>
+            </div>
+            
+            <div class="form-group">
+              <div class="col-md-offset-4 col-md-8">
+                <span v-on:click="soarSave()" class="btn btn-primary">提&nbsp;&nbsp;&nbsp;&nbsp;交</span>
+              </div>
+            </div>
+            
           </form>
         </div>
       <div>
     </div>
     <script>
       (function (){
+        var defaultConfig = {
+          'allow-online-as-test' : '',
+          'only-syntax-check' : ''
+        };
         function getSoarConfig(){
           var configs = localStorage.getItem('soar_config');
           try {
@@ -190,6 +247,7 @@
               $('#soar-content').html('<span class="placegolder">soar结果展示 ...</span>');
             },
             soarEdit:function (){
+              initConfig();
               layer.open({
                 type: 1,
                 title: 'soar 配置编辑',
@@ -201,9 +259,17 @@
               });
             },
             soarSave:function(){
+              console.log(vueApp.itemConfig['allow-online-as-test']);
             }
           }
         });
+        vueApp.soarEdit(-1);
+        
+        function initConfig(){
+          for(var i in defaultConfig){
+            if (!vueApp[i]) vueApp.itemConfig[i] = defaultConfig[i];
+          }
+        };
         
         var converter = new showdown.Converter();
         converter.setOption('tables', true);
