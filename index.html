@@ -121,14 +121,14 @@
             <div class="form-group">
               <label class="col-md-4 control-label">线上环境数据库配置(online-dsn)</label>
               <div class="col-md-7">
-                <input type="text" class="form-control" placeholder="user:password@host:port/database">
+                <input type="text" class="form-control" placeholder="user:password@host:port/database" v-model="itemConfig['online-dsn']">
               </div>
               <div class="col-md-1"></div>
             </div>
             <div class="form-group">
               <label class="col-md-4 control-label">测试环境数据库配置(test-dsn)</label>
               <div class="col-md-7">
-                <input type="text" class="form-control" placeholder="user:password@host:port/database">
+                <input type="text" class="form-control" placeholder="user:password@host:port/database" v-model="itemConfig['test-dsn']">
               </div>
               <div class="col-md-1"></div>
             </div>
@@ -150,26 +150,12 @@
             <div class="form-group">
               <label class="col-md-4 control-label">黑名单列表(blacklist)</label>
               <div class="col-md-7">
-                <input type="text" class="form-control" placeholder="blacklist中的SQL不会被评审，可以是指纹，也可以是正则">
+                <textarea class="form-control" placeholder="blacklist中的SQL不会被评审，可以是指纹，也可以是正则" v-model="itemConfig['blacklist']"></textarea>
               </div>
-              <div class="col-md-1"></div>
-            </div>
-            <div class="form-group">
-              <label class="col-md-4 control-label">只做语法检查不输出优化建议(only-syntax-check)</label>
-              <div class="col-md-7">
-                <label class="radio-inline">
-                  <input type="radio" name="only-syntax-check" value="" v-model="itemConfig['only-syntax-check']"> 默认
-                </label>
-                <label class="radio-inline">
-                  <input type="radio" name="only-syntax-check" value="true" v-model="itemConfig['only-syntax-check']"> 是
-                </label>
-                <label class="radio-inline">
-                  <input type="radio" name="only-syntax-check" value="false" v-model="itemConfig['only-syntax-check']"> 否
-                </label>
+              <div class="col-md-1">
+                <span class="glyphicon glyphicon-question-sign"></span>
               </div>
-              <div class="col-md-1"></div>
             </div>
-            
             <div class="form-group">
               <label class="col-md-4 control-label">是否开启数据采样(sampling)</label>
               <div class="col-md-7">
