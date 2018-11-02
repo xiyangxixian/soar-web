@@ -9,7 +9,7 @@
 import os
 import json
 import uuid
-from flask import Flask,request
+from flask import Flask,request,render_template
 from config import soar_args
 from config import BASE_DIR
 from core.parse import req_parse2cmd_parse
@@ -40,7 +40,9 @@ def hello_world():
     finally:
         os.remove(_tmpfile)
 
-
+@app.route('/',methods=['POST', 'GET'])
+def index():
+    return render_template('index.html')
 
 
 

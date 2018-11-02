@@ -2,3 +2,5 @@
 * text=auto
 __pycache__
 nbproject
+nbproject
+.vscode/
