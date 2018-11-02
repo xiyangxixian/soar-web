@@ -61,7 +61,7 @@
         <div class=" form-inline">
           <div class="form-group">
             <label>配置模板：</label>
-            <select class="form-control w-200" v-model="curConfig">
+            <select class="form-control w-200" v-model="curId">
               <option v-for="(item, index) in configs" v-bind:value="index">{{item.name}}</option>
             </select>
           </div>
@@ -91,6 +91,8 @@
         <div class=" form-inline mb-20">
           <div class="form-group">
             <span class="btn btn-primary" v-on:click="soarEdit(-1)">添加配置</span>
+            <span class="btn btn-primary">导出配置</span>
+            <span class="btn btn-primary">导入配置</span>
           </div>
         </div>
         <table class="table table-bordered table-hover">
@@ -195,7 +197,7 @@
             </div>
           </form>
         </div>
-      <div>
+      </div>
     </div>
     <script>
       (function (){
@@ -231,19 +233,71 @@
           data:{
             router:'',
             configs: [],
-            curConfig: 0,
+            curId: 0,
             itemConfig:{},
             editId:-1
           },
           methods:{
             sqlAnalysis:function(type){
               var query = window.sqlEditor.getValue();
-              if (!query) layer.msg('sql 不能为空', {time:1000});
+              if (!query) {
+                layer.msg('sql 不能为空', {time:1000});
+                return false;
+              }
               var data = {};
-              data.query = query;
-              
-              $.post('./soar-res.txt', {sql:window.sqlEditor.getValue()}, function(res){
+              var curFormat = function (res){
+                $('#soar-content').html(res);
+              };
+              var markdownFormat = function (res){
                 $('#soar-content').html(converter.makeHtml(res));
+              };
+              var textEditFormat = function(res){
+                $('#soar-content').html('<textarea id="sql-show"></textarea></span>');
+                var editor = CodeMirror.fromTextArea($('#soar-content #sql-show')[0], {
+                  mode: 'text/x-mysql',
+                  styleActiveLine:true,
+                  readOnly:true
+                });
+                editor.setValue(res.trim());
+              };
+              switch(type){
+                case 1:
+                  curFormat = markdownFormat;
+                  break;
+                case 2:
+                  curFormat = textEditFormat;
+                  data['report-type'] = 'pretty';
+                  break;
+                case 3:
+                  curFormat = textEditFormat;
+                  data['report-type'] = 'compress';
+                  break;
+                case 4:
+                  curFormat = textEditFormat;
+                  data['report-type'] = 'fingerprint';
+                  break;
+                case 5:
+                  data['only-syntax-check'] = 'true';
+                  break;
+              }
+              data.query = query;
+              var config = this.configs[this.curId] || {};
+              for(var i in config){
+                if(i == 'name') continue;
+                if (config[i]) data[i] = config[i];
+              }
+              $.post('soar-markdown.txt', data, function(res){
+                var json;
+                try {
+                  json = JSON.parse(res);
+                } catch (e) {
+                  json = {status:true, result:res};
+                }
+                if (json.status) {
+                  curFormat(json.result);
+                } else {
+                  layer.msg(json.result, {msg:1000});
+                }
               });
             },
             clear:function(){
