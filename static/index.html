@@ -4,16 +4,16 @@
     <title>soar web</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script type="text/javascript" src="./static/js/jquery.min.js"></script>
-    <script type="text/javascript" src="./static/js/page.js"></script>
-    <script type="text/javascript" src="./static/lib/layui/layui.all.js"></script>
-    <script type="text/javascript" src="./static/js/vue.min.js"></script>
-    <script type="text/javascript" src="./static/js/codemirror.js"></script>
-    <script type="text/javascript" src="./static/js/sql.js"></script>
-    <script type="text/javascript" src="./static/js/showdown.js"></script>
-    <script type="text/javascript" src="./static/js/placeholder.js"></script>
-    <link rel="stylesheet" href="./static/css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="./static/css/codemirror.css"/>
+    <script type="text/javascript" src="./js/jquery.min.js"></script>
+    <script type="text/javascript" src="./js/page.js"></script>
+    <script type="text/javascript" src="./lib/layui/layui.all.js"></script>
+    <script type="text/javascript" src="./js/vue.min.js"></script>
+    <script type="text/javascript" src="./js/codemirror.js"></script>
+    <script type="text/javascript" src="./js/sql.js"></script>
+    <script type="text/javascript" src="./js/showdown.js"></script>
+    <script type="text/javascript" src="./js/placeholder.js"></script>
+    <link rel="stylesheet" href="./css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="./css/codemirror.css"/>
     <style>
       .w-100{width: 100px !important;}
       .w-150{width: 150px !important;}
@@ -242,7 +242,7 @@
               var data = {};
               data.query = query;
               
-              $.post('./static/soar-res.txt', {sql:window.sqlEditor.getValue()}, function(res){
+              $.post('./soar-res.txt', {sql:window.sqlEditor.getValue()}, function(res){
                 $('#soar-content').html(converter.makeHtml(res));
               });
             },
