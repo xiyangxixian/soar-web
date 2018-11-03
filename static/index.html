@@ -103,8 +103,8 @@
         <div class=" form-inline mb-20">
           <div class="form-group">
             <span class="btn btn-primary" v-on:click="soarEdit(-1)">添加配置</span>
-            <span class="btn btn-primary">导出配置</span>
-            <span class="btn btn-primary">导入配置</span>
+            <span class="btn btn-primary" v-on:click="exportConfig()">导出配置</span>
+            <span class="btn btn-primary" v-on:click="showImportConfig()">导入配置</span>
           </div>
         </div>
         <!--soar 配置列表-->
@@ -136,8 +136,8 @@
       </div>
       <!--soar 配置页面-->
       <!--soar 配置编辑弹窗-->
-      <div id="soar-edit-tpl" style="display:none">
-        <div class="mt-20" style="overflow-x:hidden;padding-left:16px;">
+      <div id="soar-edit-tpl" style="display:none;padding:20px;">
+        <div style="overflow-x:hidden;">
           <form class="form-horizontal">
             <div class="form-group">
               <label class="col-md-4 control-label">配置名称</label>
@@ -215,6 +215,62 @@
         </div>
       </div>
       <!--soar 配置编辑弹窗-->
+      <!--soar 配置导出弹窗-->
+      <div id="soar-export-tpl" style="display:none;padding:20px;">
+        <textarea v-model="exportConfigJson" style="width:100%;height:320px;"></textarea>
+      </div>
+      <!--soar 配置导出弹窗-->
+      <!--soar 配置导入弹窗-->
+      <div id="soar-import-tpl" style="display:none;padding:20px;height:260px;">
+        <div style="overflow-x:hidden;padding-left:16px;">
+          <form class="form-horizontal">
+            <div class="form-group">
+              <label class="col-md-4 control-label">导入类型</label>
+              <div class="col-md-7">
+                <label class="radio-inline">
+                  <input type="radio" name="type" value="1" v-model="importConfig.type"> 文本
+                </label>
+                <label class="radio-inline">
+                  <input type="radio" name="type" value="2" v-model="importConfig.type"> 文件
+                </label>
+              </div>
+              <div class="col-md-1"></div>
+            </div>
+            <div class="form-group">
+              <label class="col-md-4 control-label">是否覆盖原有配置</label>
+              <div class="col-md-7">
+                <label class="radio-inline">
+                  <input type="radio" name="cover" value="0" v-model="importConfig.cover"> 否
+                </label>
+                <label class="radio-inline">
+                  <input type="radio" name="cover" value="1" v-model="importConfig.cover"> 是
+                </label>
+              </div>
+              <div class="col-md-1"></div>
+            </div>
+            <div v-if="importConfig.type==1" class="form-group">
+              <label class="col-md-4 control-label">导入内容</label>
+                <div class="col-md-7">
+                  <textarea rows="3" class="form-control" v-model="importConfig.content"></textarea>
+                </div>
+              <div class="col-md-1"></div>
+            </div>
+            <div v-if="importConfig.type==2" class="form-group">
+              <label class="col-md-4 control-label">导入内容</label>
+              <div class="col-md-7">
+                <input type="file" class="form-control" id="import-file" style="padding-top:4px;">
+              </div>
+              <div class="col-md-1"></div>
+            </div>
+            <div class="form-group">
+              <div class="col-md-offset-4 col-md-8">
+                <span v-on:click="importSave()" class="btn btn-primary">提&nbsp;&nbsp;&nbsp;&nbsp;交</span>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <!--soar 配置导入弹窗-->
     </div>
     <script>
       (function (){
@@ -258,7 +314,9 @@
             configs: [],
             curId: 0,
             itemConfig:{},
-            editId:-1
+            editId:-1,
+            exportConfigJson:'',
+            importConfig:{}
           },
           methods:{
             //根据sql分析选项， 进行补贴的展示
@@ -330,9 +388,81 @@
                 if (json.status) {
                   curFormat(json.result);
                 } else {
-                  layer.msg(json.result, {msg:1000});
+                  layer.msg(json.result, {time:1000});
                 }
               });
+            },
+            //配置导出
+            exportConfig:function (){
+              this.exportConfigJson = JSON.stringify(getSoarConfig());
+              layer.open({
+                type: 1,
+                title: 'soar 配置导出',
+                area : ['600px'],
+                content: $('#soar-export-tpl'),
+                cancel:function (){
+                  $('#soar-export-tpl').hide();
+                }
+              });
+            },
+            //配置导入
+            showImportConfig:function(){
+              this.importConfig = {type:'1',cover:'0'};
+              layer.open({
+                type: 1,
+                title: 'soar 配置导入',
+                area : ['600px'],
+                content: $('#soar-import-tpl'),
+                cancel:function (){
+                  $('#soar-import-tpl').hide();
+                }
+              });
+            },
+            //配置导入保存
+            importSave:function(){
+              var content = '';
+              //文本导入
+              if (this.importConfig.type == 1) {
+                content = this.importConfig.content;
+                handleContent();
+              } else { //文件的导入
+                if (!window.FileReader){
+                  layer.msg('浏览器不支持文件导入，请使用文本导入',{time:1000});
+                  return;
+                }
+                var reader = new FileReader();
+                var file = $('#import-file')[0].files[0];
+                if (!file) {
+                  layer.msg('文件内容不能为空',{time:1000});
+                  return;
+                }
+                //读取文件内容
+                var reader = new FileReader();
+                reader.readAsText(file);
+                reader.onload = function(){
+                    content = this.result;
+                    handleContent();
+                };
+              }
+              //导入配置
+              function handleContent(){
+                var arr = [];
+                try {
+                   arr = JSON.parse(content);
+                   if (!$.isArray(arr)) throw new Error('');
+                } catch (e) {
+                  layer.msg('导入内容格式不正确',{time:1000});
+                  return;
+                }
+                var configs = getSoarConfig();
+                if (vueApp.importConfig.cover==1) configs = [];
+                arr.forEach(function (item){
+                  configs.push(item);
+                });
+                saveSoarConfig(configs);
+                vueApp.configs = configs;
+                layer.msg('导入成功',{time:1000});
+              }
             },
             //清除结果展示
             clear:function(){
@@ -352,7 +482,7 @@
               layer.open({
                 type: 1,
                 title: 'soar 配置编辑',
-                area : ['1000px' , '500px'],
+                area : ['1000px'],
                 content: $('#soar-edit-tpl'),
                 cancel:function (){
                   $('#soar-edit-tpl').hide();
