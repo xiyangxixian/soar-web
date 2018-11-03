@@ -161,7 +161,8 @@
               <div class="col-md-1"></div>
             </div>
             <div class="form-group">
-              <label class="col-md-4 control-label">允许线上环境当作测试环境(allow-online-as-test)</label>
+              <label class="col-md-4 control-label">允许线上环境当作测试环境
+                <br><span style="margin-top:10px;display:inline-block">(allow-online-as-test)</span></label>
               <div class="col-md-7">
                 <label class="radio-inline">
                   <input type="radio" name="allow-online-as-test" value="" v-model="itemConfig['allow-online-as-test']"> 默认
@@ -172,6 +173,7 @@
                 <label class="radio-inline">
                   <input type="radio" name="allow-online-as-test" value="false" v-model="itemConfig['allow-online-as-test']"> 否
                 </label>
+                <br><span style="color:#666;margin-top:10px;display:inline-block">注：线上环境和测试环境配置相同时， 该参数为“是”，才会返回explain信息</span>
               </div>
               <div class="col-md-1"></div>
             </div>
@@ -279,10 +281,10 @@
           'allow-online-as-test' : '',
           'sampling':''
         };
-        //请求的api
+        //请求的 api
         var api = 'soar-markdown.txt';
         
-        //获取soar 配置项列表， 如果没有则初始化一条默认，配置
+        //获取 soar 配置项列表， 如果没有则初始化一条默认，配置
         function getSoarConfig(){
           var configs = localStorage.getItem('soar_config');
           try {
