@@ -47,7 +47,7 @@
       
       .show-markdown{overflow-x:auto;}
       .show-markdown table td, .show-markdown table th {font-size: 12px;border-bottom: 1px solid #919699;border-right: 1px solid #919699;}
-      .show-markdown table{border-top: 1px solid #919699;border-left: 1px solid #919699;border-spacing: 0;}
+      .show-markdown table{border-top: 1px solid #919699;border-left: 1px solid #919699;border-spacing: 0;width:780px;}
       .show-markdown table th {padding: 4px 8px;background: #E2E2E2;}
       .show-markdown table td {padding: 8px;vertical-align: top;}
       
@@ -84,7 +84,7 @@
             <span class="btn btn-danger ml-20" v-on:click="clear()">清空</span>
           </div>
         </div>
-        <div class="mt-20 container" style="height:600px;margin-left:0px;margin-right:0px;">
+        <div class="mt-20 container" v-bind:style="{height:editorHeight}" style="margin-left:0px;margin-right:0px;">
           <div class="row" style="height:100%;">
             <!--sql 语句输入-->
             <div class="col-md-5" style="padding-left:0px;height:100%;">
@@ -320,6 +320,14 @@
             exportConfigJson:'',
             importConfig:{}
           },
+          computed:{
+            editorHeight:function(){
+              var textHeght = 500 + ($(window).height() -657);
+              if (textHeght < 400) textHeght = 400;
+              if (textHeght > 600) textHeght = 600;
+              return textHeght + 'px';
+            }
+          },
           methods:{
             //根据sql分析选项， 进行补贴的展示
             sqlAnalysis:function(type){
@@ -335,7 +343,7 @@
               };
               //markdown转html展示
               var markdownFormat = function (res){
-                $('#soar-content').html(converter.makeHtml(res));
+                $('#soar-content').html('<div style="transform: scale(0.8);transform-origin: 0 0 0;margin-bottom:-20%;">'+converter.makeHtml(res)+'</div>');
               };
               //用富文本框展示sql 并且高亮显示
               var textEditFormat = function(res){
