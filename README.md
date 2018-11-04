@@ -11,7 +11,7 @@
 
 ## 安装与使用
 ```
-windows： run.bat
+Windows： run.bat
 Linux or Mac： sh run.sh
 ```
 
