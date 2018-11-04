@@ -83,7 +83,7 @@ def save_tmp_sql(args,sql_tmp_file):
     :return:
     '''
 
-    with open(sql_tmp_file,'a') as f:
+    with open(sql_tmp_file,'a',encoding='utf8') as f:
             f.write(args['query'])
 
 def save_tmp_conf(args,conf_tmp_file):
@@ -94,7 +94,7 @@ def save_tmp_conf(args,conf_tmp_file):
     :return:
     '''
 
-    with open(conf_tmp_file,'w') as f:
+    with open(conf_tmp_file,'w',encoding='utf8') as f:
         for arg, value in args.items():
             if isinstance(value,list):
                 f.write('%s:\n'%(arg))
@@ -112,7 +112,7 @@ def save_tmp_blacklist(args,blacklist_tmp_file):
     :param blacklist_tmp_file:
     :return:
     '''
-    with open(blacklist_tmp_file,'w') as f:
+    with open(blacklist_tmp_file,'w',encoding='utf8') as f:
         for black in args['blacklist'].split('\n'):
             f.write(black)
             f.write('\n')
