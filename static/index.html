@@ -351,6 +351,7 @@
                 var editor = CodeMirror.fromTextArea($('#soar-content #sql-show')[0], {
                   mode: 'text/x-mysql',
                   styleActiveLine:true,
+                  lineWrapping:true,
                   readOnly:true
                 });
                 editor.setValue(res.trim());
@@ -558,7 +559,8 @@
         converter.setOption('tables', true);
         window.sqlEditor = CodeMirror.fromTextArea(document.getElementById("sql-edit"), {
           mode: 'text/x-mysql',
-          styleActiveLine:true
+          styleActiveLine:true,
+          lineWrapping:true,
         });
         
         //前端录音初始化目录
