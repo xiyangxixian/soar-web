@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!--js 库文件-->
     <script type="text/javascript" src="./js/jquery.min.js"></script>
-    <script type="text/javascript" src="./js/page.js"></script>
+    <script type="text/javascript" src="./js/director.min.js"></script>
     <script type="text/javascript" src="./lib/layui/layui.all.js"></script>
     <script type="text/javascript" src="./js/vue.min.js"></script>
     <script type="text/javascript" src="./js/codemirror.js"></script>
@@ -560,27 +560,20 @@
         window.sqlEditor = CodeMirror.fromTextArea(document.getElementById("sql-edit"), {
           mode: 'text/x-mysql',
           styleActiveLine:true,
-          lineWrapping:true,
+          lineWrapping:true
         });
-        
-        //前端录音初始化目录
-        if (window.location.pathname != '' || window.location.pathname != '/') page.base(window.location.pathname + '#');
-        
-        //sql分析页面回调
-        page('/analysis', function (ctx){
-          vueApp.router = '/analysis';
-          vueApp.configs = getSoarConfig();
-        });
-        //soar配置页面回调
-        page('/config', function (){
-          vueApp.router = '/config';
-          vueApp.configs = getSoarConfig();
-        });
-        //默认路由
-        page('*', function (ctx){
-            page.redirect('/analysis');
-        });
-        page.start();
+        var routes = {
+            '/analysis': function (ctx){
+              vueApp.router = '/analysis';
+              vueApp.configs = getSoarConfig();
+            },
+            '/config': function (){
+              vueApp.router = '/config';
+              vueApp.configs = getSoarConfig();
+            }
+          };
+          var router = Router(routes);
+          router.init('analysis');
       })();
     </script>
   </body>
