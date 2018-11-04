@@ -1,5 +1,5 @@
 # soar-web
-基于 [soar](https://github.com/XiaoMi/soar) 的开源 sql 分析与优化的 WEB 图形化工具，支持添加、修改配置，多配置切换，配置的导出、导入与导入功能。
+基于小米 [soar](https://github.com/XiaoMi/soar) 的开源 sql 分析与优化的 WEB 图形化工具，支持添加、修改配置，多配置切换，配置的导出、导入与导入功能。
 
 ![soar](https://raw.githubusercontent.com/xiyangxixian/soar-web/master/doc/img/example-1.png)
 ![soar](https://raw.githubusercontent.com/xiyangxixian/soar-web/master/doc/img/example-2.png)
