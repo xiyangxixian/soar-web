@@ -47,9 +47,9 @@
       
       .show-markdown{overflow-x:auto;}
       .show-markdown table td, .show-markdown table th {font-size: 12px;border-bottom: 1px solid #919699;border-right: 1px solid #919699;}
-      .show-markdown table{border-top: 1px solid #919699;border-left: 1px solid #919699;border-spacing: 0;width:780px;}
+      .show-markdown table{border-top: 1px solid #919699;border-left: 1px solid #919699;border-spacing: 0;width:800px;}
       .show-markdown table th {padding: 4px 8px;background: #E2E2E2;}
-      .show-markdown table td {padding: 8px;vertical-align: top;}
+      .show-markdown table td {padding: 8px;vertical-align:top; word-break:break-word;}
       
     </style>
   </head>
@@ -84,7 +84,7 @@
             <span class="btn btn-danger ml-20" v-on:click="clear()">清空</span>
           </div>
         </div>
-        <div class="mt-20 container" v-bind:style="{height:editorHeight}" style="margin-left:0px;margin-right:0px;">
+        <div class="mt-20 container" v-bind:style="{height:editorHeight}" style="margin-left:0px;margin-right:0px;width: 100%;">
           <div class="row" style="height:100%;">
             <!--sql 语句输入-->
             <div class="col-md-5" style="padding-left:0px;height:100%;">
