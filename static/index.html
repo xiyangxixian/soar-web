@@ -126,7 +126,7 @@
               <td class="text-center">{{item['test-dsn']||'--'}}</td>
               <td class="text-center">
                 <span class="glyphicon glyphicon-pencil ponter" v-on:click="soarEdit(index)"></span>
-                <span v-show="index!=0" class="ml-5 glyphicon glyphicon-trash ponter" v-on:click="soarDel(index)"></span>
+                <span v-show="index!=0||configs.length>1" class="ml-5 glyphicon glyphicon-trash ponter" v-on:click="soarDel(index)"></span>
                 <span class="ml-5 glyphicon glyphicon-copy ponter"v-on:click="soarCopy(index)" title="点击复制"></span>
               </td>
             </tr>
