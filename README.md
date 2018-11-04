@@ -9,8 +9,8 @@
 * python3
 * Flask
 
-## 使用
-```python
+## 安装与使用
+chmod -R a+x ./soar 增加执行权限（linux 和 mac 需要）
+chmod -R a+w ./tmp  增加写权限（linux 和 mac 需要）
 python soar-wep.py
 然后再浏览器上输入对应的IP地址与端口号即可访问
-```
