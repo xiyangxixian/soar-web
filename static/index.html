@@ -308,7 +308,7 @@
         function saveSoarConfig(configs){
           localStorage.setItem('soar_config', JSON.stringify(configs));
         }
-        
+              
         var vueApp = new Vue({
           el:'#vue-app',
           data:{
@@ -319,6 +319,11 @@
             editId:-1,
             exportConfigJson:'',
             importConfig:{}
+          },
+          watch: {
+            curId:function(newId) {
+              localStorage.setItem('config_select', newId);
+            }
           },
           computed:{
             editorHeight:function(){
@@ -383,7 +388,7 @@
                   break;
               }
               data.query = query;
-              var config = this.configs[this.curId] || {};
+              var config = this.configs[this.curId] || this.configs[0] || {};
               for(var i in config){
                 if(i == 'name') continue;
                 if (config[i]) data[i] = config[i];
@@ -537,6 +542,7 @@
             soarDel:function(id){
               layer.confirm('确定删除？', function(index){
                 vueApp.configs.splice(id, 1);
+                saveSoarConfig(vueApp.configs);
                 layer.close(index);
               });
             },
@@ -566,10 +572,14 @@
             '/analysis': function (ctx){
               vueApp.router = '/analysis';
               vueApp.configs = getSoarConfig();
+              var curId = Number(localStorage.getItem('config_select'))||0;
+              vueApp.curId = (curId >= vueApp.configs.length || curId < 0) ? 0 : curId;
             },
             '/config': function (){
               vueApp.router = '/config';
               vueApp.configs = getSoarConfig();
+              var curId = Number(localStorage.getItem('config_select'))||0;
+              vueApp.curId = (curId >= vueApp.configs.length || curId < 0) ? 0 : curId;
             }
           };
           var router = Router(routes);
