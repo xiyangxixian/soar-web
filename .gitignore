@@ -1,4 +1,8 @@
 nbproject
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
 *.py[cod]
 *.so
 *.egg
