@@ -569,21 +569,21 @@
           lineWrapping:true
         });
         var routes = {
-            '/analysis': function (ctx){
-              vueApp.router = '/analysis';
-              vueApp.configs = getSoarConfig();
-              var curId = Number(localStorage.getItem('config_select'))||0;
-              vueApp.curId = (curId >= vueApp.configs.length || curId < 0) ? 0 : curId;
-            },
-            '/config': function (){
-              vueApp.router = '/config';
-              vueApp.configs = getSoarConfig();
-              var curId = Number(localStorage.getItem('config_select'))||0;
-              vueApp.curId = (curId >= vueApp.configs.length || curId < 0) ? 0 : curId;
-            }
-          };
-          var router = Router(routes);
-          router.init('analysis');
+          '/analysis': function (ctx){
+            vueApp.router = '/analysis';
+            vueApp.configs = getSoarConfig();
+            var curId = Number(localStorage.getItem('config_select'))||0;
+            vueApp.curId = (curId >= vueApp.configs.length || curId < 0) ? 0 : curId;
+          },
+          '/config': function (){
+            vueApp.router = '/config';
+            vueApp.configs = getSoarConfig();
+            var curId = Number(localStorage.getItem('config_select'))||0;
+            vueApp.curId = (curId >= vueApp.configs.length || curId < 0) ? 0 : curId;
+          }
+        };
+        var router = Router(routes);
+        router.init('analysis');
       })();
     </script>
   </body>
