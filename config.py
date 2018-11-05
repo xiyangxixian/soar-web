@@ -8,11 +8,20 @@
 
 import os
 
+# WEB 服务器地址
+HOST = '0.0.0.0'
+
+# WEB 服务器断开
+PORT = 5077
+
+# 根目录
 BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 
+# 临时目录
 TMP_DIR = BASE_DIR + os.sep + 'tmp' + os.sep
 SOAR_PATH = BASE_DIR + os.sep + 'soar' + os.sep
 
+# 是否打开浏览器
 IS_OPEN_BROWESER = True  # True False
 
 DEBUG = False

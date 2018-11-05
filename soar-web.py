@@ -11,7 +11,11 @@ import json
 from flask import Flask
 from flask import request
 from flask import redirect
+
+from config import HOST
+from config import PORT
 from config import DEBUG
+from config import IS_OPEN_BROWESER
 from core.common import soar_result
 from core.common import soar_args_check
 from core.common import open_brower
@@ -52,5 +56,5 @@ def error_info(error):
 
 if __name__ == '__main__':
     # TODO 初始环境检查,包括 tmp，soar 目录是否可读写 soar 不存在自动拉取
-    open_brower("http://localhost:5077")
-    app.run(threaded=True,port=5077)
+    if IS_OPEN_BROWESER: open_brower("http://127.0.0.1:%s"%(PORT))
+    app.run(threaded=True,host=HOST,port=PORT)
