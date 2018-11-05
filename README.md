@@ -9,24 +9,29 @@
 * python3
 * Flask
 
+Python 环境未安装的可参考下面操作：
+
+```
+Mac or Windows：
+step 1 去 python 官网下载安装 python3
+setp 2 pip install -g Flask
+
+Ubuntu：
+step 1 sudo apt-get install python3 python3-pip (如果两个包都有安装可跳过此步骤)
+setp 2 pip install -g Flask
+
+CentOS：
+step 1 sudo yum install python3 python3-pip (如果两个包都有安装可跳过此步骤)
+setp 2 pip install -g Flask
+```
+
+
 ## 安装与使用
 ```
 Windows： run.bat
 Linux or Mac： sh run.sh
-然后在浏览器上输入对应的IP地址与端口号即可访问
-
-如果需要改IP地址和端口号, 可在config.py钟进行修改
-
-Python 环境未安装的可参考下面操作:
-Mac or Windows:
-step 1 去 python 官网下载安装 python3
-setp 2 pip install -g Flask
-
-Ubuntu:
-step 1 sudo apt-get install python3 python3-pip (如果两个包都有安装可跳过此步骤)
-setp 2 pip install -g Flask
-
-CentOS:
-step 1 sudo yum install python3 python3-pip (如果两个包都有安装可跳过此步骤)
-setp 2 pip install -g Flask
 ```
+
+然后在浏览器上输入 http://127.0.0.1:5077 进行访问
+
+如果需要改IP地址和端口号, 可在 config.py 中进行修改
