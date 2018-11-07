@@ -6,26 +6,26 @@
 ![soar](https://raw.githubusercontent.com/xiyangxixian/soar-web/master/doc/img/example-3.png?v=1)
 
 ## 环境需求
-* python3
+* python
 * Flask
 
 Python 环境未安装的可参考下面操作：
 ```
 Windows：
 step 1 去 python 官网下载安装 python3 (已安装可跳过此步骤)
-setp 2 pip install -g Flask
+setp 2 pip install Flask
 
 Mac：
 step 1 brew install python3 python3-pip (如果两个包都有安装可跳过此步骤)
-setp 2 pip install -g Flask
+setp 2 pip install Flask
 
 Ubuntu：
 step 1 sudo apt-get install python3 python3-pip (如果两个包都有安装可跳过此步骤)
-setp 2 pip install -g Flask
+setp 2 pip install Flask
 
 CentOS：
 step 1 sudo yum install python3 python3-pip (如果两个包都有安装可跳过此步骤)
-setp 2 pip install -g Flask
+setp 2 pip install Flask
 ```
 
 
