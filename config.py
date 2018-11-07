@@ -26,13 +26,13 @@ IS_OPEN_BROWESER = True  # True False
 
 DEBUG = False
 
-#多值定义需要使用英文,隔开方式返回
+# 多值定义需要使用英文,隔开方式返回
 MUL_SOAR_ARGS = [    'ignore-rules','explain-warn-access-type',
                      'table-allow-charsets', 'rewrite-rules',
                      'explain-warn-select-type', 'explain-warn-access-type'
                      'explain-warn-extra', 'explain-warn-scalability',
                      'table-allow-engines'
-                    # ,'blacklist' # blacklist单独处理以换行符为分隔符号
+                    # 'blacklist' # blacklist单独处理以换行符为分隔符号
                  ]
 
 SOAR_RUN_TIMEOUT = 5  # soar 执行超时后直接强制退出
@@ -44,7 +44,7 @@ SOAR_ARGS = {
     "allow-online-as-test": None,
     "alsologtostderr": None,
     "blacklist": str,
-    # "config": str,  #配置文件服务器端自动生成
+    # "config": str,  # 配置文件服务器端自动生成
     "conn-time-out": int,
     "delimiter": str,
     "drop-test-temporary": None,

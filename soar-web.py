@@ -50,8 +50,12 @@ def f0f(error):
 
 @app.errorhandler(Exception)
 def error_info(error):
+    if DEBUG:
+        result = str(error)
+    else:
+        result = '500 error'
     return json.dumps({
-        "result": '500 error', "status": True}
+        "result": result, "status": False}
     )
 
 if __name__ == '__main__':
