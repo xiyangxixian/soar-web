@@ -6,7 +6,7 @@
 ![soar](https://raw.githubusercontent.com/xiyangxixian/soar-web/master/doc/img/example-3.png?v=1)
 
 ## 环境需求
-* python3
+* python
 * Flask
 
 Python 环境未安装的可参考下面操作：
