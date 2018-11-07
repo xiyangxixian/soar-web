@@ -394,17 +394,26 @@
                 if (config[i]) data[i] = config[i];
               }
               //提交请求， 根据具体api酌情修改
-              $.post(api, data, function(res){
-                var json;
-                try {
-                  json = JSON.parse(res);
-                } catch (e) {
-                  json = {status:true, result:res};
-                }
-                if (json.status) {
-                  curFormat(json.result);
-                } else {
-                  layer.msg(json.result, {time:1000});
+              var loadIndex = layer.load(2, {offset:'30%'});
+              $.ajax({
+                url: api,
+                data: data,      
+                success: function (res) {
+                  layer.close(loadIndex);
+                  var json;
+                  try {
+                    json = JSON.parse(res);
+                  } catch (e) {
+                    json = {status:true, result:res};
+                  }
+                  if (json.status) {
+                    curFormat(json.result);
+                  } else {
+                    layer.msg(json.result, {time:1000});
+                  }
+                },
+                error: function () {
+                  layer.close(loadIndex);
                 }
               });
             },
