@@ -397,7 +397,8 @@
               var loadIndex = layer.load(2, {offset:'30%'});
               $.ajax({
                 url: api,
-                data: data,      
+                data: data,
+                method:'POST',   
                 success: function (res) {
                   layer.close(loadIndex);
                   var json;
