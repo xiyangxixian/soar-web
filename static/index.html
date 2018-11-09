@@ -82,6 +82,15 @@
             <span class="btn btn-primary" v-on:click="sqlAnalysis(6)">Alter合并</span>
             <!--<span class="btn btn-primary" v-on:click="sqlAnalysis(7)">EXP解析</span>-->
             <span class="btn btn-danger ml-20" v-on:click="clear()">清空</span>
+            <div class="btn-group" v-bind:class="{open:showExport}" v-on:click="showExport=!showExport">
+              <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> 导出 <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu">
+                <li><a href="javascript:;" v-on:click="">html</a></li>
+                <li><a href="javascript:;" v-on:click="">markdown</a></li>
+                <li><a href="javascript:;" v-on:click="">json</a></li>
+              </ul>
+            </div>
           </div>
         </div>
         <div class="mt-20 container" v-bind:style="{height:editorHeight}" style="margin-left:0px;margin-right:0px;width: 100%;">
@@ -151,14 +160,14 @@
               <div class="col-md-7">
                 <input type="text" class="form-control" placeholder="user:password@host:port/database" v-model="itemConfig['online-dsn']">
               </div>
-              <div class="col-md-1"></div>
+              <div class="col-md-1"><span v-on:click="testConnect(itemConfig['online-dsn'])" class="glyphicon glyphicon-refresh ponter" style="line-height:32px;" title="点击测试数据库链接"></span></div>
             </div>
             <div class="form-group">
               <label class="col-md-4 control-label">测试环境数据库配置(test-dsn)</label>
               <div class="col-md-7">
                 <input type="text" class="form-control" placeholder="user:password@host:port/database" v-model="itemConfig['test-dsn']">
               </div>
-              <div class="col-md-1"></div>
+              <div class="col-md-1"><span v-on:click="testConnect(itemConfig['test-dsn'])" class="glyphicon glyphicon-refresh ponter" style="line-height:32px;" title="点击测试数据库链接"></span></div>
             </div>
             <div class="form-group">
               <label class="col-md-4 control-label">允许线上环境当作测试环境
@@ -282,7 +291,10 @@
           'sampling':''
         };
         //请求的 api
-        var api = '/soar-api';
+        var api = {
+         soar: '/soar-api',
+         testConnect: '/test-connect'
+        };
         
         //获取 soar 配置项列表， 如果没有则初始化一条默认，配置
         function getSoarConfig(){
@@ -318,7 +330,8 @@
             itemConfig:{},
             editId:-1,
             exportConfigJson:'',
-            importConfig:{}
+            importConfig:{},
+            showExport:false
           },
           watch: {
             curId:function(newId) {
@@ -334,6 +347,33 @@
             }
           },
           methods:{
+            request:function(config, success, error){
+              var loadIndex;
+              if (config.isLoading) loadIndex = layer.load(2, {offset:'30%'});
+              $.ajax({
+                url: config.url,
+                data: config.data || {},
+                method:config.method || 'POST',   
+                success: function (res) {
+                  if (config.isLoading) layer.close(loadIndex);
+                  var json;
+                  try {
+                    json = JSON.parse(res);
+                  } catch (e) {
+                    json = {status:true, result:res};
+                  }
+                  if (json.status) {
+                    if($.isFunction(success)) success(json);
+                  } else {
+                    layer.msg(json.result, {time:1000});
+                  }
+                },
+                error: function () {
+                  if (config.isLoading) layer.close(loadIndex);
+                  if($.isFunction(error)) error();
+                }
+              });
+            },
             //根据sql分析选项， 进行补贴的展示
             sqlAnalysis:function(type){
               var query = window.sqlEditor.getValue();
@@ -394,28 +434,13 @@
                 if (config[i]) data[i] = config[i];
               }
               //提交请求， 根据具体api酌情修改
-              var loadIndex = layer.load(2, {offset:'30%'});
-              $.ajax({
-                url: api,
-                data: data,
-                method:'POST',   
-                success: function (res) {
-                  layer.close(loadIndex);
-                  var json;
-                  try {
-                    json = JSON.parse(res);
-                  } catch (e) {
-                    json = {status:true, result:res};
-                  }
-                  if (json.status) {
-                    curFormat(json.result);
-                  } else {
-                    layer.msg(json.result, {time:1000});
-                  }
-                },
-                error: function () {
-                  layer.close(loadIndex);
-                }
+              this.request({url:api.soar, data:data, isLoading:true}, function(json){
+                curFormat(json.result);
+              });
+            },
+            testConnect:function(dsn){
+              this.request({url:api.testConnect,data:{dsn:dsn}, isLoading:true}, function(json){
+                layer.msg(json.result, {time:1000});
               });
             },
             //配置导出
@@ -579,12 +604,14 @@
           lineWrapping:true
         });
         var routes = {
-          '/analysis': function (ctx){
+          //sql 分享页面
+          '/analysis': function (){
             vueApp.router = '/analysis';
             vueApp.configs = getSoarConfig();
             var curId = Number(localStorage.getItem('config_select'))||0;
             vueApp.curId = (curId >= vueApp.configs.length || curId < 0) ? 0 : curId;
           },
+          //soar 配置分享页面
           '/config': function (){
             vueApp.router = '/config';
             vueApp.configs = getSoarConfig();
