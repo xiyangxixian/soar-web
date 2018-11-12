@@ -8,24 +8,29 @@
 ## 环境需求
 * python2.7 or python3.x
 * Flask
+* pymysql
 
 Python 环境未安装的可参考下面操作：
 ```
 Windows：
 step 1 去 python 官网下载安装 python3 (已安装可跳过此步骤)
 setp 2 pip install Flask
+setp 3 pip install pymysql
 
 Mac：
 step 1 brew install python3 python3-pip (如果两个包都有安装可跳过此步骤)
 setp 2 pip install Flask
+setp 3 pip install pymysql
 
 Ubuntu：
 step 1 sudo apt-get install python3 python3-pip (如果两个包都有安装可跳过此步骤)
 setp 2 pip install Flask
+setp 3 pip install pymysql
 
 CentOS：
 step 1 sudo yum install python3 python3-pip (如果两个包都有安装可跳过此步骤)
 setp 2 pip install Flask
+setp 3 pip install pymysql
 ```
 
 

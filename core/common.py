@@ -13,6 +13,7 @@ import tempfile
 import subprocess
 import webbrowser
 from collections import OrderedDict
+from urllib.parse import urlparse
 
 from config import TMP_DIR
 from config import SOAR_ARGS
@@ -202,3 +203,22 @@ def soar_args_check(args):
 def open_brower(url):
     if IS_OPEN_BROWESER:
         webbrowser.open(url)
+
+def parse_dsn(host):
+    res = urlparse('http://%s' % host)
+    arr = res.netloc.split('@')
+    user = 'root'
+    pwd = ''
+    host = '127.0.0.1'
+    db = res.path.strip('/')
+    if len(arr) == 2:
+        arr2 = arr[0].split(':')
+        host = arr[1]
+        if len(arr2) == 2:
+            user = arr2[0]
+            pwd = arr2[1]
+        else:
+            user = arr2[0]
+    else:
+        host = arr[0]
+    return {'host':host, 'user':user, 'pwd':pwd, 'db':db,'charset':''}
