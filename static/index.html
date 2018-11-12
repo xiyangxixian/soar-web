@@ -80,15 +80,30 @@
             <span class="btn btn-primary" v-on:click="sqlAnalysis(4)">指纹</span>
             <span class="btn btn-primary" v-on:click="sqlAnalysis(5)">语法检查</span>
             <span class="btn btn-primary" v-on:click="sqlAnalysis(6)">Alter合并</span>
+            <div class="btn-group" v-bind:class="{open:openExport}" v-on:click="openExport=!openExport">
+              <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">SQL 改写 <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu">
+                <li><a href="javascript:;" v-on:click="rewrite('mergealter')">ALTER 合并</a></li>
+                <li><a href="javascript:;" v-on:click="rewrite('dml2select')">删除转查询</a></li>
+                <li><a href="javascript:;" v-on:click="rewrite('star2columns')">* 转全字段</a></li>
+                <li><a href="javascript:;" v-on:click="rewrite('insertcolumns')">INSERT 补全</a></li>
+                <li><a href="javascript:;" v-on:click="rewrite('having')">HAVING 转 where</a></li>
+                <li><a href="javascript:;" v-on:click="rewrite('or2in')">OR 转 IN</a></li>
+                <li><a href="javascript:;" v-on:click="rewrite('standard')">关键字转小写</a></li>
+                <li><a href="javascript:;" v-on:click="rewrite('alwaystrue')">删除无用条件</a></li>
+              </ul>
+            </div>
+            
             <!--<span class="btn btn-primary" v-on:click="sqlAnalysis(7)">EXP解析</span>-->
             <span class="btn btn-danger ml-20" v-on:click="clear()">清空</span>
             <div v-if="showExport" class="btn-group" v-bind:class="{open:openExport}" v-on:click="openExport=!openExport">
               <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> 导出 <span class="caret"></span>
               </button>
               <ul class="dropdown-menu">
-                <li><a href="javascript:;" v-on:click="exportSoar(1)">html</a></li>
-                <li><a href="javascript:;" v-on:click="exportSoar(2)">markdown</a></li>
-                <li><a href="javascript:;" v-on:click="exportSoar(3)">json</a></li>
+                <li><a href="javascript:;" v-on:click="exportSoar('html')">html</a></li>
+                <li><a href="javascript:;" v-on:click="exportSoar('markdown')">markdown</a></li>
+                <li><a href="javascript:;" v-on:click="exportSoar('json')">json</a></li>
               </ul>
             </div>
           </div>
@@ -467,9 +482,8 @@
             //html导出
             exportSoar:function(type){
               var query = window.sqlEditor.getValue();
-              var map = {1:'html', 2:'markdown',3:'json'};
               var data = {};
-              data['report-type'] = map[type] || '';
+              data['report-type'] = type || '';
               var config = this.configs[this.curId] || this.configs[0] || {};
               for(var i in config){
                 if(i == 'name') continue;
