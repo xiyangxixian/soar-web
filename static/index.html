@@ -82,13 +82,13 @@
             <span class="btn btn-primary" v-on:click="sqlAnalysis(6)">Alter合并</span>
             <!--<span class="btn btn-primary" v-on:click="sqlAnalysis(7)">EXP解析</span>-->
             <span class="btn btn-danger ml-20" v-on:click="clear()">清空</span>
-            <div class="btn-group" v-bind:class="{open:showExport}" v-on:click="showExport=!showExport">
+            <div v-if="showExport" class="btn-group" v-bind:class="{open:openExport}" v-on:click="openExport=!openExport">
               <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> 导出 <span class="caret"></span>
               </button>
               <ul class="dropdown-menu">
-                <li><a href="javascript:;" v-on:click="">html</a></li>
-                <li><a href="javascript:;" v-on:click="">markdown</a></li>
-                <li><a href="javascript:;" v-on:click="">json</a></li>
+                <li><a href="javascript:;" v-on:click="exportSoar(1)">html</a></li>
+                <li><a href="javascript:;" v-on:click="exportSoar(2)">markdown</a></li>
+                <li><a href="javascript:;" v-on:click="exportSoar(3)">json</a></li>
               </ul>
             </div>
           </div>
@@ -293,7 +293,8 @@
         //请求的 api
         var api = {
          soar: '/soar-api',
-         testConnect: '/test-connect'
+         testConnect: '/test-connect',
+         downLoad : '/soar-download'
         };
         
         //获取 soar 配置项列表， 如果没有则初始化一条默认，配置
@@ -316,6 +317,24 @@
           return configs;
         }
         
+        function postDownLoad(data){
+          var form = $("<form>");   //定义一个form表单
+          form.attr('style','display:none');   //下面为在form表单中添加查询参数
+          form.attr('target','');
+          form.attr('method','post');
+          form.attr('action',api.downLoad);
+          for(var i in data){
+            var inputDom = $('<input>'); 
+            inputDom.attr('type','hidden'); 
+            inputDom.attr('name',i); 
+            inputDom.attr('value',data[i]);
+            $('body').append(form);  //将表单放置在web中
+            form.append(inputDom);
+          }
+          form.submit();
+          form.remove();
+        }
+        
         //存储soar配置项列表
         function saveSoarConfig(configs){
           localStorage.setItem('soar_config', JSON.stringify(configs));
@@ -331,6 +350,7 @@
             editId:-1,
             exportConfigJson:'',
             importConfig:{},
+            openExport:false,
             showExport:false
           },
           watch: {
@@ -365,7 +385,7 @@
                   if (json.status) {
                     if($.isFunction(success)) success(json);
                   } else {
-                    layer.msg(json.result, {time:1000});
+                    layer.msg(json.result, {time:2000});
                   }
                 },
                 error: function () {
@@ -436,12 +456,27 @@
               //提交请求， 根据具体api酌情修改
               this.request({url:api.soar, data:data, isLoading:true}, function(json){
                 curFormat(json.result);
+                vueApp.showExport = type == 1;
               });
             },
             testConnect:function(dsn){
               this.request({url:api.testConnect,data:{dsn:dsn}, isLoading:true}, function(json){
                 layer.msg(json.result, {time:1000});
               });
+            },
+            //html导出
+            exportSoar:function(type){
+              var query = window.sqlEditor.getValue();
+              var map = {1:'html', 2:'markdown',3:'json'};
+              var data = {};
+              data['report-type'] = map[type] || '';
+              var config = this.configs[this.curId] || this.configs[0] || {};
+              for(var i in config){
+                if(i == 'name') continue;
+                if (config[i]) data[i] = config[i];
+              }
+              data.query = query;
+              postDownLoad(data);
             },
             //配置导出
             exportConfig:function (){
@@ -518,6 +553,7 @@
             //清除结果展示
             clear:function(){
               $('#soar-content').html('<span class="placegolder">soar结果展示 ...</span>');
+              this.showExport = false;
             },
             //初始化配置
             initConfig:function (){
