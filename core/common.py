@@ -210,6 +210,7 @@ def parse_dsn(host):
     user = 'root'
     pwd = ''
     host = '127.0.0.1'
+    port = 3306
     db = res.path.strip('/')
     if len(arr) == 2:
         arr2 = arr[0].split(':')
@@ -221,4 +222,7 @@ def parse_dsn(host):
             user = arr2[0]
     else:
         host = arr[0]
-    return {'host':host, 'user':user, 'pwd':pwd, 'db':db,'charset':''}
+    hostArr = host.split(':')
+    host = hostArr[0]
+    if (len(hostArr) == 2) : port = hostArr[1]
+    return {'host':host, 'user':user, 'pwd':pwd, 'db':db, 'port':int(port), 'charset':''}
