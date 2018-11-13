@@ -68,7 +68,13 @@ def testconnect():
     dsn = request.values.get('dsn')
     res = parse_dsn(dsn)
     try:
-        pymysql.connect(res['host'], res['user'], res['pwd'], res['db'])
+        pymysql.connect(
+            host = res['host'],
+            port = int(res['port']),
+            user = res['user'],
+            passwd = res['pwd'],
+            db = res['db'],
+        )
         status = True
         result = '连接成功！'
     except Exception as e:
