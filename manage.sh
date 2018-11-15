@@ -1,6 +1,6 @@
 #!/bin/bash
 dir=`dirname $0`
-pybin='python3'
+pybin='python'
 
 function start(){
   if [ $(checkPid) ]; then
