@@ -6,7 +6,7 @@
 ![soar](https://raw.githubusercontent.com/xiyangxixian/soar-web/master/doc/img/example-3.png?v=1)
 
 ## 环境需求
-* python2.7 or python3.x
+* python3.x
 * Flask
 * pymysql
 
@@ -28,7 +28,7 @@ setp 2 pip install Flask
 setp 3 pip install pymysql
 
 CentOS：
-step 1 sudo yum install python3 python3-pip (如果两个包都有安装可跳过此步骤)
+step 1 sudo yum install python36 python36-pip (如果两个包都有安装可跳过此步骤)
 setp 2 pip install Flask
 setp 3 pip install pymysql
 ```
@@ -38,6 +38,8 @@ setp 3 pip install pymysql
 ```
 Windows： run.bat
 Linux or Mac： sh run.sh
+
+注：当主机上存在多个 python 版本时, 需自行更改 run.sh 或者 run.bat 中的 python 版本指定为 3.x 以上的版本运行。
 ```
 
 然后在浏览器上输入 http://127.0.0.1:5077 进行访问
