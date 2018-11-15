@@ -6,7 +6,7 @@
 ![soar](https://raw.githubusercontent.com/xiyangxixian/soar-web/master/doc/img/example-3.png?v=1)
 
 ## 环境需求
-* python2.7 or python3.x
+* python3.x
 * Flask
 * pymysql
 
@@ -28,7 +28,7 @@ setp 2 pip install Flask
 setp 3 pip install pymysql
 
 CentOS：
-step 1 sudo yum install python3 python3-pip (如果两个包都有安装可跳过此步骤)
+step 1 sudo yum install python36 python36-pip (如果两个包都有安装可跳过此步骤)
 setp 2 pip install Flask
 setp 3 pip install pymysql
 ```
