@@ -39,7 +39,7 @@ setp 3 pip install pymysql
 Windows： run.bat
 Linux or Mac： sh run.sh
 
-注：存在多个 python 版本时, 需自行更改 run.sh 或者 run.bat 中的 python 版本指定为 3.x 以上的版本运行。
+注：当主机上存在多个 python 版本时, 需自行更改 run.sh 或者 run.bat 中的 python 版本指定为 3.x 以上的版本运行。
 ```
 
 然后在浏览器上输入 http://127.0.0.1:5077 进行访问
