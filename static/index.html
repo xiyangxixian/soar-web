@@ -21,6 +21,9 @@
       .w-100{width: 100px !important;}
       .w-150{width: 150px !important;}
       .w-200{width: 200px !important;}
+      .minw-200{min-width: 200px !important;}
+      .maxw-500{max-width: 500px !important;}
+      
       .ml-5{margin-left:5px !important;}
       .mr-5{margin-right:5px !important;}
       .ml-20{margin-left:20px !important;}
@@ -51,6 +54,8 @@
       .show-markdown table th {padding: 4px 8px;background: #E2E2E2;}
       .show-markdown table td {padding: 8px;vertical-align:top; word-break:break-word;}
       
+      /*列表样式*/
+      .content-soar-list table tbody tr td{vertical-align: middle;}
     </style>
   </head>
   <body>
@@ -68,7 +73,7 @@
         <div class=" form-inline">
           <div class="form-group">
             <label>配置模板：</label>
-            <select class="form-control w-200" v-model="curId">
+            <select class="form-control minw-200 maxw-500" v-model="curId">
               <option v-for="(item, index) in configs" v-bind:value="index">{{item.name}}</option>
             </select>
           </div>
@@ -123,7 +128,7 @@
       </div>
       <!--sql 分析页面-->
       <!--soar 配置页面-->
-      <div class="content" v-show="router=='/config'">
+      <div class="content content-soar-list" v-show="router=='/config'">
         <div class=" form-inline mb-20">
           <div class="form-group">
             <span class="btn btn-primary" v-on:click="soarEdit(-1)">添加配置</span>
