@@ -79,8 +79,7 @@
             <span class="btn btn-primary" v-on:click="sqlAnalysis(3)">压缩</span>
             <span class="btn btn-primary" v-on:click="sqlAnalysis(4)">指纹</span>
             <span class="btn btn-primary" v-on:click="sqlAnalysis(5)">语法检查</span>
-            <span class="btn btn-primary" v-on:click="sqlAnalysis(6)">Alter合并</span>
-            <div class="btn-group" v-bind:class="{open:openExport}" v-on:click="openExport=!openExport">
+            <div class="btn-group" v-bind:class="{open:openRewrite}"open:openExport v-on:click="openRewrite=!openRewrite">
               <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">SQL 改写 <span class="caret"></span>
               </button>
               <ul class="dropdown-menu">
@@ -116,7 +115,7 @@
             </div>
             <!--服务器返回展示-->
             <div class="col-md-7" style="padding-right:0px;height:100%;">
-              <div class="show-content show-markdown" style="height:100%; padding:10px;" id="soar-content"><span class="placegolder">soar结果展示 ...</span></div>
+              <div class="show-content show-markdown" style="height:100%;" id="soar-content"><span class="placegolder">soar结果展示 ...</span></div>
             </div>
           </div>
         </div>
@@ -366,7 +365,8 @@
             exportConfigJson:'',
             importConfig:{},
             openExport:false,
-            showExport:false
+            showExport:false,
+            openRewrite:false
           },
           watch: {
             curId:function(newId) {
@@ -382,6 +382,26 @@
             }
           },
           methods:{
+            //默认显示
+            curFormat:function (res){
+              $('#soar-content').html(res);
+            },
+            //markdown转html展示
+            markdownFormat : function (res){
+              $('#soar-content').html('<div style="transform: scale(0.8);transform-origin: 0 0 0;margin-bottom:-20%;padding:10px;">'+converter.makeHtml(res)+'</div>');
+            },
+            //用富文本框展示sql 并且高亮显示
+            textEditFormat : function(res){
+              $('#soar-content').html('<textarea id="sql-show"></textarea>');
+              var editor = CodeMirror.fromTextArea($('#soar-content #sql-show')[0], {
+                mode: 'text/x-mysql',
+                styleActiveLine:true,
+                lineWrapping:true,
+                readOnly:true
+              });
+              editor.setValue(res.trim());
+            },
+            //请求封装
             request:function(config, success, error){
               var loadIndex;
               if (config.isLoading) loadIndex = layer.load(2, {offset:'30%'});
@@ -401,6 +421,7 @@
                     if($.isFunction(success)) success(json);
                   } else {
                     layer.msg(json.result, {time:2000});
+                    error(json);
                   }
                 },
                 error: function () {
@@ -417,47 +438,29 @@
                 return false;
               }
               var data = {};
-              //默认当做html展示
-              var curFormat = function (res){
-                $('#soar-content').html(res);
-              };
-              //markdown转html展示
-              var markdownFormat = function (res){
-                $('#soar-content').html('<div style="transform: scale(0.8);transform-origin: 0 0 0;margin-bottom:-20%;">'+converter.makeHtml(res)+'</div>');
-              };
-              //用富文本框展示sql 并且高亮显示
-              var textEditFormat = function(res){
-                $('#soar-content').html('<textarea id="sql-show"></textarea></span>');
-                var editor = CodeMirror.fromTextArea($('#soar-content #sql-show')[0], {
-                  mode: 'text/x-mysql',
-                  styleActiveLine:true,
-                  lineWrapping:true,
-                  readOnly:true
-                });
-                editor.setValue(res.trim());
-              };
+              var curFormat = this.curFormat;
               switch(type){
                 case 1://sql 分析评估
-                  curFormat = markdownFormat;
+                  curFormat = this.markdownFormat;
                   break;
                 case 2://sql 梅花
-                  curFormat = textEditFormat;
+                  curFormat = this.textEditFormat;
                   data['report-type'] = 'pretty';
                   break;
                 case 3://压缩
-                  curFormat = textEditFormat;
+                  curFormat = this.textEditFormat;
                   data['report-type'] = 'compress';
                   break;
                 case 4://指纹
-                  curFormat = textEditFormat;
+                  curFormat = this.textEditFormat;
                   data['report-type'] = 'fingerprint';
                   break;
                 case 5://语法检查
-                  curFormat = textEditFormat;
+                  curFormat = this.textEditFormat;
                   data['only-syntax-check'] = 'true';
                   break;
                 case 6: //alret 合并
-                  curFormat = textEditFormat;
+                  curFormat = this.textEditFormat;
                   data['report-type'] = 'rewrite';
                   data['rewrite-rules'] = 'mergealter';
                   break;
@@ -470,10 +473,28 @@
               }
               //提交请求， 根据具体api酌情修改
               this.request({url:api.soar, data:data, isLoading:true}, function(json){
-                curFormat(json.result);
-                vueApp.showExport = type == 1;
+                json.result ? curFormat(json.result) : vueApp.textEditFormat(data.query);
+                vueApp.showExport = type == 1 && json.result;
+                if(!json.result) layer.msg('SQL 执行错误，请检查字段，表是否存在！', {time:2000});
               });
             },
+            rewrite:function (type){
+              var query = window.sqlEditor.getValue();
+              var data = {};
+              data['report-type'] = 'rewrite';
+              data['rewrite-rules'] = type;
+              var config = this.configs[this.curId] || this.configs[0] || {};
+              for(var i in config){
+                if(i == 'name') continue;
+                if (config[i]) data[i] = config[i];
+              }
+              data.query = query;
+              this.request({url:api.soar, data:data, isLoading:true}, function(json){
+                vueApp.textEditFormat(json.result || data.query);
+                if(!json.result) layer.msg('SQL 执行错误请，检查字段，表是否存在！', {time:2000});
+              });
+            },
+            //链接测试
             testConnect:function(dsn){
               this.request({url:api.testConnect,data:{dsn:dsn}, isLoading:true}, function(json){
                 layer.msg(json.result, {time:1000});
