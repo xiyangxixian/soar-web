@@ -84,8 +84,9 @@
               </button>
               <ul class="dropdown-menu">
                 <li><a href="javascript:;" v-on:click="rewrite('mergealter')">ALTER 合并</a></li>
-                <li><a href="javascript:;" v-on:click="rewrite('dml2select')">删除转查询</a></li>
+                <li><a href="javascript:;" v-on:click="rewrite('countstar')">COUNT(col) 转 COUNT(*)</a></li>
                 <li><a href="javascript:;" v-on:click="rewrite('star2columns')">* 转全字段</a></li>
+                <li><a href="javascript:;" v-on:click="rewrite('dml2select')">删除转查询</a></li>
                 <li><a href="javascript:;" v-on:click="rewrite('insertcolumns')">INSERT 补全</a></li>
                 <li><a href="javascript:;" v-on:click="rewrite('having')">HAVING 转 where</a></li>
                 <li><a href="javascript:;" v-on:click="rewrite('or2in')">OR 转 IN</a></li>
