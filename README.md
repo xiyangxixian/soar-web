@@ -47,7 +47,7 @@ Linux or Mac： bash run.sh
 ```
 
 ## docker 支持
-地址：https://cloud.docker.com/guoyahao/soar-web
+地址：https://hub.docker.com/r/guoyahao/soar-web/
 ```
 docker pull guoyahao/soar-web
 docker run -d --name soar-web -p 5077:5077 guoyahao/soar-web
