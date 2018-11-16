@@ -47,11 +47,14 @@ Linux or Mac： bash run.sh
 ```
 
 ## docker 支持
+地址：https://cloud.docker.com/guoyahao/soar-web
 ```
 docker pull guoyahao/soar-web
 docker run -d --name soar-web -p 5077:5077 guoyahao/soar-web
 ```
 
-然后在浏览器上输入 http://127.0.0.1:5077 进行访问
+## 访问
+在浏览器上输入 http://127.0.0.1:5077 进行访问
 
+## 配置
 如果需要改IP地址和端口号, 可在 config.py 中进行修改
