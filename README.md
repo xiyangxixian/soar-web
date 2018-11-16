@@ -50,6 +50,7 @@ Linux or Mac： bash run.sh
 ```
 docker pull guoyahao/soar-web
 docker run -d --name soar-web -p 5077:5077 guoyahao/soar-web
+```
 
 然后在浏览器上输入 http://127.0.0.1:5077 进行访问
 
