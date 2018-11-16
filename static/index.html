@@ -116,11 +116,11 @@
         <div class="mt-20 container" v-bind:style="{height:editorHeight}" style="margin-left:0px;margin-right:0px;width: 100%;">
           <div class="row" style="height:100%;">
             <!--sql 语句输入-->
-            <div class="col-md-5" style="padding-left:0px;height:100%;">
+            <div class="col-xs-5" style="padding-left:0px;height:100%;">
               <div class="show-content"><textarea placeholder="输入SQL语句 ..." id="sql-edit" style="display:none"></textarea></div>
             </div>
             <!--服务器返回展示-->
-            <div class="col-md-7" style="padding-right:0px;height:100%;">
+            <div class="col-xs-7" style="padding-right:0px;height:100%;">
               <div class="show-content show-markdown" style="height:100%;" id="soar-content"><span class="placegolder">soar结果展示 ...</span></div>
             </div>
           </div>
@@ -169,30 +169,30 @@
         <div style="overflow-x:hidden;">
           <form class="form-horizontal">
             <div class="form-group">
-              <label class="col-md-4 control-label">配置名称</label>
-              <div class="col-md-7">
+              <label class="col-xs-4 control-label">配置名称</label>
+              <div class="col-xs-7">
                 <input type="text" class="form-control" v-model="itemConfig['name']">
               </div>
-              <div class="col-md-1"></div>
+              <div class="col-xs-1"></div>
             </div>
             <div class="form-group">
-              <label class="col-md-4 control-label">线上环境数据库配置(online-dsn)</label>
-              <div class="col-md-7">
+              <label class="col-xs-4 control-label">线上环境数据库配置(online-dsn)</label>
+              <div class="col-xs-7">
                 <input type="text" class="form-control" placeholder="user:password@host:port/database" v-model="itemConfig['online-dsn']">
               </div>
-              <div class="col-md-1"><span v-on:click="testConnect(itemConfig['online-dsn'])" class="glyphicon glyphicon-refresh ponter" style="line-height:32px;" title="点击测试数据库链接"></span></div>
+              <div class="col-xs-1"><span v-on:click="testConnect(itemConfig['online-dsn'])" class="glyphicon glyphicon-refresh ponter" style="line-height:32px;" title="点击测试数据库链接"></span></div>
             </div>
             <div class="form-group">
-              <label class="col-md-4 control-label">测试环境数据库配置(test-dsn)</label>
-              <div class="col-md-7">
+              <label class="col-xs-4 control-label">测试环境数据库配置(test-dsn)</label>
+              <div class="col-xs-7">
                 <input type="text" class="form-control" placeholder="user:password@host:port/database" v-model="itemConfig['test-dsn']">
               </div>
-              <div class="col-md-1"><span v-on:click="testConnect(itemConfig['test-dsn'])" class="glyphicon glyphicon-refresh ponter" style="line-height:32px;" title="点击测试数据库链接"></span></div>
+              <div class="col-xs-1"><span v-on:click="testConnect(itemConfig['test-dsn'])" class="glyphicon glyphicon-refresh ponter" style="line-height:32px;" title="点击测试数据库链接"></span></div>
             </div>
             <div class="form-group">
-              <label class="col-md-4 control-label">允许线上环境当作测试环境
+              <label class="col-xs-4 control-label">允许线上环境当作测试环境
                 <br><span style="margin-top:10px;display:inline-block">(allow-online-as-test)</span></label>
-              <div class="col-md-7">
+              <div class="col-xs-7">
                 <label class="radio-inline">
                   <input type="radio" name="allow-online-as-test" value="" v-model="itemConfig['allow-online-as-test']"> 默认
                 </label>
@@ -204,20 +204,20 @@
                 </label>
                 <br><span style="color:#666;margin-top:10px;display:inline-block">注：线上环境和测试环境配置相同时， 该参数为“是”，才会返回explain信息</span>
               </div>
-              <div class="col-md-1"></div>
+              <div class="col-xs-1"></div>
             </div>
             <div class="form-group">
-              <label class="col-md-4 control-label">黑名单列表(blacklist)</label>
-              <div class="col-md-7">
+              <label class="col-xs-4 control-label">黑名单列表(blacklist)</label>
+              <div class="col-xs-7">
                 <textarea rows="3" class="form-control" placeholder="blacklist中的SQL不会被评审，可以是指纹，也可以是正则， 一行一个" v-model="itemConfig['blacklist']"></textarea>
               </div>
-              <div class="col-md-1">
+              <div class="col-xs-1">
                 <span v-on:click="showHelp('blacklist')" class="glyphicon glyphicon-question-sign ponter" style="color:#f0ad4e"></span>
               </div>
             </div>
             <div class="form-group">
-              <label class="col-md-4 control-label">是否开启数据采样(sampling)</label>
-              <div class="col-md-7">
+              <label class="col-xs-4 control-label">是否开启数据采样(sampling)</label>
+              <div class="col-xs-7">
                 <label class="radio-inline">
                   <input type="radio" name="only-syntax-check" value="" v-model="itemConfig['sampling']"> 默认
                 </label>
@@ -228,17 +228,17 @@
                   <input type="radio" name="only-syntax-check" value="false" v-model="itemConfig['sampling']"> 否
                 </label>
               </div>
-              <div class="col-md-1"></div>
+              <div class="col-xs-1"></div>
             </div>
             <div class="form-group">
-              <label class="col-md-4 control-label">允许的数据库引擎(table-allow-engines)</label>
-              <div class="col-md-7">
+              <label class="col-xs-4 control-label">允许的数据库引擎(table-allow-engines)</label>
+              <div class="col-xs-7">
                 <input type="text" class="form-control" placeholder="默认为 InnoDB">
               </div>
-              <div class="col-md-1"></div>
+              <div class="col-xs-1"></div>
             </div>
             <div class="form-group">
-              <div class="col-md-offset-4 col-md-8">
+              <div class="col-xs-offset-4 col-xs-8">
                 <span v-on:click="soarSave()" class="btn btn-primary">提&nbsp;&nbsp;&nbsp;&nbsp;交</span>
               </div>
             </div>
@@ -256,8 +256,8 @@
         <div style="overflow-x:hidden;padding-left:16px;">
           <form class="form-horizontal">
             <div class="form-group">
-              <label class="col-md-4 control-label">导入类型</label>
-              <div class="col-md-7">
+              <label class="col-xs-4 control-label">导入类型</label>
+              <div class="col-xs-7">
                 <label class="radio-inline">
                   <input type="radio" name="type" value="1" v-model="importConfig.type"> 文本
                 </label>
@@ -265,11 +265,11 @@
                   <input type="radio" name="type" value="2" v-model="importConfig.type"> 文件
                 </label>
               </div>
-              <div class="col-md-1"></div>
+              <div class="col-xs-1"></div>
             </div>
             <div class="form-group">
-              <label class="col-md-4 control-label">是否覆盖原有配置</label>
-              <div class="col-md-7">
+              <label class="col-xs-4 control-label">是否覆盖原有配置</label>
+              <div class="col-xs-7">
                 <label class="radio-inline">
                   <input type="radio" name="cover" value="0" v-model="importConfig.cover"> 否
                 </label>
@@ -277,24 +277,24 @@
                   <input type="radio" name="cover" value="1" v-model="importConfig.cover"> 是
                 </label>
               </div>
-              <div class="col-md-1"></div>
+              <div class="col-xs-1"></div>
             </div>
             <div v-if="importConfig.type==1" class="form-group">
-              <label class="col-md-4 control-label">导入内容</label>
-                <div class="col-md-7">
+              <label class="col-xs-4 control-label">导入内容</label>
+                <div class="col-xs-7">
                   <textarea rows="3" class="form-control" v-model="importConfig.content"></textarea>
                 </div>
-              <div class="col-md-1"></div>
+              <div class="col-xs-1"></div>
             </div>
             <div v-if="importConfig.type==2" class="form-group">
-              <label class="col-md-4 control-label">导入内容</label>
-              <div class="col-md-7">
+              <label class="col-xs-4 control-label">导入内容</label>
+              <div class="col-xs-7">
                 <input type="file" class="form-control" id="import-file" style="padding-top:4px;">
               </div>
-              <div class="col-md-1"></div>
+              <div class="col-xs-1"></div>
             </div>
             <div class="form-group">
-              <div class="col-md-offset-4 col-md-8">
+              <div class="col-xs-offset-4 col-xs-8">
                 <span v-on:click="importSave()" class="btn btn-primary">提&nbsp;&nbsp;&nbsp;&nbsp;交</span>
               </div>
             </div>
