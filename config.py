@@ -24,7 +24,7 @@ SOAR_PATH = BASE_DIR + os.sep + 'soar' + os.sep
 # 是否打开浏览器
 IS_OPEN_BROWESER = True  # True False
 
-DEBUG = True
+DEBUG = False
 
 # 多值定义需要使用英文,隔开方式返回
 MUL_SOAR_ARGS = [    'ignore-rules','explain-warn-access-type',
@@ -35,7 +35,7 @@ MUL_SOAR_ARGS = [    'ignore-rules','explain-warn-access-type',
                     # 'blacklist' # blacklist单独处理以换行符为分隔符号
                  ]
 
-SOAR_RUN_TIMEOUT = 5  # soar 执行超时后直接强制退出
+# SOAR_RUN_TIMEOUT = 5  # soar 执行超时后直接强制退出 暂时不用
 
 SOAR_NOT_USE_ARGS = ['version','log-output','verbose','print-config']
 

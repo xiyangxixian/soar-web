@@ -13,22 +13,25 @@ import tempfile
 import subprocess
 import webbrowser
 from collections import OrderedDict
-from urllib.parse import urlparse
+
 
 from config import TMP_DIR
 from config import SOAR_ARGS
 from config import SOAR_PATH
 from config import MUL_SOAR_ARGS
-from config import SOAR_RUN_TIMEOUT
 from config import IS_OPEN_BROWESER
 from config import DEBUG
 from config import SOAR_NOT_USE_ARGS
 
+try:
+    from urllib.parse import urlparse
+except ImportError:
+    from urlparse import urlparse
 
 
 def select_soar_for_os_version():
     '''
-    获取不同平台soar的位置
+    获取不同平台 soar 的位置
     :return:
     '''
     os_name = platform.system()
@@ -188,11 +191,11 @@ def soar_args_check(args):
     args_error=[]
     for arg,v in args.items():
         if arg not in SOAR_ARGS:
-            args_error.append('soar中没有发现配置: %s,%s '%(arg,args[arg]))
+            args_error.append('soar 中没有发现配置: %s,%s '%(arg,args[arg]))
         if arg in MUL_SOAR_ARGS:
             args[arg] = args[arg].split(',') #逗号隔开
         if arg in SOAR_NOT_USE_ARGS:
-            args_error.append('soar此配置禁用: %s,%s ' % (arg, args[arg]))
+            args_error.append('soar 此配置禁用: %s,%s ' % (arg, args[arg]))
 
     if args_error:
        return json.dumps({'result':'\n'.join(args_error),'status':False})
