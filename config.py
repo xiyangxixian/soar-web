@@ -11,7 +11,7 @@ import os
 # WEB 服务器地址
 HOST = '0.0.0.0'
 
-# WEB 服务器断开
+# WEB 服务器端口
 PORT = 5077
 
 # 根目录
@@ -24,7 +24,7 @@ SOAR_PATH = BASE_DIR + os.sep + 'soar' + os.sep
 # 是否打开浏览器
 IS_OPEN_BROWESER = True  # True False
 
-DEBUG = False
+DEBUG = False  # 打开 debug 会在 tmp 目录下存留 sql 文件 还有执行时的配置文件
 
 # 多值定义需要使用英文,隔开方式返回
 MUL_SOAR_ARGS = [    'ignore-rules','explain-warn-access-type',
@@ -35,7 +35,7 @@ MUL_SOAR_ARGS = [    'ignore-rules','explain-warn-access-type',
                     # 'blacklist' # blacklist单独处理以换行符为分隔符号
                  ]
 
-SOAR_RUN_TIMEOUT = 5  # soar 执行超时后直接强制退出
+# SOAR_RUN_TIMEOUT = 5  # soar 执行超时后直接强制退出，目前取消此配置为了兼容 py2 后续考虑加入
 
 SOAR_NOT_USE_ARGS = ['version','log-output','verbose','print-config']
 

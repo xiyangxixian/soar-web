@@ -8,7 +8,6 @@
 
 import json
 import time
-import re
 import pymysql
 
 from flask import Flask
@@ -89,7 +88,7 @@ def index():
 @app.errorhandler(404)
 def f0f(error):
     return json.dumps({
-            "result": '404请求不存在', "status": True}
+            "result": '404 请求不存在', "status": True}
         ),404
 
 @app.errorhandler(Exception)
