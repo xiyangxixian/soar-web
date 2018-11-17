@@ -43,7 +43,7 @@ Linux or Mac： bash run.sh
 关闭服务：bash manage.sh stop
 重启服务：bash manage.sh restart
 
-注：当主机上存在多个 python 版本时, 需自行更改 run.sh 或者 run.bat 或 manage.sh 中的 python 版本指定为 3.x 以上的版本运行。
+注：当主机上存在多个 python 版本时, 需自行更改 run.sh, run.bat, manage.sh 中的 python 版本指定为 3.x 以上的版本运行。
 ```
 
 ## docker 支持
