@@ -24,7 +24,7 @@ SOAR_PATH = BASE_DIR + os.sep + 'soar' + os.sep
 # 是否打开浏览器
 IS_OPEN_BROWESER = True  # True False
 
-DEBUG = True
+DEBUG = False
 
 # 多值定义需要使用英文,隔开方式返回
 MUL_SOAR_ARGS = [    'ignore-rules','explain-warn-access-type',

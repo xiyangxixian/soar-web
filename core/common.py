@@ -13,7 +13,11 @@ import tempfile
 import subprocess
 import webbrowser
 from collections import OrderedDict
-from urllib.parse import urlparse
+
+try:
+    from urllib.parse import urlparse
+except ImportError:
+    from urlparse import urlparse
 
 from config import TMP_DIR
 from config import SOAR_ARGS
