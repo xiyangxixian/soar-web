@@ -58,27 +58,28 @@ def req_parse2cmd_parse(args):
     return cmd_args
 
 
-def runcmd(cmd):
+def runcmd(cmd, sql=''):
     '''
     执行外部命令
     :param cmd: 传入列表一个参数为命令，防止命令拼接执行
     :return:
     '''
-    out_temp = tempfile.SpooledTemporaryFile(max_size=10 * 1000)
-    sql_tmp_dir = TMP_DIR + os.sep
+    # out_temp = tempfile.SpooledTemporaryFile(max_size=10 * 1000)
+    # sql_tmp_dir = TMP_DIR + os.sep
     try:
-        fileno = out_temp.fileno()
-        p = subprocess.Popen(cmd, shell=False,cwd=sql_tmp_dir, stdout=fileno,
-                             stderr=fileno,universal_newlines=True)
+        # fileno = out_temp.fileno()
+        p = subprocess.Popen(cmd, shell=False, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE,universal_newlines=True)
+        p.stdin.write(sql)
+        p.stdin.close()
         p.wait() # 如果超时直接干掉
-        out_temp.seek(0)
-        return out_temp.read()
+        # out_temp.seek(0)
+        data = p.stdout.read()
+        p.stdout.close()
+        return data
     except Exception as e:
         # 异常信息会暴露一些系统位置等消息
-        return b"run error: %s"%(str(e).encode('utf8'))
-    finally:
-        if out_temp:
-            out_temp.close()
+        return (b"run error: %s"%(str(e).encode('utf-8'))).decode('utf-8')
 
 def save_tmp_sql(args,sql_tmp_file):
     '''
@@ -140,8 +141,8 @@ def soar_result(args):
         save_tmp_blacklist(args, blacklist_tmp_file)
         args['blacklist'] = blacklist_tmp_file
 
-    save_tmp_sql(args, sql_tmp_file)
-    args['query'] = sql_tmp_file
+    query_sql = args['query']
+    del args['query']
 
     cmd_args['config'] = conf_tmp_file # soar 规定 -config 必须作为第一个参数
 
@@ -159,7 +160,7 @@ def soar_result(args):
     if DEBUG:
         print(' '.join(cmd_line)) #打印日志信息
 
-    result = runcmd(cmd_line).decode('utf8')
+    result = runcmd(cmd_line, query_sql)
 
     # 语法检查正确后 soar 无提示,人为提示结果正确
     if 'only-syntax-check' in args and 'true' in args['only-syntax-check'] \
