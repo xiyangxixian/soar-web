@@ -58,39 +58,27 @@ def req_parse2cmd_parse(args):
     return cmd_args
 
 
-def runcmd(cmd, sql=''):
+def runcmd(cmd):
     '''
     执行外部命令
     :param cmd: 传入列表一个参数为命令，防止命令拼接执行
     :return:
     '''
-    # out_temp = tempfile.SpooledTemporaryFile(max_size=10 * 1000)
-    # sql_tmp_dir = TMP_DIR + os.sep
+    sql_tmp_dir = TMP_DIR + os.sep
     try:
-        # fileno = out_temp.fileno()
-        p = subprocess.Popen(cmd, shell=False, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+
+        p = subprocess.Popen(cmd, shell=False,cwd=sql_tmp_dir, stdout=subprocess.PIPE,
                              stderr=subprocess.PIPE,universal_newlines=True)
-        p.stdin.write(sql)
-        p.stdin.close()
-        p.wait() # 如果超时直接干掉
-        # out_temp.seek(0)
-        data = p.stdout.read()
-        p.stdout.close()
-        return data
+        stdout, stderr = p.communicate()
+
+        if p.returncode != 0 or len(stderr) != 0:
+            return stderr
+        return stdout
+
     except Exception as e:
         # 异常信息会暴露一些系统位置等消息
-        return (b"run error: %s"%(str(e).encode('utf-8'))).decode('utf-8')
+        return b"run error: %s"%(str(e).encode('utf8'))
 
-def save_tmp_sql(args,sql_tmp_file):
-    '''
-    query 转成临时 sql 文件
-    :param args:
-    :param sql_tmp_file:
-    :return:
-    '''
-
-    with open(sql_tmp_file,'a') as f:
-            f.write(args['query'])
 
 def save_tmp_conf(args,conf_tmp_file):
     '''
@@ -132,7 +120,6 @@ def soar_result(args):
     :return:
     '''
     soar_run_uuid = TMP_DIR + str(uuid.uuid1()) # 执行 soar 使用临时缓存路径前缀
-    sql_tmp_file =  soar_run_uuid +'.sql'
     conf_tmp_file =soar_run_uuid +'.yaml'
     blacklist_tmp_file= soar_run_uuid +'.blacklist'
     cmd_args=OrderedDict()  # soar 要求 -config 作为第一参数
@@ -141,11 +128,12 @@ def soar_result(args):
         save_tmp_blacklist(args, blacklist_tmp_file)
         args['blacklist'] = blacklist_tmp_file
 
-    query_sql = args['query']
-    del args['query']
+
+
 
     cmd_args['config'] = conf_tmp_file # soar 规定 -config 必须作为第一个参数
-
+    cmd_args['query'] = args['query']
+    args.pop('query')
     # 排除 test-dsn online-dsn 继续使用命令行方式字符串代替,主要原因懒的转成序列
     if 'test-dsn' in args:
         cmd_args['test-dsn'] = args['test-dsn']
@@ -160,7 +148,7 @@ def soar_result(args):
     if DEBUG:
         print(' '.join(cmd_line)) #打印日志信息
 
-    result = runcmd(cmd_line, query_sql)
+    result = runcmd(cmd_line)
 
     # 语法检查正确后 soar 无提示,人为提示结果正确
     if 'only-syntax-check' in args and 'true' in args['only-syntax-check'] \
@@ -171,7 +159,6 @@ def soar_result(args):
     if DEBUG is False:
         try:
             # 移除临时配置文件
-            os.remove(sql_tmp_file)
             os.remove(conf_tmp_file)
             os.remove(blacklist_tmp_file)
         except Exception as e:
