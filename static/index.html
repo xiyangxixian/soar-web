@@ -37,12 +37,12 @@
       [v-cloak]{display:none;}
       
       /*markdown 样式*/
-      .sql-analysis-show{transform: scale(0.8);transform-origin: 0 0 0;padding:10px;}
-      .sql-analysis-show:not(table){width:820px}
+      .sql-analysis-show{padding:10px;}
+      
       .show-markdown h1, .show-markdown h2, .show-markdown h3{margin-top:0px !important;margin-bottom:0px !important;}
-      .show-markdown h2{font-size:20px !important;margin:30px 0px 20px 0px !important;padding-bottom: 5px;border-bottom: 1px solid #919699;}
-      .show-markdown h1{font-size:24px !important;margin:20px 0px !important;}
-      .show-markdown h3{font-size:16px !important;margin:16px 0px !important;}
+      .show-markdown h2{font-size:16px !important;margin:24px 0px 16px 0px !important;padding-bottom: 5px;border-bottom: 1px solid #919699;}
+      .show-markdown h1{font-size:20px !important;margin:10px 0px !important;}
+      .show-markdown h3{font-size:15px !important;margin:16px 0px !important;}
       .show-markdown h4{font-size:14px !important;}
       .show-markdown p{margin-bottom: 10px !important;}
       
@@ -52,7 +52,7 @@
       
       .show-markdown{overflow-x:auto;}
       .show-markdown table td, .show-markdown table th {font-size: 12px;border-bottom: 1px solid #919699;border-right: 1px solid #919699;}
-      .show-markdown table{border-top: 1px solid #919699;border-left: 1px solid #919699;border-spacing: 0;width:800px;}
+      .show-markdown table{border-top: 1px solid #919699;border-left: 1px solid #919699;border-spacing: 0;width:808px;transform: scale(0.8);transform-origin: 0 0 0;}
       .show-markdown table th {padding: 4px 8px;background: #E2E2E2;}
       .show-markdown table td {padding: 8px;vertical-align:top; word-break:break-word;}
       
@@ -397,9 +397,9 @@
             //markdown转html展示
             markdownFormat : function (res){
               $('#soar-content').html('<div class="sql-analysis-show">'+converter.makeHtml(res)+'</div>');
-              var height = $('.sql-analysis-show').height();
-              var diffHeight = Math.round(height / 8 * 10) - height
-              $('.sql-analysis-show').css('margin-bottom',-diffHeight + 'px');
+              var height = $('.sql-analysis-show table').height();
+              var diffHeight = 0.2 * height
+              $('.sql-analysis-show table').css('margin-bottom',-diffHeight + 'px');
             },
             //用富文本框展示sql 并且高亮显示
             textEditFormat : function(res){
