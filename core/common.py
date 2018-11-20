@@ -68,7 +68,7 @@ def runcmd(cmd):
     try:
 
         p = subprocess.Popen(cmd, shell=False,cwd=sql_tmp_dir, stdout=subprocess.PIPE,
-                             stderr=subprocess.PIPE,universal_newlines=True)
+                             stderr=subprocess.PIPE,universal_newlines=True,encoding='utf8')
         stdout, stderr = p.communicate()
 
         if p.returncode != 0 or len(stderr) != 0:
