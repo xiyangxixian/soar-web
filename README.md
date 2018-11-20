@@ -48,7 +48,7 @@ Linux or Mac： bash run.sh
 
 ## docker 支持
 地址：https://hub.docker.com/r/becivells/soar-web/   
-**Dockerfile 见项目文件夹 dockerfile/dev**
+Dockerfile 见根目录 Dockerfile 文件
 ```
 docker pull becivells/soar-web
 docker run -d --name soar-web -p 5077:5077 becivells/soar-web
