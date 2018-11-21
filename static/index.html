@@ -52,9 +52,9 @@
       
       .show-markdown{overflow-x:auto;}
       .show-markdown table td, .show-markdown table th {font-size: 12px;border-bottom: 1px solid #919699;border-right: 1px solid #919699;}
-      .show-markdown table{border-top: 1px solid #919699;border-left: 1px solid #919699;border-spacing: 0;width:808px;transform: scale(0.8);transform-origin: 0 0 0;}
+      .show-markdown table{width:100%;display:block;overflow:auto;border-top: 1px solid #919699;border-left: 1px solid #919699;border-spacing: 0;}
       .show-markdown table th {padding: 4px 8px;background: #E2E2E2;}
-      .show-markdown table td {padding: 8px;vertical-align:top; word-break:break-word;}
+      .show-markdown table td {padding: 8px;vertical-align:top;}
       
       /*列表样式*/
       .content-soar-list table tbody tr td{vertical-align: middle;}
@@ -86,7 +86,7 @@
             <span class="btn btn-primary" v-on:click="sqlAnalysis(3)">压缩</span>
             <span class="btn btn-primary" v-on:click="sqlAnalysis(4)">指纹</span>
             <span class="btn btn-primary" v-on:click="sqlAnalysis(5)">语法检查</span>
-            <div class="btn-group" v-bind:class="{open:openRewrite}"open:openExport v-on:click="openRewrite=!openRewrite">
+            <div class="btn-group" v-bind:class="{open:openRewrite}" v-on:click="openRewrite=!openRewrite">
               <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">SQL改写 <span class="caret"></span>
               </button>
               <ul class="dropdown-menu">
@@ -118,11 +118,11 @@
         <div class="mt-20 container" v-bind:style="{height:editorHeight}" style="margin-left:0px;margin-right:0px;width: 100%;">
           <div class="row" style="height:100%;">
             <!--sql 语句输入-->
-            <div class="col-xs-5" style="padding-left:0px;height:100%;">
+            <div class="col-xs-5" style="width:45%;padding-left:0px;height:100%;">
               <div class="show-content"><textarea placeholder="输入SQL语句 ..." id="sql-edit" style="display:none"></textarea></div>
             </div>
             <!--服务器返回展示-->
-            <div class="col-xs-7" style="padding-right:0px;height:100%;">
+            <div class="col-xs-7" style="width:55%;padding-right:0px;height:100%;">
               <div class="show-content show-markdown" style="height:100%;" id="soar-content"><span class="placegolder">soar结果展示 ...</span></div>
             </div>
           </div>
@@ -339,6 +339,7 @@
           return configs;
         }
         
+        //通过 post 方法下载
         function postDownLoad(data){
           var form = $("<form>");   //定义一个form表单
           form.attr('style','display:none');   //下面为在form表单中添加查询参数
@@ -365,22 +366,24 @@
         var vueApp = new Vue({
           el:'#vue-app',
           data:{
-            router:'',
-            configs: [],
-            curId: 0,
-            itemConfig:{},
-            editId:-1,
-            exportConfigJson:'',
-            importConfig:{},
-            openExport:false,
-            showExport:false,
-            openRewrite:false
+            router:'',   //路由
+            configs: [],    //soar 配置列表
+            curId: 0,    //当前选择的配置项
+            itemConfig:{},  //当前编辑配置详情
+            editId:-1,  //当前编辑配置id
+            exportConfigJson:'', //导出的json
+            importConfig:{},  //导入的配置
+            openExport:false,  //是否展开导出
+            showExport:false, //是否展开导出按钮
+            openRewrite:false // 是否展开重写按钮
           },
           watch: {
+            //监听当前配置项, 发生变化时存储到 localStorage
             curId:function(newId) {
               localStorage.setItem('config_select', newId);
             }
           },
+          //计算编辑器的高度
           computed:{
             editorHeight:function(){
               var textHeght = 500 + ($(window).height() -657);
@@ -397,9 +400,6 @@
             //markdown转html展示
             markdownFormat : function (res){
               $('#soar-content').html('<div class="sql-analysis-show">'+converter.makeHtml(res)+'</div>');
-              var height = $('.sql-analysis-show table').height();
-              var diffHeight = 0.2 * height
-              $('.sql-analysis-show table').css('margin-bottom',-diffHeight + 'px');
             },
             //用富文本框展示sql 并且高亮显示
             textEditFormat : function(res){
@@ -432,7 +432,7 @@
                     if($.isFunction(success)) success(json);
                   } else {
                     layer.msg(json.result, {time:2000});
-                    error(json);
+                    if ($.isFunction(error))error(json);
                   }
                 },
                 error: function () {
