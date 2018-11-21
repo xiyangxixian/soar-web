@@ -11,6 +11,7 @@ import uuid
 import platform
 import subprocess
 import webbrowser
+import tempfile
 from collections import OrderedDict
 
 from config import TMP_DIR
@@ -62,20 +63,21 @@ def runcmd(cmd):
     :param cmd: 传入列表一个参数为命令，防止命令拼接执行
     :return:
     '''
+    out_temp = tempfile.SpooledTemporaryFile(max_size=10 * 1000 * 1000)
     sql_tmp_dir = TMP_DIR + os.sep
     try:
-
-        p = subprocess.Popen(cmd, shell=False,cwd=sql_tmp_dir, stdout=subprocess.PIPE,
-                             stderr=subprocess.PIPE,universal_newlines=True,encoding='utf8')
-        stdout, stderr = p.communicate()
-
-        if p.returncode != 0 or len(stderr) != 0:
-            return stderr
-        return stdout
-
+        fileno = out_temp.fileno()
+        p = subprocess.Popen(cmd, shell=False,cwd=sql_tmp_dir, stdout=fileno,
+                             stderr=fileno,universal_newlines=True)
+        p.wait() # 如果超时直接干掉
+        out_temp.seek(0)
+        return out_temp.read().decode('utf8')
     except Exception as e:
         # 异常信息会暴露一些系统位置等消息
-        return ("run error: %s"%(str(e).encode('utf8'))).decode('utf8')
+        return (b"run error: %s" % (str(e).encode('utf8'))).decode('utf8')
+    finally:
+        if out_temp:
+            out_temp.close()
 
 
 def save_tmp_conf(args,conf_tmp_file):
