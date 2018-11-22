@@ -1,8 +1,8 @@
 # soar-web
 基于小米 [soar](https://github.com/XiaoMi/soar) 的开源 sql 分析与优化的 WEB 图形化工具，支持 soar 配置的添加、修改、复制，多配置切换，配置的导出、导入与导入功能。
 
-![soar](https://raw.githubusercontent.com/xiyangxixian/soar-web/master/doc/img/example-1.png?v=1)
-![soar](https://raw.githubusercontent.com/xiyangxixian/soar-web/master/doc/img/example-2.png?v=1)
+![soar](https://raw.githubusercontent.com/xiyangxixian/soar-web/master/doc/img/example-1.png?v=2)
+![soar](https://raw.githubusercontent.com/xiyangxixian/soar-web/master/doc/img/example-2.png?v=2)
 ![soar](https://raw.githubusercontent.com/xiyangxixian/soar-web/master/doc/img/example-3.png?v=1)
 
 ## 环境需求
@@ -35,6 +35,16 @@ setp 3 pip install pymysql
 
 ## 安装与使用
 ```
+下载源码（Windows 可略过此步骤）：
+sudo -y apt-get install wget 或者 sudo yum -y install wget 
+wget https://codeload.github.com/xiyangxixian/soar-web/zip/master -O soar-web.zip 
+
+解压缩（Windows 可略过此步骤）：
+sudo -y apt-get install unzip 或者 sudo yum -y install unzip 
+unzip soar-web.zip
+cd soar-web-matster
+
+运行启动脚本
 Windows： run.bat
 Linux or Mac： bash run.sh
 
