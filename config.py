@@ -11,7 +11,7 @@ import os
 # WEB 服务器地址
 HOST = '0.0.0.0'
 
-# WEB 服务器断开
+# WEB 服务器端口
 PORT = 5077
 
 # 根目录
@@ -24,6 +24,7 @@ SOAR_PATH = BASE_DIR + os.sep + 'soar' + os.sep
 # 是否打开浏览器
 IS_OPEN_BROWESER = True  # True False
 
+# 是否打开调试模式
 DEBUG = False
 
 # 多值定义需要使用英文,隔开方式返回
