@@ -38,9 +38,10 @@ setp 3 pip install pymysql
 下载源码（Windows 可略过此步骤）：
 wget https://codeload.github.com/xiyangxixian/soar-web/zip/master -O soar-web.zip 
 
-解压缩：
+解压缩（Windows 可略过此步骤）：
+sudo -y apt-get install unzip or sudo yum install unzip 
 unzip soar-web.zip
-cd soar-web
+cd soar-web-matster
 
 运行启动脚本
 Windows： run.bat
