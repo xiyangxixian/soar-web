@@ -36,6 +36,7 @@ setp 3 pip install pymysql
 ## 安装与使用
 ```
 下载源码（Windows 可略过此步骤）：
+sudo -y apt-get install wget 或者 sudo yum -y install wget 
 wget https://codeload.github.com/xiyangxixian/soar-web/zip/master -O soar-web.zip 
 
 解压缩（Windows 可略过此步骤）：
