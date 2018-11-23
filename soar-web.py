@@ -94,7 +94,6 @@ def f0f(error):
 
 @app.errorhandler(Exception)
 def error_info(error):
-
     return json.dumps({
         "result": str(error), "status": False}
     )
