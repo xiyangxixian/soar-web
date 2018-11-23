@@ -94,6 +94,12 @@ def save_tmp_conf(args,conf_tmp_file):
                 f.write('%s:\n'%(arg))
                 for v in value:
                     f.write('  - %s\n'%(v))
+            elif isinstance(value, dict):
+                f.write('%s:\n' % (arg))
+                for k,v in value.items():
+                    if v != 'false' and v != 'true':
+                        v = "'%s'" % v
+                    f.write('  %s : %s\n' % (k,v))
             else:
                 f.write('%s: %s\n'%(arg,value))
 
@@ -132,12 +138,8 @@ def soar_result(args):
     cmd_args['query'] = args['query']
     args.pop('query')
     # 排除 test-dsn online-dsn 继续使用命令行方式字符串代替,主要原因懒的转成序列
-    if 'test-dsn' in args:
-        cmd_args['test-dsn'] = args['test-dsn']
-        args.pop('test-dsn')
-    if 'online-dsn' in args:
-        cmd_args['online-dsn'] = args['online-dsn']
-        args.pop('online-dsn')
+    args['online-dsn'] = dsn2soaryaml(args['online-dsn'])
+    args['test-dsn'] = dsn2soaryaml(args['test-dsn'])
 
     save_tmp_conf(args, conf_tmp_file)
     cmd_line = req_parse2cmd_parse(cmd_args)
@@ -187,12 +189,14 @@ def soar_args_check(args):
 
     return None  # 默认不用返回也是 None
 
-
+# 打开浏览器
 def open_brower(url):
     if IS_OPEN_BROWESER:
         webbrowser.open(url)
 
+# 解析dsn
 def parse_dsn(host):
+    host = scEncode(host)
     res = urlparse('http://%s' % host)
     arr = res.netloc.split('@')
     user = 'root'
@@ -203,10 +207,57 @@ def parse_dsn(host):
         arr2 = arr[0].split(':')
         host = arr[1]
         user = arr2[0]
-        if len(arr2) == 2:pwd = arr2[1]
+        if len(arr2) == 2 : pwd = arr2[1]
     else:
         host = arr[0]
     hostArr = host.split(':')
     host = hostArr[0]
+    query = parse_query(res.query)
+    charset = 'utf8'
+    if 'charset' in query.keys() : charset = scDecode(query['charset'])
     if (len(hostArr) == 2) : port = hostArr[1]
-    return {'host':host, 'user':user, 'pwd':pwd, 'db':db, 'port':int(port), 'charset':''}
+    return {
+        'host':scDecode(host),
+        'user':scDecode(user),
+        'pwd':scDecode(pwd),
+        'db':scDecode(db),
+        'port':int(port),
+        'charset':charset
+    }
+
+# dsn 特殊字符编码
+def scEncode(str):
+    map = {'@':'a',':':'b','/':'c'}
+    for key,value in map.items():
+        oldStr = '\\%s' % key
+        newStr = '\\%s' % value
+        str = str.replace(oldStr, newStr)
+    return str
+
+# dsn 特殊字符解码
+def scDecode(str):
+    map = {'a':'@','b':':','c':'/'}
+    for key,value in map.items():
+        oldStr = '\\%s' % key
+        str = str.replace(oldStr, value)
+    return str
+
+# 查询字符串解析
+def parse_query(query):
+    arr = query.split('&')
+    res = {}
+    for i in arr :
+        paramArr = i.split('=')
+        if len(paramArr) == 2 : res[paramArr[0]] = paramArr[1]
+    return res
+
+# soar 配置文件
+def dsn2soaryaml(dsn):
+    dsn = parse_dsn(dsn)
+    return {
+        'addr' : '%s:%s' % (dsn['host'], dsn['port']),
+        'schema' : dsn['db'],
+        'user' : dsn['user'],
+        'password' : dsn['pwd'],
+        'disable' : 'false'
+    }
