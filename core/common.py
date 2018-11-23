@@ -93,16 +93,23 @@ def save_tmp_conf(args,conf_tmp_file):
             if isinstance(value,list):
                 f.write('%s:\n'%(arg))
                 for v in value:
-                    f.write('  - %s\n'%(v))
+                    f.write('  - %s\n'%(yaml_str(v)))
             elif isinstance(value, dict):
                 f.write('%s:\n' % (arg))
                 for k,v in value.items():
-                    if v != 'false' and v != 'true':
-                        v = "'%s'" % v
-                    f.write('  %s : %s\n' % (k,v))
+                    f.write('  %s: %s\n' % (k, yaml_str(v)))
             else:
-                f.write('%s: %s\n'%(arg,value))
+                f.write('%s: %s\n'%(arg,yaml_str(value)))
 
+# yaml 字符串
+def yaml_str(str):
+    if str is False:
+        return 'false'
+    elif str is True:
+        return 'true'
+    elif str != 'false' and str != 'true':
+        return  "'%s'" % (str.replace("'", "''"))
+    return str
 
 
 def save_tmp_blacklist(args,blacklist_tmp_file):

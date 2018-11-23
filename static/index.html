@@ -434,9 +434,12 @@
             //将 soar 配置合并到请求中
             mergeConfig : function (data){
               var config = this.configs[this.curId] || this.configs[0] || {};
-              var res = $.extend(data, config);
-              delete res.name;
-              return res;
+              for (var i in config) {
+                if (i == 'name') continue;
+                if (!config[i] || !config[i].trim || (config[i].trim()) == '') continue;
+                data[i] = config[i];
+              }
+              return data;
             },
             //请求封装
             request : function(config, success, error){
@@ -460,6 +463,7 @@
                     layer.msg(json.result, {time:2000});
                     if ($.isFunction(error))error(json);
                   }
+                  if (json.log) console.log(json.log);
                 },
                 error: function () {
                   if (config.isLoading) layer.close(loadIndex);
