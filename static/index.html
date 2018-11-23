@@ -327,6 +327,10 @@
           soar : 'soar_config',
           configSelect : 'config_select'
         };
+        
+        //初始化sql编辑器
+        var converter = new showdown.Converter();
+        converter.setOption('tables', true);
               
         var vueApp = new Vue({
           el:'#vue-app',
@@ -359,11 +363,13 @@
             }
           },
           methods:{
+            run : function (callback){
+              if ($.isFunction(callback)) callback.call(this);
+              return this;
+            },
             initRouter : function (router){
               this.curRouter = router;
-              this.configs = this.getSoarConfig();
-              var curId = Number(localStorage.getItem(cacheKey.configSelect)) || 0;
-              this.curId = (curId >= vueApp.configs.length || curId < 0) ? 0 : curId;
+              this.curId = (this.curId < 0 || this.curId >= vueApp.configs.length) ? 0 : this.curId;
             },
             //获取 soar 配置项列表， 如果没有则初始化一条默认，配置
             getSoarConfig : function (){
@@ -463,7 +469,7 @@
             },
             //根据sql分析选项， 进行补贴的展示
             sqlAnalysis:function(type){
-              var query = window.sqlEditor.getValue();
+              var query = this.sqlEditor.getValue();
               if (!query) return layer.msg('sql 不能为空', {time:1000});
               var data = {};
               var curFormat = this.curFormat;
@@ -499,7 +505,7 @@
             },
             //sql 改写功能
             rewrite:function (rule){
-              var query = window.sqlEditor.getValue();
+              var query = this.sqlEditor.getValue();
               if (!query) return layer.msg('sql 不能为空', {time:1000});
               var data = {};
               data.query = query;
@@ -521,7 +527,7 @@
             },
             //html导出
             exportSoar : function(type){
-              var query = window.sqlEditor.getValue();
+              var query = this.sqlEditor.getValue();
               if (!query) return layer.msg('sql 不能为空', {time:1000});
               var data = {};
               data.query = query;
@@ -663,28 +669,31 @@
             },
             //复制配置项
             soarCopy : function(id){
-              layer.prompt({title:'请输入模板名称'},function(value, index){
+              var config = vueApp.configs[id];
+              layer.prompt({title:'请输入新的模板名称', value:config.name+' - 副本'},function(value, index){
                 vueApp.editId = -1;
                 vueApp.itemConfig = {};
-                vueApp.itemConfig = $.extend(vueApp.itemConfig, vueApp.configs[id]);
+                vueApp.itemConfig = $.extend(vueApp.itemConfig, config);
                 vueApp.initConfig();
                 vueApp.itemConfig.name = value;
                 if (vueApp.soarSave()) layer.close(index);
               });
             }
           }
+        }).run(function (){
+          //初始化配置
+          this.configs = this.getSoarConfig();
+          this.curId = Number(localStorage.getItem(cacheKey.configSelect)) || 0;
+          //sql 编辑器
+          this.sqlEditor = CodeMirror.fromTextArea(document.getElementById("sql-edit"), {
+            mode: 'text/x-mysql',
+            styleActiveLine:true,
+            lineWrapping:true
+          });
         });
         
-        //初始化sql编辑器
-        var converter = new showdown.Converter();
-        converter.setOption('tables', true);
-        window.sqlEditor = CodeMirror.fromTextArea(document.getElementById("sql-edit"), {
-          mode: 'text/x-mysql',
-          styleActiveLine:true,
-          lineWrapping:true
-        });
-        
-        var routes = {
+        //监听路由
+        Router({
           //sql 分享页面
           '/analysis': function (){
             vueApp.initRouter(router.analysis);
@@ -693,8 +702,7 @@
           '/config': function (){
             vueApp.initRouter(router.config);
           }
-        };
-        Router(routes).init(router.analysis);
+        }).init(router.analysis);
       })();
     </script>
   </body>
