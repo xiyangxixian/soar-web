@@ -103,13 +103,15 @@ def save_tmp_conf(args,conf_tmp_file):
 
 # yaml 字符串
 def yaml_str(str):
-    if str is False:
+    if str is False or str == 'false':
         return 'false'
-    elif str is True:
+    elif str is True or str == 'true':
         return 'true'
-    elif str != 'false' and str != 'true':
+    try:
+        int(str)
+        return str
+    except:
         return  "'%s'" % (str.replace("'", "''"))
-    return str
 
 
 def save_tmp_blacklist(args,blacklist_tmp_file):
