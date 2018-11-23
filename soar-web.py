@@ -66,8 +66,8 @@ def soardownload():
 @app.route('/test-connect',methods=['POST', 'GET'])
 def testconnect():
     dsn = request.values.get('dsn')
-    res = parse_dsn(dsn)
     try:
+        res = parse_dsn(dsn)
         pymysql.connect(
             host = res['host'],
             port = int(res['port']),

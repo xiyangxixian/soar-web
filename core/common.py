@@ -130,6 +130,11 @@ def soar_result(args):
     blacklist_tmp_file= soar_run_uuid +'.blacklist'
     cmd_args=OrderedDict()  # soar 要求 -config 作为第一参数
 
+    # 解析数据库连接
+    args['online-dsn'] = dsn2soaryaml(args['online-dsn'])
+    args['test-dsn'] = dsn2soaryaml(args['test-dsn'])
+
+    # 黑名单列表
     if 'blacklist' in args:
         save_tmp_blacklist(args, blacklist_tmp_file)
         args['blacklist'] = blacklist_tmp_file
@@ -137,9 +142,6 @@ def soar_result(args):
     cmd_args['config'] = conf_tmp_file # soar 规定 -config 必须作为第一个参数
     cmd_args['query'] = args['query']
     args.pop('query')
-    # 排除 test-dsn online-dsn 继续使用命令行方式字符串代替,主要原因懒的转成序列
-    args['online-dsn'] = dsn2soaryaml(args['online-dsn'])
-    args['test-dsn'] = dsn2soaryaml(args['test-dsn'])
 
     save_tmp_conf(args, conf_tmp_file)
     cmd_line = req_parse2cmd_parse(cmd_args)
@@ -196,32 +198,35 @@ def open_brower(url):
 
 # 解析dsn
 def parse_dsn(host):
-    host = scEncode(host)
-    res = urlparse('http://%s' % host)
-    arr = res.netloc.split('@')
-    user = 'root'
-    pwd = ''
-    port = 3306
-    db = res.path.strip('/')
-    if len(arr) == 2:
-        arr2 = arr[0].split(':')
-        host = arr[1]
-        user = arr2[0]
-        if len(arr2) == 2 : pwd = arr2[1]
-    else:
-        host = arr[0]
-    hostArr = host.split(':')
-    host = hostArr[0]
-    query = parse_query(res.query)
-    charset = 'utf8'
-    if 'charset' in query.keys() : charset = scDecode(query['charset'])
-    if (len(hostArr) == 2) : port = hostArr[1]
+    try :
+        host = scEncode(host)
+        res = urlparse('http://%s' % host)
+        arr = res.netloc.split('@')
+        user = 'root'
+        pwd = ''
+        port = 3306
+        db = res.path.strip('/')
+        if len(arr) == 2:
+            arr2 = arr[0].split(':')
+            host = arr[1]
+            user = arr2[0]
+            if len(arr2) == 2 : pwd = arr2[1]
+        else:
+            host = arr[0]
+        hostArr = host.split(':')
+        host = hostArr[0]
+        query = parse_query(res.query)
+        charset = 'utf8'
+        if 'charset' in query.keys() : charset = scDecode(query['charset'])
+        if (len(hostArr) == 2) : port = int(hostArr[1])
+    except:
+        raise RuntimeError('数据库连接错误');
     return {
         'host':scDecode(host),
         'user':scDecode(user),
         'pwd':scDecode(pwd),
         'db':scDecode(db),
-        'port':int(port),
+        'port':port,
         'charset':charset
     }
 
