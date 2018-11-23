@@ -318,7 +318,7 @@
          downLoad : '/soar-download'
         };
         //路由
-        var router = {
+        var r = {
           analysis : '/analysis', //sql 分析
           config : '/config'  //soar配置
         };
@@ -345,7 +345,7 @@
             openExport : false,  //是否展开导出
             showExport : false, //是否展开导出按钮
             openRewrite : false, // 是否展开重写按钮
-            router : router // 路由配置
+            router : r // 路由配置
           },
           watch: {
             //监听当前配置项, 发生变化时存储到 localStorage
@@ -696,13 +696,13 @@
         Router({
           //sql 分享页面
           '/analysis': function (){
-            vueApp.initRouter(router.analysis);
+            vueApp.initRouter(r.analysis);
           },
           //soar 配置分享页面
           '/config': function (){
-            vueApp.initRouter(router.config);
+            vueApp.initRouter(r.config);
           }
-        }).init(router.analysis);
+        }).init(r.analysis);
       })();
     </script>
   </body>
