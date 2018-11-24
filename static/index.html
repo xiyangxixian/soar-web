@@ -403,7 +403,7 @@
               localStorage.setItem(cacheKey.soar, JSON.stringify(configs));
             },
             //通过 post 方法下载
-            postDownLoad : function (url, data){
+            postDownload : function (url, data){
               var form = $('<form>');   //定义一个form表单
               form.attr('style', 'display:none');  //隐藏表单 
               form.attr('method', 'post'); //post 方法
@@ -544,7 +544,7 @@
               data.query = query;
               data['report-type'] = type || '';
               data = this.mergeConfig(data);
-              this.postDownLoad(api.download, data);
+              this.postDownload(api.download, data);
             },
             //配置导出
             exportConfig : function (){
