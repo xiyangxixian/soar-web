@@ -74,7 +74,7 @@ def runcmd(cmd):
         return out_temp.read().decode('utf8')
     except Exception as e:
         # 异常信息会暴露一些系统位置等消息
-        return (b"run error: %s" % (str(e).encode('utf8'))).decode('utf8')
+        return 'run error: %s' % str(e)
     finally:
         if out_temp:
             out_temp.close()
@@ -208,7 +208,7 @@ def open_brower(url):
 # 解析dsn
 def parse_dsn(host):
     try :
-        host = scEncode(host)
+        host = sc_encode(host)
         res = urlparse('http://%s' % host)
         arr = res.netloc.split('@')
         user = 'root'
@@ -226,34 +226,35 @@ def parse_dsn(host):
         host = hostArr[0]
         query = parse_query(res.query)
         charset = 'utf8'
-        if 'charset' in query.keys() : charset = scDecode(query['charset'])
+        if 'charset' in query.keys() : charset = sc_decode(query['charset'])
         if (len(hostArr) == 2) : port = int(hostArr[1])
     except:
         raise RuntimeError('数据库连接错误');
     return {
-        'host':scDecode(host),
-        'user':scDecode(user),
-        'pwd':scDecode(pwd),
-        'db':scDecode(db),
-        'port':port,
-        'charset':charset
+        'host' : sc_decode(host),
+        'user' : sc_decode(user),
+        'pwd' : sc_decode(pwd),
+        'db' : sc_decode(db),
+        'port' : port,
+        'charset' : charset
     }
 
+# 特殊字符, 从左往右编码
+schars = ['\\', '@', ':', '/']
+    
 # dsn 特殊字符编码
-def scEncode(str):
-    map = {'@':'a',':':'b','/':'c'}
-    for key,value in map.items():
-        oldStr = '\\%s' % key
-        newStr = '\\%s' % value
-        str = str.replace(oldStr, newStr)
+def sc_encode(str):
+    for val in schars:
+        old_str = '\\%s' % val
+        new_str = '\\{%d}' % ord(val)
+        str = str.replace(old_str, new_str)
     return str
 
 # dsn 特殊字符解码
-def scDecode(str):
-    map = {'a':'@','b':':','c':'/'}
-    for key,value in map.items():
-        oldStr = '\\%s' % key
-        str = str.replace(oldStr, value)
+def sc_decode(str):
+    for val in schars[::-1]:
+        old_str = '\\{%d}' % ord(val)
+        str = str.replace(old_str, val)
     return str
 
 # 查询字符串解析
