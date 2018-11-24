@@ -317,7 +317,7 @@
         var api = {
          soar : '/soar-api',  //soar sql 分析优化接口 
          testConnect : '/test-connect',  //测试数据库连接
-         downLoad : '/soar-download'  //导出接口
+         download : '/soar-download'  //导出接口
         };
         //路由
         var r = {
@@ -544,7 +544,7 @@
               data.query = query;
               data['report-type'] = type || '';
               data = this.mergeConfig(data);
-              this.postDownLoad(api.downLoad, data);
+              this.postDownLoad(api.download, data);
             },
             //配置导出
             exportConfig : function (){
