@@ -149,7 +149,7 @@ def soar_result(args):
         save_tmp_blacklist(args, blacklist_tmp_file)
         args['blacklist'] = blacklist_tmp_file
     if 'log-level' in args:
-        args['log-output']=log_tmp_file
+        args['log-output']=log_tmp_file.replace('\\', '\\\\')
 
     cmd_args['config'] = conf_tmp_file # soar 规定 -config 必须作为第一个参数
     cmd_args['query'] = args['query']
@@ -175,8 +175,7 @@ def soar_result(args):
             "status": True,
             "log":loginfo
 
-        }
-        )
+        })
     if DEBUG is False:
         try:
             # 移除临时配置文件
@@ -190,8 +189,7 @@ def soar_result(args):
         "result": result,
         "status": True,
         "log": loginfo,
-    }
-    )
+    })
 
 def soar_args_check(args):
     '''

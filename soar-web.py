@@ -95,8 +95,8 @@ def f0f(error):
 @app.errorhandler(Exception)
 def error_info(error):
     return json.dumps({
-        "result": str(error), "status": False}
-    )
+        "result": str(error), "status": False
+    })
 
 if __name__ == '__main__':
     # TODO 初始环境检查,包括 tmp，soar 目录是否可读写 soar 不存在自动拉取
