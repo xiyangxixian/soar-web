@@ -162,7 +162,6 @@ def soar_result(args):
         print(' '.join(cmd_line)) #打印日志信息
 
     result = runcmd(cmd_line)
-    print (result)
     loginfo = ''
     if 'log-level' in args:
         with open(log_tmp_file,'r') as f:
