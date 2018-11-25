@@ -140,8 +140,8 @@ def soar_result(args):
     cmd_args=OrderedDict()  # soar 要求 -config 作为第一参数
 
     # 解析数据库连接
-    args['online-dsn'] = dsn2soaryaml(args['online-dsn'])
-    args['test-dsn'] = dsn2soaryaml(args['test-dsn'])
+    if 'online-dsn' in args : args['online-dsn'] = dsn2soaryaml(args['online-dsn'])
+    if 'test-dsn' in args : args['test-dsn'] = dsn2soaryaml(args['test-dsn'])
 
     # 黑名单列表
     if 'blacklist' in args:
