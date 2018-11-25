@@ -164,8 +164,11 @@ def soar_result(args):
     result = runcmd(cmd_line)
     loginfo = ''
     if 'log-level' in args:
-        with open(log_tmp_file,'r') as f:
-            loginfo = f.read()
+        try:
+            with open(log_tmp_file,'r') as f:
+                loginfo = f.read()
+        except:
+            pass
 
     # 语法检查正确后 soar 无提示,人为提示结果正确
     if 'only-syntax-check' in args and 'true' in args['only-syntax-check'] \
