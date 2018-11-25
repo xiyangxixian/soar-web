@@ -147,7 +147,7 @@ def soar_result(args):
     # 黑名单列表
     if 'blacklist' in args:
         save_tmp_blacklist(args, blacklist_tmp_file)
-        args['blacklist'] = blacklist_tmp_file
+        args['blacklist'] = blacklist_tmp_file.replace('\\', '\\\\')
     if 'log-level' in args:
         args['log-output']=log_tmp_file.replace('\\', '\\\\')
 
