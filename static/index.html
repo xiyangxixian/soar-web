@@ -467,30 +467,32 @@
             //请求封装
             request : function(config, success, error){
               var loadIndex;
-              if (config.isLoading) loadIndex = layer.load(2, {offset:'30%'});
+              if (config.isLoading) loadIndex = layer.load(2, {offset:'30%'});  //打开加载动画
               $.ajax({
-                url: config.url,
-                data: config.data || {},
-                method:config.method || 'POST',   
+                url : config.url,  //请求url
+                data : config.data || {},  //请求数据
+                method : config.method || 'POST',  //默认 POST 请求
+                timeout : (config.timeout || 30) * 1000,  //默认 30 秒超时
                 success: function (res) {
-                  if (config.isLoading) layer.close(loadIndex);
+                  if (config.isLoading) layer.close(loadIndex);  //关闭加载动画
                   var json;
+                  //解析 json
                   try {
                     json = JSON.parse(res);
                   } catch (e) {
                     json = {status:true, result:res};
                   }
                   if (json.status) {
-                    if($.isFunction(success)) success(json);
+                    if($.isFunction(success)) success(json);  //成功回调处理
                   } else {
-                    layer.msg(json.result, {time:2000});
-                    if ($.isFunction(error))error(json);
+                    layer.msg(json.result, {time:2000});  //提示错误信息
+                    if ($.isFunction(error)) error(json);  //错误回调处理
                   }
-                  if (json.log) console.log(json.log);
+                  if (json.log) console.log(json.log);  //如果有日志, 则打印至控制台
                 },
                 error: function () {
-                  if (config.isLoading) layer.close(loadIndex);
-                  if($.isFunction(error)) error();
+                  if (config.isLoading) layer.close(loadIndex);  //关闭弹窗
+                  if($.isFunction(error)) error();  //错误回调处理
                 }
               });
             },
@@ -528,6 +530,8 @@
                 json.result ? curFormat(json.result) : vueApp.textEditFormat(data.query);
                 vueApp.showExport = type == 1 && json.result;
                 if(!json.result) layer.msg('SQL 执行错误，请检查字段，表是否存在！', {time:2000});
+              }, function (json){
+                if(!json) layer.msg('请求超时！', {time:2000});
               });
             },
             //sql 改写功能
@@ -542,14 +546,18 @@
               this.request({url:api.soar, data:data, isLoading:true}, function(json){
                 vueApp.textEditFormat(json.result || data.query);
                 if(!json.result) layer.msg('SQL 执行错误请，检查字段，表是否存在！', {time:2000});
+              }, function (json){
+                if(!json) layer.msg('请求超时！', {time:2000});
               });
             },
             //数据库连接测试
             testConnect : function(dsn){
               dsn = dsn ? dsn.trim() : '';
               if (!dsn) return layer.msg('数据库连接不能为空', {time:1000});
-              this.request({url:api.testConnect,data:{dsn:dsn}, isLoading:true}, function(json){
+              this.request({url:api.testConnect,data:{dsn:dsn}, isLoading:true, timeout:5}, function(json){
                 layer.msg(json.result, {time:1000});
+              }, function (json){
+                if(!json) layer.msg('连接超时！', {time:2000});
               });
             },
             //html导出
