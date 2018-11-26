@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
   <head>
-    <title>soar web</title>
+    <title>SOAR WEB</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!--js 库文件-->
@@ -65,6 +65,10 @@
       .content-soar-list table tbody tr td{vertical-align: middle;}
       .content-soar-list table thead th{background-color: #f5fafe;border-bottom: none;}
       .hljs-keyword{color: #d73a49}
+      
+      /*弹窗样式*/
+      .alert{align-items:center; position:fixed;font-size:14px;text-align: center;padding:10px 20px 10px 15px !important;min-width:300px;z-index:100000000;justify-content:center;left:50%;transform:translateX(-50%);}
+      .alert .glyphicon{display:inline-block;margin-right:10px;vertical-align:-1.5px;font-size:16px;}
     </style>
   </head>
   <body>
@@ -72,8 +76,8 @@
       <!--导航-->
       <header style="margin:20px 0px;">
         <ul class="nav nav-tabs">
-          <li role="presentation" v-bind:class="{active:curRouter==router.analysis}"><a href="#/analysis">sql分析</a></li>
-          <li role="presentation" v-bind:class="{active:curRouter==router.config}"><a href="#/config">soar配置</a></li>
+          <li role="presentation" v-bind:class="{active:curRouter==router.analysis}"><a href="#/analysis">SQL分析</a></li>
+          <li role="presentation" v-bind:class="{active:curRouter==router.config}"><a href="#/config">SOAR配置</a></li>
         </ul>
       </header>
       <!--导航-->
@@ -93,7 +97,7 @@
             <span class="btn btn-primary" v-on:click="sqlAnalysis(3)">压缩</span>
             <span class="btn btn-primary" v-on:click="sqlAnalysis(4)">指纹</span>
             <span class="btn btn-primary" v-on:click="sqlAnalysis(5)">语法检查</span>
-            <div class="btn-group" v-bind:class="{open:openRewrite}" v-on:click="openRewrite=!openRewrite">
+            <div class="btn-group" v-bind:class="{open:menuOpen.rewrite}" v-on:click.stop="toggleMenu('rewrite')">
               <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">SQL改写 <span class="caret"></span>
               </button>
               <ul class="dropdown-menu">
@@ -109,8 +113,8 @@
               </ul>
             </div>
             <span class="btn btn-danger ml-20" v-on:click="clear()">清空</span>
-            <div v-if="showExport" class="btn-group" v-bind:class="{open:openExport}" v-on:click="openExport=!openExport">
-              <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> 导出 <span class="caret"></span>
+            <div v-if="showExport" class="btn-group" v-bind:class="{open:menuOpen['export']}" v-on:click.stop="toggleMenu('export')">
+              <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">导出 <span class="caret"></span>
               </button>
               <ul class="dropdown-menu">
                 <li><a href="javascript:;" v-on:click="exportSoar('html')">html</a></li>
@@ -130,11 +134,11 @@
           <div class="row" style="height:100%;">
             <!--sql 语句输入-->
             <div class="col-xs-5" style="width:46%;padding-left:0px;height:100%;">
-              <div class="show-content"><textarea placeholder="输入SQL语句 ..." id="sql-edit" style="display:none"></textarea></div>
+              <div class="show-content"><textarea placeholder="输入 SQL 语句 ..." id="sql-edit" style="display:none"></textarea></div>
             </div>
             <!--服务器返回展示-->
             <div class="col-xs-7" style="width:54%;padding-right:0px;height:100%;">
-              <div class="show-content show-markdown" style="height:100%;" id="soar-content"><span class="placegolder">soar结果展示 ...</span></div>
+              <div class="show-content show-markdown" style="height:100%;" id="soar-content"><span class="placegolder">{{label.defaultResult}}</span></div>
             </div>
           </div>
         </div>
@@ -347,6 +351,69 @@
           lineWrapping : true  //换行显示
         };
         
+        //弹窗
+        layer.openMsg = function (msg, type, timeout){
+          type = type || 'info';
+          timeout = timeout || 3000;
+          //弹窗样式
+          var classMap = {
+            info : 'alert-info',
+            warning : 'alert-warning',
+            success : 'alert-success', 
+            error : 'alert-danger'
+          };
+          //弹窗 icon 样式
+          var iconMap = {
+            info : 'glyphicon-info-sign',
+            warning : 'glyphicon-exclamation-sign',
+            success : 'glyphicon-ok-sign',
+            'error' : 'glyphicon-remove-sign'
+          };
+          var curClass = classMap[type] || 'alert-info';
+          var curIconClass = iconMap[type] || 'glyphicon-info-sign';
+          //弹窗组件html
+          var dom = $('<div class="alert" role="alert"><span class="glyphicon"></span><span class="alert-msg"></span></div>');
+          //设置类样式
+          dom.addClass(curClass).find('.alert-msg').text(msg);
+          dom.find('.glyphicon').addClass(curIconClass);
+          //设置初始 css
+          dom.css('top','-20px').css('opacity',0);
+          //加入页面
+          $('body').append(dom);
+          //淡入淡出时间
+          var showtime = 250;
+          //淡入
+          dom.animate({
+            top:'16px',
+            opacity:'1'
+          }, showtime, function (){
+            //显示一段时间然后淡出
+            setTimeout(function(){
+              dom.animate({
+                top:'-20px',
+                opacity:'0'
+              }, showtime, function (){
+                this.remove();
+              });
+            }, timeout);
+          });
+        };
+        
+        //错误信息弹窗
+        layer.errorMsg = function(msg){
+          layer.openMsg(msg, 'error');
+        };
+        
+        //成功信息弹窗
+        layer.successMsg = function(msg){
+          layer.openMsg(msg, 'success');
+        };
+        
+        //成功信息弹窗
+        layer.warnMsg = function(msg){
+          layer.openMsg(msg, 'warning');
+        };
+        
         //初始化sql编辑器
         var converter = new showdown.Converter();
         converter.setOption('tables', true);
@@ -361,18 +428,23 @@
             editId : -1,  //当前编辑配置id
             exportConfigJson : '', //导出的json
             importConfig : {},  //导入的配置
-            openExport : false,  //是否展开导出
             showExport : false, //是否展开导出按钮
-            openRewrite : false, // 是否展开重写按钮
+            menuOpen : {
+              'rewrite' : false, //是否展开重写按钮
+              'export' : false  //是否展开导出
+            },
+            label : {
+              defaultResult : 'SOAR 结果展示 ...'  //右侧结果 placeholder
+            },
             router : r, // 路由配置
             logLevel : 0 //日志等级
           },
           watch : {
             //监听当前配置项, 发生变化时存储到 localStorage
-            curId:function(newId) {
+            curId : function(newId) {
               localStorage.setItem(cacheKey.configSelect, newId);
             },
-            logLevel:function(level) {
+            logLevel : function(level) {
               localStorage.setItem(cacheKey.logLevel, level);
             }
           },
@@ -393,6 +465,12 @@
             initRouter : function (router){
               this.curRouter = router;
               this.curId = (this.curId < 0 || this.curId >= vueApp.configs.length) ? 0 : this.curId;
+            },
+            toggleMenu : function (key){
+              for(var i in this.menuOpen){
+                if (i != key) this.menuOpen[i] = false;
+              }
+              this.menuOpen[key] = !this.menuOpen[key];
             },
             //获取 soar 配置项列表， 如果没有则初始化一条默认，配置
             getSoarConfig : function (){
@@ -485,8 +563,8 @@
                   if (json.status) {
                     if($.isFunction(success)) success(json);  //成功回调处理
                   } else {
-                    layer.msg(json.result, {time:2000});  //提示错误信息
-                    if ($.isFunction(error)) error(json);  //错误回调处理
+                    layer.errorMsg(json.result);
+                    if ($.isFunction(error)) error(json);
                   }
                   if (json.log) console.log(json.log);  //如果有日志, 则打印至控制台
                 },
@@ -499,7 +577,7 @@
             //根据sql分析选项， 进行补贴的展示
             sqlAnalysis:function(type){
               var query = this.sqlEditor.getValue();
-              if (!query) return layer.msg('sql 不能为空', {time:1000});
+              if (!query) return layer.errorMsg('SQL 不能为空');
               var data = {};
               var curFormat = this.curFormat;
               switch(type){
@@ -529,15 +607,15 @@
               this.request({url:api.soar, data:data, isLoading:true}, function(json){
                 json.result ? curFormat(json.result) : vueApp.textEditFormat(data.query);
                 vueApp.showExport = type == 1 && json.result;
-                if(!json.result) layer.msg('SQL 执行错误，请检查字段，表是否存在', {time:2000});
+                if(!json.result) layer.errorMsg('SQL 执行错误，请检查字段，表是否存在');
               }, function (json){
-                if(!json) layer.msg('请求超时', {time:2000});
+                if(!json) layer.errorMsg('请求超时');
               });
             },
             //sql 改写功能
             rewrite:function (rule){
               var query = this.sqlEditor.getValue();
-              if (!query) return layer.msg('sql 不能为空', {time:1000});
+              if (!query) return layer.errorMsg('SQL 不能为空');
               var data = {};
               data.query = query;
               data['report-type'] = 'rewrite';
@@ -545,25 +623,25 @@
               data = this.mergeConfig(data);
               this.request({url:api.soar, data:data, isLoading:true}, function(json){
                 vueApp.textEditFormat(json.result || data.query);
-                if(!json.result) layer.msg('SQL 执行错误请，检查字段，表是否存在', {time:2000});
+                if(!json.result) layer.errorMsg('SQL 执行错误请，检查字段，表是否存在');
               }, function (json){
-                if(!json) layer.msg('请求超时', {time:2000});
+                if(!json) layer.errorMsg('请求超时');
               });
             },
             //数据库连接测试
             testConnect : function(dsn){
               dsn = dsn ? dsn.trim() : '';
-              if (!dsn) return layer.msg('数据库连接不能为空', {time:1000});
+              if (!dsn) return layer.errorMsg('数据库连接不能为空');
               this.request({url:api.testConnect,data:{dsn:dsn}, isLoading:true, timeout:5}, function(json){
-                layer.msg(json.result, {time:1000});
+                layer.successMsg(json.result);
               }, function (json){
-                if(!json) layer.msg('连接超时', {time:2000});
+                if(!json) layer.errorMsg('连接超时');
               });
             },
             //html导出
             exportSoar : function(type){
               var query = this.sqlEditor.getValue();
-              if (!query) return layer.msg('sql 不能为空', {time:1000});
+              if (!query) return layer.errorMsg('SQL 不能为空');
               var data = {};
               data.query = query;
               data['report-type'] = type || '';
@@ -575,7 +653,7 @@
               this.exportConfigJson = JSON.stringify(this.getSoarConfig());
               layer.open({
                 type: 1,
-                title: 'soar 配置导出',
+                title: 'SOAR 配置导出',
                 area : ['600px'],
                 content: $('#soar-export-tpl'),
                 cancel:function (){
@@ -588,7 +666,7 @@
               this.importConfig = {type:'1',cover:'0'};
               layer.open({
                 type: 1,
-                title: 'soar 配置导入',
+                title: 'SOAR 配置导入',
                 area : ['600px'],
                 content: $('#soar-import-tpl'),
                 cancel:function (){
@@ -604,10 +682,10 @@
                 content = this.importConfig.content;
                 handleContent();
               } else { //文件的导入
-                if (!window.FileReader) return layer.msg('浏览器不支持文件导入，请使用文本导入',{time:1000});
+                if (!window.FileReader) return layer.errorMsg('浏览器不支持文件导入，请使用文本导入');
                 var reader = new FileReader();
                 var file = $('#import-file')[0].files[0];
-                if (!file) return layer.msg('文件内容不能为空',{time:1000});
+                if (!file) return layer.errorMsg('文件内容不能为空');
                 //读取文件内容
                 var reader = new FileReader();
                 reader.readAsText(file);
@@ -623,7 +701,7 @@
                    arr = JSON.parse(content);
                    if (!$.isArray(arr)) throw new Error('');
                 } catch (e) {
-                  return layer.msg('导入内容格式不正确',{time:1000});
+                  return layer.errorMsg('导入内容格式不正确');
                 }
                 var configs = vueApp.getSoarConfig();
                 if (vueApp.importConfig.cover == 1) configs = [];
@@ -632,12 +710,12 @@
                 });
                 vueApp.saveSoarConfig(configs);
                 vueApp.configs = configs;
-                layer.msg('导入成功',{time:1000});
+                layer.successMsg('导入成功',{time:1000});
               }
             },
             //清除结果展示
             clear : function(){
-              $('#soar-content').html('<span class="placegolder">soar结果展示 ...</span>');
+              $('#soar-content').html('<span class="placegolder">' + this.label.defaultResult + '</span>');
               this.showExport = false;
             },
             //初始化配置
@@ -653,7 +731,7 @@
               this.initConfig();
               layer.open({
                 type: 1,
-                title: 'soar 配置编辑',
+                title: 'SOAR 配置编辑',
                 area : ['1000px'],
                 content: $('#soar-edit-tpl'),
                 cancel:function (){
@@ -675,13 +753,13 @@
             //保存配置
             soarSave : function(){
               if (!this.itemConfig['name']) {
-                layer.msg('配置名称不能为空', {time:1000});
+                layer.errorMsg('配置名称不能为空');
                 return false;
               }
               for(var i=0;i<this.configs.length;i++){
                 var item = this.configs[i];
-                if (item.name==this.itemConfig['name'] && this.editId != i) {
-                  layer.msg('配置名称不能重复', {time:1000});
+                if (item.name == this.itemConfig['name'] && this.editId != i) {
+                  layer.errorMsg('配置名称不能重复');
                   return false;
                 }
               }
@@ -691,7 +769,7 @@
                 Vue.set(this.configs, this.editId, $.extend({}, this.itemConfig));
               }
               this.saveSoarConfig(this.configs);
-              layer.msg('保存成功', {time:1000});
+              layer.successMsg('保存成功');
               return true;
             },
             //删除配置
@@ -700,6 +778,7 @@
                 vueApp.configs.splice(id, 1);
                 vueApp.saveSoarConfig(vueApp.configs);
                 layer.close(index);
+                layer.warnMsg('删除成功');
               });
             },
             //复制配置项
@@ -712,6 +791,7 @@
                 vueApp.initConfig();
                 vueApp.itemConfig.name = value;
                 if (vueApp.soarSave()) layer.close(index);
+                layer.successMsg('复制成功');
               });
             }
           }
@@ -723,6 +803,13 @@
           //sql 编辑器
           editorOption.readOnly = false;
           this.sqlEditor = CodeMirror.fromTextArea($('#sql-edit')[0], editorOption);
+          //点击空白出时, 关闭展开按钮
+          var _this = this;
+          $(document).click(function (e){
+            for(var i in _this.menuOpen){
+              _this.menuOpen[i] = false;
+            }
+          });
         });
         
         //监听路由
