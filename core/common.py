@@ -167,7 +167,7 @@ def soar_result(args):
     loginfo = ''
     if 'log-level' in args:
         try:
-            with codecs.open(log_tmp_file, 'r', encoding='utf8', errors='ignore') as f:
+            with codecs.open(log_tmp_file, 'r', encoding='utf8', errors='replace') as f:
                 loginfo = f.read()
         except:
             pass
