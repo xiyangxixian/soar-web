@@ -12,6 +12,8 @@ import platform
 import subprocess
 import webbrowser
 import tempfile
+import codecs
+
 from collections import OrderedDict
 
 from config import TMP_DIR
@@ -88,7 +90,7 @@ def save_tmp_conf(args,conf_tmp_file):
     :return:
     '''
 
-    with open(conf_tmp_file, 'w', encoding='utf8') as f:
+    with codecs.open(conf_tmp_file, 'w', encoding='utf8', errors='ignore') as f:
         for arg, value in args.items():
             if isinstance(value,list):
                 f.write('%s:\n'%(arg))
@@ -121,7 +123,7 @@ def save_tmp_blacklist(args,blacklist_tmp_file):
     :param blacklist_tmp_file:
     :return:
     '''
-    with open(blacklist_tmp_file, 'w', encoding='utf8') as f:
+    with codecs.open(blacklist_tmp_file, 'w', encoding='utf8', errors='ignore') as f:
         for black in args['blacklist'].split('\n'):
             f.write(black)
             f.write('\n')
@@ -165,7 +167,7 @@ def soar_result(args):
     loginfo = ''
     if 'log-level' in args:
         try:
-            with open(log_tmp_file, 'r') as f:
+            with codecs.open(log_tmp_file, 'r', encoding='utf8', errors='ignore') as f:
                 loginfo = f.read()
         except:
             pass
