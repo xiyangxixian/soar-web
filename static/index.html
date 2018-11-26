@@ -386,13 +386,13 @@
           dom.animate({
             top:'16px',
             opacity:'1'
-          },showtime, function (){
+          }, showtime, function (){
             //显示一段时间然后淡出
             setTimeout(function(){
               dom.animate({
                 top:'-20px',
                 opacity:'0'
-              },showtime, function (){
+              }, showtime, function (){
                 this.remove();
               });
             }, timeout);
