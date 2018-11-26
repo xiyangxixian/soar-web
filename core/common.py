@@ -73,7 +73,7 @@ def runcmd(cmd):
                              stderr=fileno,universal_newlines=True)
         p.wait() # 如果超时直接干掉
         out_temp.seek(0)
-        return out_temp.read().decode('utf8', 'ignore')
+        return out_temp.read().decode('utf8', 'replace')
     except Exception as e:
         # 异常信息会暴露一些系统位置等消息
         return 'run error: %s' % str(e)
@@ -167,7 +167,7 @@ def soar_result(args):
     loginfo = ''
     if 'log-level' in args:
         try:
-            with codecs.open(log_tmp_file, 'r', encoding='utf8', errors='ignore') as f:
+            with codecs.open(log_tmp_file, 'r', encoding='utf8', errors='replace') as f:
                 loginfo = f.read()
         except:
             pass
