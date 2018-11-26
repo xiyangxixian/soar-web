@@ -23,7 +23,11 @@
       .w-150{width: 150px !important;}
       .w-200{width: 200px !important;}
       .minw-200{min-width: 200px !important;}
+      .maxw-360{max-width: 360px !important;}
+      .maxw-400{max-width: 400px !important;}
       .maxw-500{max-width: 500px !important;}
+      .float-left{float:left;}
+      .float-right{float:right;}
       
       .ml-5{margin-left:5px !important;}
       .mr-5{margin-right:5px !important;}
@@ -78,7 +82,7 @@
         <div class=" form-inline">
           <div class="form-group">
             <label>配置模板：</label>
-            <select class="form-control minw-200 maxw-500" v-model="curId">
+            <select class="form-control minw-200 maxw-360" v-model="curId">
               <option v-for="(item, index) in configs" v-bind:value="index">{{item.name}}</option>
             </select>
           </div>
@@ -114,6 +118,12 @@
                 <li><a href="javascript:;" v-on:click="exportSoar('json')">json</a></li>
               </ul>
             </div>
+          </div>
+          <div class="form-group float-right">
+            <label>日志等级：</label>
+            <select class="form-control" v-model="logLevel">
+              <option v-for="item in [0,1,2,3,4,5,6,7]" v-bind:value="item">{{item}}</option>
+            </select>
           </div>
         </div>
         <div class="mt-20 container" v-bind:style="{height:editorHeight}" style="margin-left:0px;margin-right:0px;width: 100%;">
@@ -327,7 +337,8 @@
         //存储key
         var cacheKey = {
           soar : 'soar_config',  //soar 配置缓存 key
-          configSelect : 'config_select'  //当前选择的配置模板缓存 key
+          configSelect : 'config_select',  //当前选择的配置模板缓存 key
+          logLevel : 'log_level'  //日志等级缓存 key
         };
         //sql 编辑器配置
         var editorOption = {
@@ -353,12 +364,16 @@
             openExport : false,  //是否展开导出
             showExport : false, //是否展开导出按钮
             openRewrite : false, // 是否展开重写按钮
-            router : r // 路由配置
+            router : r, // 路由配置
+            logLevel : 0 //日志等级
           },
           watch : {
             //监听当前配置项, 发生变化时存储到 localStorage
             curId:function(newId) {
               localStorage.setItem(cacheKey.configSelect, newId);
+            },
+            logLevel:function(level) {
+              localStorage.setItem(cacheKey.logLevel, level);
             }
           },
           //计算编辑器的高度
@@ -446,6 +461,7 @@
                 if (!config[i] || !config[i].trim || (config[i].trim()) == '') continue;
                 data[i] = config[i];
               }
+              if (this.logLevel != 0) data['log-level'] = this.logLevel;
               return data;
             },
             //请求封装
@@ -695,6 +711,7 @@
           //初始化配置
           this.configs = this.getSoarConfig();
           this.curId = Number(localStorage.getItem(cacheKey.configSelect)) || 0;
+          this.logLevel = Number(localStorage.getItem(cacheKey.logLevel)) || 0;
           //sql 编辑器
           editorOption.readOnly = false;
           this.sqlEditor = CodeMirror.fromTextArea($('#sql-edit')[0], editorOption);

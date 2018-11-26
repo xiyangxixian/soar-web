@@ -12,6 +12,8 @@ import platform
 import subprocess
 import webbrowser
 import tempfile
+import codecs
+
 from collections import OrderedDict
 
 from config import TMP_DIR
@@ -88,7 +90,7 @@ def save_tmp_conf(args,conf_tmp_file):
     :return:
     '''
 
-    with open(conf_tmp_file,'w') as f:
+    with codecs.open(conf_tmp_file, 'w', encoding='utf8', errors='ignore') as f:
         for arg, value in args.items():
             if isinstance(value,list):
                 f.write('%s:\n'%(arg))
@@ -121,7 +123,7 @@ def save_tmp_blacklist(args,blacklist_tmp_file):
     :param blacklist_tmp_file:
     :return:
     '''
-    with open(blacklist_tmp_file,'w') as f:
+    with codecs.open(blacklist_tmp_file, 'w', encoding='utf8', errors='ignore') as f:
         for black in args['blacklist'].split('\n'):
             f.write(black)
             f.write('\n')
@@ -138,6 +140,7 @@ def soar_result(args):
     conf_tmp_file =soar_run_uuid +'.yaml'
     blacklist_tmp_file= soar_run_uuid +'.blacklist'
     cmd_args=OrderedDict()  # soar 要求 -config 作为第一参数
+    log_tmp_file = soar_run_uuid +'.log'
 
     # 解析数据库连接
     if 'online-dsn' in args : args['online-dsn'] = dsn2soaryaml(args['online-dsn'])
@@ -146,7 +149,9 @@ def soar_result(args):
     # 黑名单列表
     if 'blacklist' in args:
         save_tmp_blacklist(args, blacklist_tmp_file)
-        args['blacklist'] = blacklist_tmp_file
+        args['blacklist'] = blacklist_tmp_file.replace('\\', '\\\\')
+    if 'log-level' in args:
+        args['log-output']=log_tmp_file.replace('\\', '\\\\')
 
     cmd_args['config'] = conf_tmp_file # soar 规定 -config 必须作为第一个参数
     cmd_args['query'] = args['query']
@@ -159,23 +164,37 @@ def soar_result(args):
         print(' '.join(cmd_line)) #打印日志信息
 
     result = runcmd(cmd_line)
+    loginfo = ''
+    if 'log-level' in args:
+        try:
+            with codecs.open(log_tmp_file, 'r', encoding='utf8', errors='ignore') as f:
+                loginfo = f.read()
+        except:
+            pass
 
     # 语法检查正确后 soar 无提示,人为提示结果正确
     if 'only-syntax-check' in args and 'true' in args['only-syntax-check'] \
             and result == '':
         return json.dumps({
-            "result": '语法检查正确', "status": True}
-        )
+            "result": '语法检查正确',
+            "status": True,
+            "log":loginfo
+
+        })
     if DEBUG is False:
         try:
             # 移除临时配置文件
             os.remove(conf_tmp_file)
             os.remove(blacklist_tmp_file)
+            if 'log-level' in args:
+                os.remove(log_tmp_file)
         except Exception as e:
                 pass
     return json.dumps({
-        "result": result, "status": True}
-    )
+        "result": result,
+        "status": True,
+        "log": loginfo,
+    })
 
 def soar_args_check(args):
     '''

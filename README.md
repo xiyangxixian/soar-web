@@ -69,3 +69,6 @@ docker run -d --name soar-web -p 5077:5077 becivells/soar-web
 
 ## 配置
 如果需要改IP地址和端口号, 可在 config.py 中进行修改
+
+## 功能相关
+**日志等级：** 日志等级为 0 时不打印日志，设置为 1-7 时，会将 soar 产生的日子打印至控制台，按 F12 或右击网页点击审查元素打开调试工具，点击 Console 按钮查看日志。
