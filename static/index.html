@@ -23,6 +23,7 @@
       .w-150{width: 150px !important;}
       .w-200{width: 200px !important;}
       .minw-200{min-width: 200px !important;}
+      .maxw-360{max-width: 360px !important;}
       .maxw-400{max-width: 400px !important;}
       .maxw-500{max-width: 500px !important;}
       .float-left{float:left;}
@@ -81,7 +82,7 @@
         <div class=" form-inline">
           <div class="form-group">
             <label>配置模板：</label>
-            <select class="form-control minw-200 maxw-400" v-model="curId">
+            <select class="form-control minw-200 maxw-360" v-model="curId">
               <option v-for="(item, index) in configs" v-bind:value="index">{{item.name}}</option>
             </select>
           </div>
@@ -121,8 +122,7 @@
           <div class="form-group float-right">
             <label>日志等级：</label>
             <select class="form-control" v-model="logLevel">
-              <option value="0">默认</option>
-              <option v-for="item in [1,2,3,4,5,6,7]" v-bind:value="item">{{item}}</option>
+              <option v-for="item in [0,1,2,3,4,5,6,7]" v-bind:value="item">{{item}}</option>
             </select>
           </div>
         </div>
