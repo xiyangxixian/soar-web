@@ -76,7 +76,7 @@ def runcmd(cmd):
         return out_temp.read().decode('utf8', 'replace')
     except Exception as e:
         # 异常信息会暴露一些系统位置等消息
-        return 'run error: %s' % str(e)
+        raise RuntimeError('run error: %s' % str(e))
     finally:
         if out_temp:
             out_temp.close()
@@ -141,6 +141,9 @@ def soar_result(args):
     blacklist_tmp_file= soar_run_uuid +'.blacklist'
     cmd_args=OrderedDict()  # soar 要求 -config 作为第一参数
     log_tmp_file = soar_run_uuid +'.log'
+
+    # sql 美化最大长度为 10k
+    args['max-pretty-sql-length'] = 10240;
 
     # 解析数据库连接
     if 'online-dsn' in args : args['online-dsn'] = dsn2soaryaml(args['online-dsn'])
@@ -248,7 +251,7 @@ def parse_dsn(host):
         if 'charset' in query.keys() : charset = sc_decode(query['charset'])
         if (len(hostArr) == 2) : port = int(hostArr[1])
     except:
-        raise RuntimeError('数据库连接错误');
+        raise RuntimeError('数据库连接错误')
     return {
         'host' : sc_decode(host),
         'user' : sc_decode(user),

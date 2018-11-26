@@ -76,7 +76,7 @@ def testconnect():
             db = res['db'],
         )
         status = True
-        result = '连接成功！'
+        result = '连接成功'
     except Exception as e:
         status = False
         result = str(e)

@@ -529,9 +529,9 @@
               this.request({url:api.soar, data:data, isLoading:true}, function(json){
                 json.result ? curFormat(json.result) : vueApp.textEditFormat(data.query);
                 vueApp.showExport = type == 1 && json.result;
-                if(!json.result) layer.msg('SQL 执行错误，请检查字段，表是否存在！', {time:2000});
+                if(!json.result) layer.msg('SQL 执行错误，请检查字段，表是否存在', {time:2000});
               }, function (json){
-                if(!json) layer.msg('请求超时！', {time:2000});
+                if(!json) layer.msg('请求超时', {time:2000});
               });
             },
             //sql 改写功能
@@ -545,9 +545,9 @@
               data = this.mergeConfig(data);
               this.request({url:api.soar, data:data, isLoading:true}, function(json){
                 vueApp.textEditFormat(json.result || data.query);
-                if(!json.result) layer.msg('SQL 执行错误请，检查字段，表是否存在！', {time:2000});
+                if(!json.result) layer.msg('SQL 执行错误请，检查字段，表是否存在', {time:2000});
               }, function (json){
-                if(!json) layer.msg('请求超时！', {time:2000});
+                if(!json) layer.msg('请求超时', {time:2000});
               });
             },
             //数据库连接测试
@@ -557,7 +557,7 @@
               this.request({url:api.testConnect,data:{dsn:dsn}, isLoading:true, timeout:5}, function(json){
                 layer.msg(json.result, {time:1000});
               }, function (json){
-                if(!json) layer.msg('连接超时！', {time:2000});
+                if(!json) layer.msg('连接超时', {time:2000});
               });
             },
             //html导出
