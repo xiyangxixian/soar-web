@@ -73,7 +73,7 @@ docker run -d --name soar-web -p 5077:5077 becivells/soar-web
 ## 功能相关
 **配置模板：** 可以添加多数据库连接实例及配置，方便在 sql 评估的相互切换使用，具体配置项详情见[https://github.com/XiaoMi/soar/blob/master/doc/config.md](https://github.com/XiaoMi/soar/blob/master/doc/config.md) 。
 
-**数据库连接：** 数据库连接成功后，soar 可以通过表结构提供更正确优质的 sql 评估建议， 配置的正确性决定了soar的服务质量。
+**数据库连接：** 数据库连接成功后，soar 可以通过表结构提供更正确优质的 sql 评估建议， 配置的正确性决定了 soar 的服务质量。
 
 **线上线下环境问题：** 线上环境作为待 sql 评估环境，soar 在进行 sql 评估时，会根据 sql 语句，从 **线上环境的数据库连接实例** 拷贝数据表到 **测试环境的数据库连接实例**，然后在测试环境下执行 sql 语句进行分析。因此测试环境的数据路连接实例需要有**最高权限**。如果无法没有最高权限可能造成一些问题，如果没有权限可以启动一个空的 mysql docker 容器作为测试环境。如果仅仅做测试用，可将线上线下环境指定为一样。
 
