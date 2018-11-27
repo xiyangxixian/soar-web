@@ -621,7 +621,7 @@
               //提交请求， 根据具体api酌情修改
               this.request({url:api.soar, data:data, isLoading:true}, function(json){
                 if (type == 5) {
-                  var checkMsg = '语法检查正确';
+                  var checkMsg = '语法正确';
                   if (json.result == checkMsg) json.result = null;
                   if (json.result) {
                     curFormat(json.result);
