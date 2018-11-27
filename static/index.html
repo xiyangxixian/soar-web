@@ -476,10 +476,12 @@
               if ($.isFunction(callback)) callback.call(this);
               return this;
             },
+            //初始化路由
             initRouter : function (router){
               this.curRouter = router;
               this.curId = (this.curId < 0 || this.curId >= vueApp.configs.length) ? 0 : this.curId;
             },
+            //下来按钮切换
             toggleMenu : function (key){
               for(var i in this.menuOpen){
                 if (i != key) this.menuOpen[i] = false;
