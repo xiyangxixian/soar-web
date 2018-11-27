@@ -476,10 +476,12 @@
               if ($.isFunction(callback)) callback.call(this);
               return this;
             },
+            //初始化路由
             initRouter : function (router){
               this.curRouter = router;
               this.curId = (this.curId < 0 || this.curId >= vueApp.configs.length) ? 0 : this.curId;
             },
+            //下拉按钮切换
             toggleMenu : function (key){
               for(var i in this.menuOpen){
                 if (i != key) this.menuOpen[i] = false;
@@ -599,7 +601,7 @@
                 case 1://sql 分析评估
                   curFormat = this.markdownFormat;
                   break;
-                case 2://sql 梅花
+                case 2://sql 美化
                   curFormat = this.textEditFormat;
                   data['report-type'] = 'pretty';
                   break;
