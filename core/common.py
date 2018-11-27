@@ -179,7 +179,7 @@ def soar_result(args):
     if 'only-syntax-check' in args and 'true' in args['only-syntax-check'] \
             and result == '':
         return json.dumps({
-            "result": '语法检查正确',
+            "result": '语法正确',
             "status": True,
             "log":loginfo
 
