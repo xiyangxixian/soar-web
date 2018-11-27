@@ -57,8 +57,8 @@
       .hljs-keyword{color: #d73a49}
       
       /*弹窗样式*/
-      .alert{align-items:center; position:fixed;font-size:14px;text-align: center;padding:10px 20px 10px 15px !important;min-width:300px;z-index:100000000;justify-content:center;left:50%;transform:translateX(-50%);}
-      .alert .glyphicon{display:inline-block;margin-right:10px;vertical-align:-1.5px;font-size:16px;}
+      .alert.soarweb-alert{align-items:center; position:fixed;font-size:14px;text-align: center;padding:10px 20px 10px 15px !important;min-width:300px;z-index:100000000;justify-content:center;left:50%;transform:translateX(-50%);}
+      .alert.soarweb-alert .glyphicon{display:inline-block;margin-right:10px;vertical-align:-1.5px;font-size:16px;}
     </style>
   </head>
   <body>
@@ -360,7 +360,7 @@
           var curClass = classMap[type] || 'alert-info';
           var curIconClass = iconMap[type] || 'glyphicon-info-sign';
           //弹窗组件html
-          var dom = $('<div class="alert" role="alert"><span class="glyphicon"></span><span class="alert-msg"></span></div>');
+          var dom = $('<div class="alert soarweb-alert" role="alert"><span class="glyphicon"></span><span class="alert-msg"></span></div>');
           //设置类样式
           dom.addClass(curClass).find('.alert-msg').text(msg);
           dom.find('.glyphicon').addClass(curIconClass);
