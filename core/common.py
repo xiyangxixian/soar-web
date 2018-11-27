@@ -182,7 +182,6 @@ def soar_result(args):
             "result": '语法正确',
             "status": True,
             "log":loginfo
-
         })
     if DEBUG is False:
         try:
