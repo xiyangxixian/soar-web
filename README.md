@@ -35,11 +35,11 @@ setp 3 pip install pymysql
 
 ## 安装与使用
 ```
-下载源码（Windows 可略过此步骤）：
+下载源码（ Windows 可略过此步骤）：
 sudo -y apt-get install wget 或者 sudo yum -y install wget 
 wget https://codeload.github.com/xiyangxixian/soar-web/zip/master -O soar-web-master.zip
 
-解压缩（Windows 可略过此步骤）：
+解压缩（ Windows 可略过此步骤）：
 sudo -y apt-get install unzip 或者 sudo yum -y install unzip 
 unzip soar-web.zip
 cd soar-web-matster
@@ -62,6 +62,11 @@ Dockerfile 见根目录 Dockerfile 文件
 ```
 docker pull becivells/soar-web
 docker run -d --name soar-web -p 5077:5077 becivells/soar-web
+
+```
+**也可以是用 Dockerfile 自行构建**
+```
+docker build --no-cache  -t soar-web .
 ```
 
 ## 访问
