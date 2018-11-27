@@ -98,28 +98,16 @@
             <span class="btn btn-primary" v-on:click="sqlAnalysis(4)">指纹</span>
             <span class="btn btn-primary" v-on:click="sqlAnalysis(5)">语法检查</span>
             <div class="btn-group" v-bind:class="{open:menuOpen.rewrite}" v-on:click.stop="toggleMenu('rewrite')">
-              <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">SQL改写 <span class="caret"></span>
-              </button>
+              <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">SQL改写 <span class="caret"></span></button>
               <ul class="dropdown-menu">
-                <li><a href="javascript:;" v-on:click="rewrite('mergealter')">ALTER 合并</a></li>
-                <li><a href="javascript:;" v-on:click="rewrite('countstar')">COUNT(col) 转 COUNT(*)</a></li>
-                <li><a href="javascript:;" v-on:click="rewrite('star2columns')">* 转全字段</a></li>
-                <li><a href="javascript:;" v-on:click="rewrite('dml2select')">删除 转 查询</a></li>
-                <li><a href="javascript:;" v-on:click="rewrite('insertcolumns')">INSERT 补全</a></li>
-                <li><a href="javascript:;" v-on:click="rewrite('having')">HAVING 转 WHERE</a></li>
-                <li><a href="javascript:;" v-on:click="rewrite('or2in')">OR 转 IN</a></li>
-                <li><a href="javascript:;" v-on:click="rewrite('standard')">关键字 转 小写</a></li>
-                <li><a href="javascript:;" v-on:click="rewrite('alwaystrue')">删除无用条件</a></li>
+                <li v-for="item in dropdown.rewrite"><a href="javascript:;" v-on:click="rewrite(item.val)">{{item.text}}</a></li>
               </ul>
             </div>
             <span class="btn btn-danger ml-20" v-on:click="clear()">清空</span>
             <div v-if="showExport" class="btn-group" v-bind:class="{open:menuOpen['export']}" v-on:click.stop="toggleMenu('export')">
-              <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">导出 <span class="caret"></span>
-              </button>
+              <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">导出 <span class="caret"></span></button>
               <ul class="dropdown-menu">
-                <li><a href="javascript:;" v-on:click="exportSoar('html')">html</a></li>
-                <li><a href="javascript:;" v-on:click="exportSoar('markdown')">markdown</a></li>
-                <li><a href="javascript:;" v-on:click="exportSoar('json')">json</a></li>
+                <li v-for="item in dropdown['export']"><a href="javascript:;" v-on:click="exportSoar(item.val)">{{item.text}}</a></li>
               </ul>
             </div>
           </div>
@@ -367,7 +355,7 @@
             info : 'glyphicon-info-sign',
             warning : 'glyphicon-exclamation-sign',
             success : 'glyphicon-ok-sign',
-            'error' : 'glyphicon-remove-sign'
+            error : 'glyphicon-remove-sign'
           };
           var curClass = classMap[type] || 'alert-info';
           var curIconClass = iconMap[type] || 'glyphicon-info-sign';
@@ -420,24 +408,50 @@
               
         var vueApp = new Vue({
           el : '#vue-app',
-          data : {
-            curRouter : '',   //当前路由
-            configs : [],    //soar 配置列表
-            curId : 0,    //当前选择的配置项
-            itemConfig : {},  //当前编辑配置详情
-            editId : -1,  //当前编辑配置id
-            exportConfigJson : '', //导出的json
-            importConfig : {},  //导入的配置
-            showExport : false, //是否展开导出按钮
-            menuOpen : {
-              'rewrite' : false, //是否展开重写按钮
-              'export' : false  //是否展开导出
-            },
-            label : {
-              defaultResult : 'SOAR 结果展示 ...'  //右侧结果 placeholder
-            },
-            router : r, // 路由配置
-            logLevel : 0 //日志等级
+          data : function (){
+            //初始化配置
+            var configs = this.getSoarConfig();
+            var curId = Number(localStorage.getItem(cacheKey.configSelect)) || 0;
+            var logLevel = Number(localStorage.getItem(cacheKey.logLevel)) || 0;
+            var dropdown = {};
+            //SQL 改写下拉选项
+            dropdown['rewrite'] = [
+              {val : 'mergealter', text : 'ALTER 合并'},
+              {val : 'countstar', text : 'COUNT(col) 转 COUNT(*)'},
+              {val : 'star2columns', text : '* 转全字段'},
+              {val : 'dml2select', text : '删除 转 查询'},
+              {val : 'insertcolumns', text : 'INSERT 补全'},
+              {val : 'having', text : 'HAVING 转 WHERE'},
+              {val : 'or2in', text : 'OR 转 IN'},
+              {val : 'standard', text : '关键字 转 小写'},
+              {val : 'alwaystrue', text : '删除无用条件'}
+            ];
+            //导出下拉选项
+            dropdown['export'] = [
+              {val : 'html', text : 'html'},
+              {val : 'markdown', text : 'markdown'},
+              {val : 'json', text : 'json'}
+            ];
+            return {
+              curRouter : '',   //当前路由
+              configs : configs,    //soar 配置列表
+              curId : curId,    //当前选择的配置项
+              itemConfig : {},  //当前编辑配置详情
+              editId : -1,  //当前编辑配置id
+              exportConfigJson : '', //导出的json
+              importConfig : {},  //导入的配置
+              dropdown : dropdown, //下拉按钮组件
+              showExport : false, //是否展开导出按钮
+              menuOpen : {
+                'rewrite' : false, //是否展开重写按钮
+                'export' : false  //是否展开导出
+              },
+              label : {
+                defaultResult : 'SOAR 结果展示 ...'  //右侧结果 placeholder
+              },
+              router : r, // 路由配置
+              logLevel : logLevel //日志等级
+            };
           },
           watch : {
             //监听当前配置项, 发生变化时存储到 localStorage
@@ -519,10 +533,11 @@
             },
             //markdown转html展示
             markdownFormat : function (res){
-              $('#soar-content').html('<div class="sql-analysis-show">'+converter.makeHtml(res)+'</div>');
-              $('#soar-content .sql-analysis-show pre code').each(function(i, code) {
+              var dom = $('<div class="sql-analysis-show">' + converter.makeHtml(res) + '</div>');
+              dom.find('pre code').each(function(i, code) {
                 hljs.highlightBlock(code);
               });
+              $('#soar-content').html(dom[0].outerHTML);
             },
             //用富文本框展示sql 并且高亮显示
             textEditFormat : function(res){
@@ -638,6 +653,7 @@
               }, function (json){
                 if(!json) layer.errorMsg('请求超时');
               });
+              this.showExport = false;
             },
             //数据库连接测试
             testConnect : function(dsn){
@@ -807,10 +823,6 @@
             }
           }
         }).run(function (){
-          //初始化配置
-          this.configs = this.getSoarConfig();
-          this.curId = Number(localStorage.getItem(cacheKey.configSelect)) || 0;
-          this.logLevel = Number(localStorage.getItem(cacheKey.logLevel)) || 0;
           //sql 编辑器
           editorOption.readOnly = false;
           this.sqlEditor = CodeMirror.fromTextArea($('#sql-edit')[0], editorOption);
