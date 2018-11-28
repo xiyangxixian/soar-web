@@ -137,8 +137,8 @@
             <tr>
               <th class="text-center" width="11%">编号</th>
               <th class="text-center" width="22%">配置名称</th>
-              <th class="text-center" width="25%">online-dsn</th>
-              <th class="text-center" width="25%">test-dsn</th>
+              <th class="text-center" width="25%">线上环境</th>
+              <th class="text-center" width="25%">测试环境</th>
               <th class="text-center" width="17%">操作</th>
             </tr>
           </thead>
@@ -171,21 +171,21 @@
               <div class="col-xs-1"></div>
             </div>
             <div class="form-group">
-              <label class="col-xs-4 control-label">线上环境数据库配置(online-dsn)</label>
+              <label class="col-xs-4 control-label">线上环境 (online-dsn)</label>
               <div class="col-xs-7">
                 <input type="text" class="form-control" placeholder="user:password@host:port/database（密码中特殊字符需用 \ 转义）" v-model="itemConfig['online-dsn']">
               </div>
               <div class="col-xs-1"><span v-on:click="testConnect(itemConfig['online-dsn'])" class="glyphicon glyphicon-refresh ponter" style="line-height:32px;" title="点击测试数据库链接"></span></div>
             </div>
             <div class="form-group">
-              <label class="col-xs-4 control-label">测试环境数据库配置(test-dsn)</label>
+              <label class="col-xs-4 control-label">测试环境 (test-dsn)</label>
               <div class="col-xs-7">
                 <input type="text" class="form-control" placeholder="user:password@host:port/database（密码中特殊字符需用 \ 转义）" v-model="itemConfig['test-dsn']">
               </div>
               <div class="col-xs-1"><span v-on:click="testConnect(itemConfig['test-dsn'])" class="glyphicon glyphicon-refresh ponter" style="line-height:32px;" title="点击测试数据库链接"></span></div>
             </div>
             <div class="form-group">
-              <label class="col-xs-4 control-label">允许线上环境当作测试环境
+              <label class="col-xs-4 control-label">线上环境作为测试环境
                 <br><span style="margin-top:10px;display:inline-block">(allow-online-as-test)</span></label>
               <div class="col-xs-7">
                 <label class="radio-inline">
@@ -197,12 +197,12 @@
                 <label class="radio-inline">
                   <input type="radio" name="allow-online-as-test" value="false" v-model="itemConfig['allow-online-as-test']"> 否
                 </label>
-                <br><span style="color:#666;margin-top:10px;display:inline-block">注：线上环境和测试环境配置相同时， 该参数为“是”，才会返回explain信息</span>
+                <br><span style="color:#666;margin-top:10px;display:inline-block">注：线上环境和测试环境配置相同时， 该参数为 “是”，才会返回 explain 信息</span>
               </div>
               <div class="col-xs-1"></div>
             </div>
             <div class="form-group">
-              <label class="col-xs-4 control-label">黑名单列表(blacklist)</label>
+              <label class="col-xs-4 control-label">黑名单列表 (blacklist)</label>
               <div class="col-xs-7">
                 <textarea rows="3" class="form-control" placeholder="blacklist中的SQL不会被评审，可以是指纹，也可以是正则， 一行一个" v-model="itemConfig['blacklist']"></textarea>
               </div>
@@ -211,7 +211,7 @@
               </div>
             </div>
             <div class="form-group">
-              <label class="col-xs-4 control-label">是否开启数据采样(sampling)</label>
+              <label class="col-xs-4 control-label">数据采样 (sampling)</label>
               <div class="col-xs-7">
                 <label class="radio-inline">
                   <input type="radio" name="only-syntax-check" value="" v-model="itemConfig['sampling']"> 默认
@@ -226,7 +226,7 @@
               <div class="col-xs-1"></div>
             </div>
             <div class="form-group">
-              <label class="col-xs-4 control-label">允许的数据库引擎(table-allow-engines)</label>
+              <label class="col-xs-4 control-label">数据库引擎 (table-allow-engines)</label>
               <div class="col-xs-7">
                 <input type="text" class="form-control" placeholder="默认为 InnoDB">
               </div>
