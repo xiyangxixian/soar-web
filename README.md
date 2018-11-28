@@ -70,15 +70,15 @@ docker build --no-cache -t soar-web .
 ```
 
 ## 访问
-在浏览器上输入 http://127.0.0.1:5077 进行访问
+在浏览器上输入 http://127.0.0.1:5077 进行访问。
 
 ## 配置
-如果需要改IP地址和端口号, 可在 config.py 中进行修改
+如果需要改 IP 地址和端口号, 可在 config.py 中进行修改。
 
 ## 功能相关
 **关于存储：** 所有的配置都是保存在浏览器 Local Storage 中的，多人之间使用是互不影响的，自己只能看到自己的配置，更换浏览器或者清除浏览器会造成配置丢失。
 
-**配置模板：** 可以添加多数据库连接实例及配置，方便在 sql 评估的相互切换使用，具体配置项详情见[https://github.com/XiaoMi/soar/blob/master/doc/config.md](https://github.com/XiaoMi/soar/blob/master/doc/config.md) 。
+**配置模板：** 可以添加多数据库连接实例及配置，方便在 sql 评估的相互切换使用，具体配置项详情见  [https://github.com/XiaoMi/soar/blob/master/doc/config.md](https://github.com/XiaoMi/soar/blob/master/doc/config.md)。
 
 **数据库连接：** 数据库连接成功后，soar 可以通过表结构提供更正确优质的 sql 评估建议， 配置的正确性决定了 soar 的服务质量。
 
