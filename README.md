@@ -1,5 +1,5 @@
 # soar-web
-基于小米 [soar](https://github.com/XiaoMi/soar) 的开源 sql 分析与优化的 WEB 图形化工具，支持 soar 配置的添加、修改、复制，多配置切换，配置的导出、导入与导入功能。
+基于小米 [soar](https://github.com/XiaoMi/soar) 的开源 sql 分析与优化的 web 图形化工具，支持 soar 配置的添加、修改、复制，多配置切换，配置的导出、导入与导入功能。
 
 ![soar](https://raw.githubusercontent.com/xiyangxixian/soar-web/master/doc/img/example-1.png?v=2)
 ![soar](https://raw.githubusercontent.com/xiyangxixian/soar-web/master/doc/img/example-2.png?v=2)
@@ -76,7 +76,7 @@ docker build --no-cache -t soar-web .
 如果需要改IP地址和端口号, 可在 config.py 中进行修改
 
 ## 功能相关
-**关于存储：** 所有的配置都是保存在浏览器 Local Storage 中的，多人之间使用是互补影响的，自己只能看到自己的配置，更换浏览器或者清除浏览器会造成配置丢失。
+**关于存储：** 所有的配置都是保存在浏览器 Local Storage 中的，多人之间使用是互不影响的，自己只能看到自己的配置，更换浏览器或者清除浏览器会造成配置丢失。
 
 **配置模板：** 可以添加多数据库连接实例及配置，方便在 sql 评估的相互切换使用，具体配置项详情见[https://github.com/XiaoMi/soar/blob/master/doc/config.md](https://github.com/XiaoMi/soar/blob/master/doc/config.md) 。
 
