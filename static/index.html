@@ -413,6 +413,7 @@
             var configs = this.getSoarConfig();
             var curId = Number(localStorage.getItem(cacheKey.configSelect)) || 0;
             var logLevel = Number(localStorage.getItem(cacheKey.logLevel)) || 0;
+            var editorHeight = this.resizeEditor() + 'px';
             var dropdown = {};
             //SQL 改写下拉选项
             dropdown['rewrite'] = [
@@ -436,6 +437,7 @@
               curRouter : '',   //当前路由
               configs : configs,    //soar 配置列表
               curId : curId,    //当前选择的配置项
+              editorHeight : editorHeight,  //编辑器高度
               itemConfig : {},  //当前编辑配置详情
               editId : -1,  //当前编辑配置id
               exportConfigJson : '', //导出的json
@@ -462,15 +464,6 @@
               localStorage.setItem(cacheKey.logLevel, level);
             }
           },
-          //计算编辑器的高度
-          computed : {
-            editorHeight:function(){
-              var textHeght = 500 + ($(window).height() -657);
-              if (textHeght < 400) textHeght = 400;
-              if (textHeght > 600) textHeght = 600;
-              return textHeght + 'px';
-            }
-          },
           methods : {
             run : function (callback){
               if ($.isFunction(callback)) callback.call(this);
@@ -487,6 +480,13 @@
                 if (i != key) this.menuOpen[i] = false;
               }
               this.menuOpen[key] = !this.menuOpen[key];
+            },
+            //计算编辑器高度
+            resizeEditor : function (){
+              var textHeght = 500 + ($(window).height() -657);
+              if (textHeght < 400) textHeght = 400;
+              if (textHeght > 600) textHeght = 600;
+              return textHeght;
             },
             //获取 soar 配置项列表， 如果没有则初始化一条默认，配置
             getSoarConfig : function (){
@@ -570,7 +570,7 @@
                 timeout : (config.timeout || 30) * 1000,  //默认 30 秒超时
                 success: function (res) {
                   if (config.isLoading) layer.close(loadIndex);  //关闭加载动画
-                  var json;
+                  var json = null;
                   //解析 json
                   try {
                     json = JSON.parse(res);
@@ -834,6 +834,14 @@
             for(var i in _this.menuOpen){
               _this.menuOpen[i] = false;
             }
+          });
+          //监听窗口大小变化
+          var timer = null;
+          $(window).resize(function(){
+            if (timer) clearTimeout(timer); 
+            timer = setTimeout(function (){
+              _this.editorHeight = _this.resizeEditor() + 'px';
+            }, 200);
           });
         });
         
