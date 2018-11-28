@@ -10,7 +10,7 @@
 * Flask
 * pymysql
 
-Python 环境未安装的可参考下面操作：
+python 环境未安装的可参考下面操作：
 ```
 Windows：
 step 1 去 python 官网下载安装 python3 (已安装可跳过此步骤)
