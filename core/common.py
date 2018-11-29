@@ -157,7 +157,7 @@ def soar_result(args):
         args['log-output']=log_tmp_file.replace('\\', '\\\\')
 
     cmd_args['config'] = conf_tmp_file # soar 规定 -config 必须作为第一个参数
-    cmd_args['query'] = args['query']
+    cmd_args['query'] = args['query'].encode('utf8')
     args.pop('query')
 
     save_tmp_conf(args, conf_tmp_file)
