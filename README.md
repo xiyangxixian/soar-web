@@ -62,7 +62,6 @@ Dockerfile 见根目录 Dockerfile 文件
 ```
 docker pull becivells/soar-web
 docker run -d --name soar-web -p 5077:5077 becivells/soar-web
-
 ```
 **也可以是用 Dockerfile 自行构建**
 ```
