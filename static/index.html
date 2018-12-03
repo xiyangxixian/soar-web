@@ -26,8 +26,8 @@
       .mb-20{margin-bottom:20px !important;}
       .CodeMirror{height:100%; padding:10px;}
       .show-content{height:100%;border:1px solid #ddd;}
-      .placegolder,pre.CodeMirror-placeholder{color: #999;}
-      .placegolder{font-size:16px; font-family: monospace;display:inline-block;padding:4px 0px;margin:10px;}
+      .placegolder,pre.CodeMirror-placeholder{color: #999;font-size:14px;}
+      .placegolder{font-family: monospace;display:inline-block;padding:4px 0px;margin:10px;}
       .ponter{cursor: pointer}
       [v-cloak]{display:none;}
       
@@ -116,7 +116,7 @@
             </div>
             <!--服务器返回展示-->
             <div class="col-xs-7" style="width:54%;padding-right:0px;height:100%;">
-              <div class="show-content show-markdown" style="height:100%;" id="soar-content"><span class="placegolder">{{label.defaultResult}}</span></div>
+              <div class="show-content show-markdown" style="height:100%;" id="soar-content" v-html="label.defaultResult"></div>
             </div>
           </div>
         </div>
@@ -449,7 +449,7 @@
                 'export' : false  //是否展开导出
               },
               label : {
-                defaultResult : 'SOAR 结果展示 ...'  //右侧结果 placeholder
+                defaultResult : '<span class="placegolder">SOAR 结果展示 ...</span>'  //右侧结果 placeholder
               },
               router : r, // 路由配置
               logLevel : logLevel //日志等级
@@ -744,7 +744,7 @@
             },
             //清除结果展示
             clear : function(){
-              $('#soar-content').html('<span class="placegolder">' + this.label.defaultResult + '</span>');
+              $('#soar-content').html(this.label.defaultResult);
               this.showExport = false;
             },
             //初始化配置
