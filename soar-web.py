@@ -60,7 +60,10 @@ def soardownload():
     timeArray = time.localtime(nowTime)
     otherStyleTime = time.strftime("%Y%m%d%H%M%S", timeArray)
     resp.headers['Content-Type'] = 'application/force-download'
-    resp.headers['Content-Disposition'] =  'filename=soar_%s.html' % otherStyleTime
+    suffixMap = {'html' : 'html', 'json' : 'json', 'markdown' : 'md'}
+    suffix = 'html'
+    if 'report-type' in args and args['report-type'] in suffixMap : suffix = suffixMap[args['report-type']]
+    resp.headers['Content-Disposition'] = 'filename=soar_%s.%s' % (otherStyleTime, suffix)
     return resp
 
 @app.route('/test-connect',methods=['POST', 'GET'])
