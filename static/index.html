@@ -7,6 +7,7 @@
     <!--css库文件-->
     <link rel="stylesheet" href="./css/bootstrap.min.css"/>
     <link rel="stylesheet" href="./css/codemirror.css"/>
+    <link rel="stylesheet" href="./css/show-hint.css"/>
     <style>
       /*公共样式*/
       .w-100{width: 100px !important;}
@@ -308,6 +309,8 @@
     <script type="text/javascript" src="./js/showdown.js"></script>
     <script type="text/javascript" src="./js/placeholder.js"></script>
     <script type="text/javascript" src="./js/highlight.pack.js"></script>
+    <script type="text/javascript" src="./js/show-hint.js"></script>
+    <script type="text/javascript" src="./js/sql-hint.js"></script>
     <script>
       (function (){
         // 设置soar 配置默认选项
@@ -336,7 +339,9 @@
         var editorOption = {
           mode : 'text/x-mysql',  //sql 编辑模式
           styleActiveLine : true,  //高亮显示
-          lineWrapping : true  //换行显示
+          lineWrapping : true,  //换行显示
+          extraKeys: {'Alt-Enter' : 'autocomplete'},  //快捷键打开提示
+          hintOptions: {completeSingle : false, completeOnSingleClick : true} //sql 自动完成配置
         };
         
         //弹窗
@@ -825,11 +830,33 @@
             }
           }
         }).run(function (){
+          var _this = this;
           //sql 编辑器
           editorOption.readOnly = false;
-          this.sqlEditor = CodeMirror.fromTextArea($('#sql-edit')[0], editorOption);
+          _this.sqlEditor = CodeMirror.fromTextArea($('#sql-edit')[0], editorOption);
+          //代码自动完成
+          _this.sqlEditor.on('inputRead', function (instance){
+            var sqlAutocomplete = false;
+            var sqlAutocompleteInProgress = false;
+            if (!sqlAutocompleteInProgress && (!instance.options.hintOptions.tables || !sqlAutocomplete)) {
+              if (!sqlAutocomplete) {
+                instance.options.hintOptions.tables = false;
+                instance.options.hintOptions.defaultTable = '';
+                sqlAutocompleteInProgress = true;
+              } else {
+                instance.options.hintOptions.tables = sqlAutocomplete;
+                instance.options.hintOptions.defaultTable = '';
+              }
+            }
+            if (instance.state.completionActive) return;
+            var cur = instance.getCursor();
+            var token = instance.getTokenAt(cur);
+            var string = '';
+            if (token.string.match(/^[a-zA-Z]+$/)) string = token.string;
+            if (string.length > 0) CodeMirror.commands.autocomplete(instance);
+          });
+          
           //点击空白出时, 关闭展开按钮
-          var _this = this;
           $(document).click(function (e){
             for(var i in _this.menuOpen){
               _this.menuOpen[i] = false;
