@@ -570,7 +570,7 @@
             },
             //随机生成 AES KEY
             randomKey : function (){
-              var min = 32, max = 64;
+              var min = 64, max = 64;
               var str = '';
               var arr = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
               // 随机产生
@@ -584,11 +584,16 @@
             //请求封装
             request : function(config, success, error){
               var key = this.randomKey();
+              console.log('key: '+key)
               var jsonData = JSON.stringify(config.data || {});
               //数据加密
               var data = {
                 key : encrypt.encrypt(key),
-                data : CryptoJS.AES.encrypt(jsonData, key).toString()
+                data : CryptoJS.AES.encrypt(jsonData, key,{
+                    iv: key,
+                    mode : CryptoJS.mode.CBC,
+                    padding : CryptoJS.pad.ZeroPadding
+                    }).toString()
               };
               var loadIndex;
               if (config.isLoading) loadIndex = layer.load(2, {offset:'30%'});  //打开加载动画
