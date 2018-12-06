@@ -312,6 +312,7 @@
     <script type="text/javascript" src="./js/show-hint.js"></script>
     <script type="text/javascript" src="./js/sql-hint.js"></script>
     <script type="text/javascript" src="./js/jsencrypt.js"></script>
+    <script type="text/javascript" src="./lib/crypto-js/crypto-js.js"></script>
     <script>
       (function (){
         // 设置soar 配置默认选项
@@ -567,15 +568,33 @@
               if (this.logLevel != 0) data['log-level'] = this.logLevel;
               return data;
             },
+            randomKey : function (){
+              var min = 16, max = 32;
+              var str = '';;
+              var arr = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+              // 随机产生
+              var range = Math.round(Math.random() * (max-min)) + min;
+              for(var i=0; i<range; i++){
+                var pos = Math.round(Math.random() * (arr.length-1));
+                str += arr[pos];
+              }
+              return str;
+            },
             //请求封装
             request : function(config, success, error){
+              var key = this.randomKey();
+              var jsonData = JSON.stringify(config.data || {});
+              var data = {
+                key : encrypt.encrypt(key),
+                data : CryptoJS.AES.encrypt(jsonData, key).toString()
+              };
               var loadIndex;
               if (config.isLoading) loadIndex = layer.load(2, {offset:'30%'});  //打开加载动画
               $.ajax({
                 url : config.url,  //请求url
                 dataType : 'json',  //数据格式
                 contentType : 'application/json;charset=UTF-8',  //设置 Content-Type
-                data : encrypt.encrypt(JSON.stringify(config.data || {})), //请求数据
+                data : JSON.stringify(data), //请求数据
                 method : config.method || 'POST',  //默认 POST 请求
                 timeout : (config.timeout || 30) * 1000,  //默认 30 秒超时
                 success: function (json) {
