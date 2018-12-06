@@ -77,7 +77,7 @@ docker build --no-cache -t soar-web .
 ## 功能相关
 **关于存储：** 所有的配置都是保存在浏览器 Local Storage 中的，多人之间使用是互不影响的，自己只能看到自己的配置，更换浏览器或者清除浏览器会造成配置丢失。
 
-**关于加密：** 配置信息在发送给服务端前会进行 RSA 加密，公钥存放在 static/data 下面, 私钥存放在根目录下的 data 目录下面，可自行更改。在线生成公钥和私钥见网站 [http://web.chacuo.net/netrsakeypair](http://web.chacuo.net/netrsakeypair)。
+**关于加密：** 配置信息在发送给服务端前会进行 RSA 和 AES 加密，公钥存放在 static/data 下面, 私钥存放在根目录下的 data 目录下面，可自行更改。在线生成公钥和私钥见网站 [http://web.chacuo.net/netrsakeypair](http://web.chacuo.net/netrsakeypair)。
 
 **配置模板：** 可以添加多数据库连接实例及配置，方便在 sql 评估的相互切换使用，具体配置项详情见  [https://github.com/XiaoMi/soar/blob/master/doc/config.md](https://github.com/XiaoMi/soar/blob/master/doc/config.md)。
 
