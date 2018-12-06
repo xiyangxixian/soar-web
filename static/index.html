@@ -574,19 +574,12 @@
               $.ajax({
                 url : config.url,  //请求url
                 dataType : 'json',  //数据格式
-                contentType : 'application/json; charset=UTF-8',
+                contentType : 'application/json;charset=UTF-8',  //设置 Content-Type
                 data : encrypt.encrypt(JSON.stringify(config.data || {})), //请求数据
                 method : config.method || 'POST',  //默认 POST 请求
                 timeout : (config.timeout || 30) * 1000,  //默认 30 秒超时
-                success: function (res) {
+                success: function (json) {
                   if (config.isLoading) layer.close(loadIndex);  //关闭加载动画
-                  var json = null;
-                  //解析 json
-                  try {
-                    json = JSON.parse(res);
-                  } catch (e) {
-                    json = {status:true, result:res};
-                  }
                   if (json.status) {
                     if($.isFunction(success)) success(json);  //成功回调处理
                   } else {
