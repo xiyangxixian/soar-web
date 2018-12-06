@@ -105,5 +105,3 @@ if __name__ == '__main__':
     # TODO 初始环境检查,包括 tmp，soar 目录是否可读写 soar 不存在自动拉取
     open_brower("http://127.0.0.1:%s"%(PORT))
     app.run(threaded=True,host=HOST,port=PORT)
-
-
