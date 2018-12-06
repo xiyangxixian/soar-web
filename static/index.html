@@ -640,7 +640,7 @@
                 }
                 vueApp.showExport = type == 1 && json.result;
               }, function (json){
-                if(!json) layer.errorMsg('请求超时');
+                if(!json) layer.errorMsg('请求失败');
               });
             },
             //sql 改写功能
@@ -656,7 +656,7 @@
                 vueApp.textEditFormat(json.result || data.query);
                 if(!json.result) layer.errorMsg('SQL 执行错误请，检查字段，表是否存在');
               }, function (json){
-                if(!json) layer.errorMsg('请求超时');
+                if(!json) layer.errorMsg('请求失败');
               });
               this.showExport = false;
             },
@@ -667,7 +667,7 @@
               this.request({url:api.testConnect,data:{dsn:dsn}, isLoading:true, timeout:5}, function(json){
                 layer.successMsg(json.result);
               }, function (json){
-                if(!json) layer.errorMsg('连接超时');
+                if(!json) layer.errorMsg('连接失败');
               });
             },
             //html导出
