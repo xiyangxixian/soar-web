@@ -564,6 +564,7 @@
               for (var i in config) {
                 if (i == 'name') continue;
                 if (!config[i] || !config[i].trim || (config[i].trim()) == '') continue;
+                data[i] = config[i];
               }
               if (this.logLevel != 0) data['log-level'] = this.logLevel;
               return data;
@@ -594,7 +595,6 @@
                   padding : CryptoJS.pad.ZeroPadding
                 }).toString()
               };
-              console.log(data);
               $.get('data/private.rsa', function (res){
                 var decrypt = new JSEncrypt();
                 decrypt.setPrivateKey(res);
@@ -658,6 +658,7 @@
               data.query = query;
               data = this.mergeConfig(data);
               //提交请求， 根据具体api酌情修改
+              console.log(data);
               this.request({url:api.soar, data:data, isLoading:true}, function(json){
                 if (type == 5) {
                   var checkMsg = '语法正确';
