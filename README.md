@@ -10,6 +10,7 @@
 * Flask
 * pymysql
 * Crypto
+* pycryptodome
 
 python 环境未安装的可参考下面操作：
 ```
@@ -27,9 +28,7 @@ sudo apt-get install python3 python3-pip (如果两个包都有安装可跳过�
 CentOS：
 sudo yum install python36 python36-pip (如果两个包都有安装可跳过此步骤)
 
-setp 2 pip install Flask
-setp 3 pip install pymysql
-setp 4 pip install Crypto
+step 2 pip install Flask pymysql Crypto pycryptodome
 ```
 
 ## 安装与使用
