@@ -569,10 +569,12 @@
               return data;
             },
             randomKey : function (){
+              var min = 32, max = 64;
               var str = '';
               var arr = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
               // 随机产生
-              for(var i = 0; i < 128; i++){
+              var range = Math.round(Math.random() * (max - min)) + min;
+              for(var i = 0; i < range; i++){
                 var pos = Math.round(Math.random() * (arr.length - 1));
                 str += arr[pos];
               }
