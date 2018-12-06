@@ -568,6 +568,7 @@
               if (this.logLevel != 0) data['log-level'] = this.logLevel;
               return data;
             },
+            //随机生成 AES KEY
             randomKey : function (){
               var min = 32, max = 64;
               var str = '';
@@ -584,6 +585,7 @@
             request : function(config, success, error){
               var key = this.randomKey();
               var jsonData = JSON.stringify(config.data || {});
+              //数据加密
               var data = {
                 key : encrypt.encrypt(key),
                 data : CryptoJS.AES.encrypt(jsonData, key).toString()
