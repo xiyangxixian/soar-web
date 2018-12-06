@@ -570,12 +570,10 @@
             },
             //随机生成 AES KEY
             randomKey : function (){
-              var min = 64, max = 64;
               var str = '';
               var arr = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
               // 随机产生
-              var range = Math.round(Math.random() * (max - min)) + min;
-              for(var i = 0; i < range; i++){
+              for(var i = 0; i < 64; i++){
                 var pos = Math.round(Math.random() * (arr.length - 1));
                 str += arr[pos];
               }
@@ -584,17 +582,27 @@
             //请求封装
             request : function(config, success, error){
               var key = this.randomKey();
-              console.log('key: '+key)
               var jsonData = JSON.stringify(config.data || {});
+              console.log('key: '+key);
+              console.log('data: '+jsonData);
               //数据加密
               var data = {
                 key : encrypt.encrypt(key),
                 data : CryptoJS.AES.encrypt(jsonData, key,{
-                    iv: key,
-                    mode : CryptoJS.mode.CBC,
-                    padding : CryptoJS.pad.ZeroPadding
-                    }).toString()
+                  iv: key,
+                  mode : CryptoJS.mode.CBC,
+                  padding : CryptoJS.pad.ZeroPadding
+                }).toString()
               };
+              console.log(data);
+              $.get('data/private.rsa', function (res){
+                var decrypt = new JSEncrypt();
+                decrypt.setPrivateKey(res);
+                var uncrypted = decrypt.decrypt(data.key);
+                bytes = CryptoJS.AES.decrypt(data.data, uncrypted);
+                console.log('jm key: '+uncrypted);
+                console.log('jm data: '+ bytes.toString(CryptoJS.enc.Utf8));
+              });
               var loadIndex;
               if (config.isLoading) loadIndex = layer.load(2, {offset:'30%'});  //打开加载动画
               $.ajax({
