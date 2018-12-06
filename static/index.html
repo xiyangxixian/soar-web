@@ -311,6 +311,7 @@
     <script type="text/javascript" src="./js/highlight.pack.js"></script>
     <script type="text/javascript" src="./js/show-hint.js"></script>
     <script type="text/javascript" src="./js/sql-hint.js"></script>
+    <script type="text/javascript" src="./js/jsencrypt.js"></script>
     <script>
       (function (){
         // 设置soar 配置默认选项
@@ -343,6 +344,9 @@
           extraKeys: {'Alt-Enter' : 'autocomplete'},  //快捷键打开提示
           hintOptions: {completeSingle : false, completeOnSingleClick : true} //sql 自动完成配置
         };
+        
+        //RSA加密
+        var encrypt = new JSEncrypt();
         
         //弹窗
         layer.openMsg = function (msg, type, timeout){
@@ -559,7 +563,6 @@
               for (var i in config) {
                 if (i == 'name') continue;
                 if (!config[i] || !config[i].trim || (config[i].trim()) == '') continue;
-                data[i] = config[i];
               }
               if (this.logLevel != 0) data['log-level'] = this.logLevel;
               return data;
@@ -570,7 +573,9 @@
               if (config.isLoading) loadIndex = layer.load(2, {offset:'30%'});  //打开加载动画
               $.ajax({
                 url : config.url,  //请求url
-                data : config.data || {},  //请求数据
+                dataType : 'json',  //数据格式
+                contentType : 'application/json; charset=UTF-8',
+                data : encrypt.encrypt(JSON.stringify(config.data || {})), //请求数据
                 method : config.method || 'POST',  //默认 POST 请求
                 timeout : (config.timeout || 30) * 1000,  //默认 30 秒超时
                 success: function (res) {
@@ -869,6 +874,9 @@
             timer = setTimeout(function (){
               _this.editorHeight = _this.resizeEditor() + 'px';
             }, 200);
+          });
+          $.get('data/public.rsa', function (data){
+            encrypt.setPublicKey(data);
           });
         });
         
