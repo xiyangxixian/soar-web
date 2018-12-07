@@ -19,10 +19,12 @@ from flask import make_response
 from config import HOST
 from config import PORT
 from config import DEBUG
+from core.check import check_env
 from core.common import soar_result
 from core.common import soar_args_check
 from core.common import open_brower
 from core.common import parse_dsn
+from core.argcrypto import decrypt
 
 
 app = Flask(__name__)
@@ -30,8 +32,22 @@ app = Flask(__name__)
 
 @app.route('/soar-api',methods=['POST', 'GET'])
 def soar():
-    args = request.values.to_dict()
+    arg = request.json
+    if  'data' not in arg or 'key' not in arg:
+        return json.dumps({
+            "result": 'data or key is None',
+            "status": True,
+            "log": 'error',
+        })
 
+    try:
+        args = json.loads(decrypt(arg['data'],arg['key']))
+    except Exception as e:
+        return json.dumps({
+            "result": str(e),
+            "status": True,
+            "log": 'error',
+        })
     if DEBUG:
         print (args)
 
@@ -68,7 +84,24 @@ def soardownload():
 
 @app.route('/test-connect',methods=['POST', 'GET'])
 def testconnect():
-    dsn = request.values.get('dsn')
+    arg = request.json
+    if  'data' not in arg or 'key' not in arg:
+        return json.dumps({
+            "result": 'data or key is None',
+            "status": True,
+            "log": 'error',
+        })
+
+    try:
+        dsn = json.loads(decrypt(arg['data'],arg['key']))['dsn']
+    except Exception as e:
+        return json.dumps({
+            "result": str(e),
+            "status": True,
+            "log": 'error',
+        })
+
+    print(dsn)
     try:
         res = parse_dsn(dsn)
         pymysql.connect(
@@ -103,5 +136,6 @@ def error_info(error):
 
 if __name__ == '__main__':
     # TODO 初始环境检查,包括 tmp，soar 目录是否可读写 soar 不存在自动拉取
+    check_env()
     open_brower("http://127.0.0.1:%s"%(PORT))
     app.run(threaded=True,host=HOST,port=PORT)

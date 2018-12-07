@@ -24,7 +24,7 @@ SOAR_PATH = BASE_DIR + os.sep + 'soar' + os.sep
 # 是否打开浏览器
 IS_OPEN_BROWESER = True  # True False
 
-RSA_PRIVATE_DIR = BASE_DIR + os.sep + 'data' + os.sep + 'private.psa'
+RSA_PRIVATE_DIR = BASE_DIR + os.sep + 'data' + os.sep + 'private.rsa'
 RSA_PUBLIC_DIR = BASE_DIR + os.sep + 'static' + os.sep + 'data' + os.sep + 'public.rsa'
 
 # 是否打开调试模式

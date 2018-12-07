@@ -574,35 +574,31 @@
               var str = '';
               var arr = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
               // 随机产生
-              for(var i = 0; i < 64; i++){
+              for(var i = 0; i < 32; i++){
                 var pos = Math.round(Math.random() * (arr.length - 1));
                 str += arr[pos];
               }
               return str;
             },
+
+
             //请求封装
             request : function(config, success, error){
               var key = this.randomKey();
+                console.log('key = "'+key+'"')
+              var Keycode = CryptoJS.enc.Utf8.parse(key)
               var jsonData = JSON.stringify(config.data || {});
-              console.log('key: '+key);
-              console.log('data: '+jsonData);
+                console.log(config.data)
+                var iv = CryptoJS.enc.Utf8.parse(key.substring(0, 16))
               //数据加密
               var data = {
                 key : encrypt.encrypt(key),
-                data : CryptoJS.AES.encrypt(jsonData, key,{
-                  iv: key,
+                data : CryptoJS.AES.encrypt(jsonData, Keycode,{
+                  iv: iv,
                   mode : CryptoJS.mode.CBC,
                   padding : CryptoJS.pad.ZeroPadding
                 }).toString()
               };
-              $.get('data/private.rsa', function (res){
-                var decrypt = new JSEncrypt();
-                decrypt.setPrivateKey(res);
-                var uncrypted = decrypt.decrypt(data.key);
-                bytes = CryptoJS.AES.decrypt(data.data, uncrypted);
-                console.log('jm key: '+uncrypted);
-                console.log('jm data: '+ bytes.toString(CryptoJS.enc.Utf8));
-              });
               var loadIndex;
               if (config.isLoading) loadIndex = layer.load(2, {offset:'30%'});  //打开加载动画
               $.ajax({
