@@ -22,7 +22,7 @@ TMP_DIR = BASE_DIR + os.sep + 'tmp' + os.sep
 SOAR_PATH = BASE_DIR + os.sep + 'soar' + os.sep
 
 # 是否打开浏览器
-IS_OPEN_BROWESER = False  # True False
+IS_OPEN_BROWESER = True  # True False
 
 # 私钥文件
 RSA_PRIVATE_DIR = BASE_DIR + os.sep + 'data' + os.sep + 'private.rsa'

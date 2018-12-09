@@ -58,7 +58,7 @@ def soar():
 
 @app.route('/soar-download',methods=['POST', 'GET'])
 def soardownload():
-    arg = request.json
+    arg = json.loads(request.values.get('json'))
     if 'data' not in arg or 'key' not in arg:
         return json.dumps({
             "result": 'data or key is None',
@@ -81,12 +81,15 @@ def soardownload():
     result = soar_result(args)
     map = json.loads(result)
     resp = make_response(map['result'])
+    # 设置时间戳
     nowTime = time.time()
     timeArray = time.localtime(nowTime)
     otherStyleTime = time.strftime("%Y%m%d%H%M%S", timeArray)
-    resp.headers['Content-Type'] = 'application/force-download'
+    # 后缀名
     suffixMap = {'html' : 'html', 'json' : 'json', 'markdown' : 'md'}
     suffix = 'html'
+    # 设置 http 头
+    resp.headers['Content-Type'] = 'application/force-download'
     if 'report-type' in args and args['report-type'] in suffixMap : suffix = suffixMap[args['report-type']]
     resp.headers['Content-Disposition'] = 'filename=soar_%s.%s' % (otherStyleTime, suffix)
     return resp

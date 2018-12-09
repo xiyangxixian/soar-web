@@ -552,7 +552,7 @@
               return data;
             },
             loadPublicKey : function(callback){
-              $.get('data/public.rsa', function (data){
+              $.get('data/public.rsa?t=' + new Date().getTime(), function (data){
                 encrypt.setPublicKey(data);
                 if ($.isFunction(callback)) callback();
               });
@@ -590,6 +590,7 @@
               var _this = this;
               this.loadPublicKey(function (){
                 data = _this.encryptData(data);
+                data = {json : JSON.stringify(data)};
                 var form = $('<form>');   //定义一个form表单
                 form.attr('style', 'display:none');  //隐藏表单 
                 form.attr('method', 'post'); //post 方法
