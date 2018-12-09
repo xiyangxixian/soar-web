@@ -8,6 +8,8 @@ function start(){
   else
     chmod -R a+x $dir/soar
     chmod -R a+w $dir/tmp
+    chmod -R a+w $dir/data
+    chmod -R a+w $dir/static/data
     nohup $pybin $dir/soar-web.py > /dev/null 2>&1 &
     echo 'soar web start ....... ok'
   fi
