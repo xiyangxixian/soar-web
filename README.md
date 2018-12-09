@@ -28,7 +28,7 @@ sudo apt-get install python3 python3-pip (如果两个包都有安装可跳过�
 CentOS：
 sudo yum install python36 python36-pip (如果两个包都有安装可跳过此步骤)
 
-step 2 pip install Flask pymysql Crypto pycrypto
+step 2 pip install -r requirement.txt
 ```
 **注**：python >= 3.6 的，请安装 pycryptodome 库, 若 Crypto 模块找不到, 则需要在 python 的依赖库目录 Lib\site-packages 中将 crypto 重命名为 Crypto 。
 
