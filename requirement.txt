@@ -1,5 +1,4 @@
 Flask
 pymysql
 Crypto
-pycrypto
 pycryptodome
