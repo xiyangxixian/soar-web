@@ -16,3 +16,5 @@ __pycache__
 *.log.*
 /nbproject
 tmp/*
+/data/*.rsa
+/static/data/*.rsa
