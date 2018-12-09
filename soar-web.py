@@ -58,7 +58,7 @@ def soar():
 
 @app.route('/soar-download',methods=['POST', 'GET'])
 def soardownload():
-    arg = json.loads(request.values.get('json'))
+    arg = request.values.to_dict()
     if 'data' not in arg or 'key' not in arg:
         return json.dumps({
             "result": 'data or key is None',
