@@ -28,7 +28,7 @@ def de_rsa(cipher_text):
         cipher = Cipher_pkcs1_v1_5.new(rsakey)  # 生成对象
 
         # 将密文解密成明文，返回的是一个bytes类型数据，需要自己转换成str
-        return cipher.decrypt(base64.b64decode(cipher_text), "ERROR")
+        return cipher.decrypt(base64.b64decode(cipher_text), 'ERROR')
 
 
 def de_aes(key, data):

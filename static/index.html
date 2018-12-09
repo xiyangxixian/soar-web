@@ -521,24 +521,6 @@
             saveSoarConfig : function (configs){
               localStorage.setItem(cacheKey.soar, JSON.stringify(configs));
             },
-            //通过 post 方法下载
-            postDownload : function (url, data){
-              var form = $('<form>');   //定义一个form表单
-              form.attr('style', 'display:none');  //隐藏表单 
-              form.attr('method', 'post'); //post 方法
-              form.attr('action', url);  //设置url
-              // form 表单中添加查询参数
-              for(var i in data){
-                var inputDom = $('<input>'); 
-                inputDom.attr('type', 'hidden'); 
-                inputDom.attr('name', i); 
-                inputDom.attr('value', data[i]);
-                $('body').append(form);  //将表单放入页面中
-                form.append(inputDom);
-              }
-              form.submit();  //提交
-              form.remove();  //移除元素
-            },
             //默认显示
             curFormat:function (res){
               $('#soar-content').html(res);
@@ -569,6 +551,12 @@
               if (this.logLevel != 0) data['log-level'] = this.logLevel;
               return data;
             },
+            loadPublicKey : function(callback){
+              $.get('data/public.rsa', function (data){
+                encrypt.setPublicKey(data);
+                if ($.isFunction(callback)) callback();
+              });
+            },
             //随机生成 AES KEY
             randomKey : function (){
               var str = '';
@@ -580,15 +568,15 @@
               }
               return str;
             },
-            //请求封装
-            request : function(config, success, error){
+            encryptData(data){
               var key = this.randomKey();
-              var Keycode = CryptoJS.enc.Utf8.parse(key)
-              var jsonData = JSON.stringify(config.data || {});
-              console.log(config.data)
-              var iv = CryptoJS.enc.Utf8.parse(key.substring(0, 16))
+              var Keycode = CryptoJS.enc.Utf8.parse(key);
+              var jsonData = JSON.stringify(data || {});
+              var iv = CryptoJS.enc.Utf8.parse(key.substring(0, 16));
+              console.log(data);
+              console.log('key: ' + key);
               //数据加密
-              var data = {
+              return {
                 key : encrypt.encrypt(key),
                 data : CryptoJS.AES.encrypt(jsonData, Keycode,{
                   iv: iv,
@@ -596,29 +584,58 @@
                   padding : CryptoJS.pad.ZeroPadding
                 }).toString()
               };
-              var loadIndex;
-              if (config.isLoading) loadIndex = layer.load(2, {offset:'30%'});  //打开加载动画
-              $.ajax({
-                url : config.url,  //请求url
-                dataType : 'json',  //数据格式
-                contentType : 'application/json;charset=UTF-8',  //设置 Content-Type
-                data : JSON.stringify(data), //请求数据
-                method : config.method || 'POST',  //默认 POST 请求
-                timeout : (config.timeout || 30) * 1000,  //默认 30 秒超时
-                success: function (json) {
-                  if (config.isLoading) layer.close(loadIndex);  //关闭加载动画
-                  if (json.status) {
-                    if($.isFunction(success)) success(json);  //成功回调处理
-                  } else {
-                    layer.errorMsg(json.result);
-                    if ($.isFunction(error)) error(json);
-                  }
-                  if (json.log) console.log(json.log);  //如果有日志, 则打印至控制台
-                },
-                error: function () {
-                  if (config.isLoading) layer.close(loadIndex);  //关闭弹窗
-                  if($.isFunction(error)) error();  //错误回调处理
+            },
+            //通过 post 方法下载
+            postDownload : function (url, data){
+              var _this = this;
+              this.loadPublicKey(function (){
+                data = _this.encryptData(data);
+                var form = $('<form>');   //定义一个form表单
+                form.attr('style', 'display:none');  //隐藏表单 
+                form.attr('method', 'post'); //post 方法
+                form.attr('action', url);  //设置url
+                // form 表单中添加查询参数
+                for(var i in data){
+                  var inputDom = $('<input>'); 
+                  inputDom.attr('type', 'hidden'); 
+                  inputDom.attr('name', i); 
+                  inputDom.attr('value', data[i]);
+                  $('body').append(form);  //将表单放入页面中
+                  form.append(inputDom);
                 }
+                form.submit();  //提交
+                form.remove();  //移除元素
+              });
+            },
+            //请求封装
+            request : function(config, success, error){
+              var _this = this;
+              this.loadPublicKey(function (){
+                var data = _this.encryptData(config.data);
+                var loadIndex;
+                if (config.isLoading) loadIndex = layer.load(2, {offset:'30%'});  //打开加载动画
+                $.ajax({
+                  url : config.url,  //请求url
+                  dataType : 'json',  //数据格式
+                  contentType : 'application/json;charset=UTF-8',  //设置 Content-Type
+                  data : JSON.stringify(data), //请求数据
+                  method : config.method || 'POST',  //默认 POST 请求
+                  timeout : (config.timeout || 30) * 1000,  //默认 30 秒超时
+                  success: function (json) {
+                    if (config.isLoading) layer.close(loadIndex);  //关闭加载动画
+                    if (json.status) {
+                      if($.isFunction(success)) success(json);  //成功回调处理
+                    } else {
+                      layer.errorMsg(json.result);
+                      if ($.isFunction(error)) error(json);
+                    }
+                    if (json.log) console.log(json.log);  //如果有日志, 则打印至控制台
+                  },
+                  error: function () {
+                    if (config.isLoading) layer.close(loadIndex);  //关闭弹窗
+                    if($.isFunction(error)) error();  //错误回调处理
+                  }
+                });
               });
             },
             //根据sql分析选项， 进行补贴的展示
@@ -894,9 +911,6 @@
             timer = setTimeout(function (){
               _this.editorHeight = _this.resizeEditor() + 'px';
             }, 200);
-          });
-          $.get('data/public.rsa', function (data){
-            encrypt.setPublicKey(data);
           });
         });
         

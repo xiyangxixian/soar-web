@@ -8,7 +8,6 @@
 
 import json
 import time
-import re
 import pymysql
 
 from flask import Flask
@@ -36,8 +35,7 @@ def soar():
     if  'data' not in arg or 'key' not in arg:
         return json.dumps({
             "result": 'data or key is None',
-            "status": True,
-            "log": 'error',
+            "status": False
         })
 
     try:
@@ -45,8 +43,7 @@ def soar():
     except Exception as e:
         return json.dumps({
             "result": str(e),
-            "status": True,
-            "log": 'error',
+            "status": False
         })
     if DEBUG:
         print (args)
@@ -61,10 +58,22 @@ def soar():
 
 @app.route('/soar-download',methods=['POST', 'GET'])
 def soardownload():
-    args = request.values.to_dict()
+    arg = request.json
+    if 'data' not in arg or 'key' not in arg:
+        return json.dumps({
+            "result": 'data or key is None',
+            "status": False
+        })
 
+    try:
+        args = json.loads(decrypt(arg['data'], arg['key']))
+    except Exception as e:
+        return json.dumps({
+            "result": str(e),
+            "status": False
+        })
     if DEBUG:
-        print (args)
+        print(args)
 
     check = soar_args_check(args)
     if check:
@@ -88,8 +97,7 @@ def testconnect():
     if  'data' not in arg or 'key' not in arg:
         return json.dumps({
             "result": 'data or key is None',
-            "status": True,
-            "log": 'error',
+            "status": False
         })
 
     try:
@@ -97,11 +105,8 @@ def testconnect():
     except Exception as e:
         return json.dumps({
             "result": str(e),
-            "status": True,
-            "log": 'error',
+            "status": False
         })
-
-    print(dsn)
     try:
         res = parse_dsn(dsn)
         pymysql.connect(
