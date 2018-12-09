@@ -6,19 +6,10 @@
 #@Software : PyCharm
 # @Desc  :
 
-import os
-import base64
 from Crypto import Random
 from Crypto.PublicKey import RSA
 from config import RSA_PUBLIC_DIR
 from config import RSA_PRIVATE_DIR
-from config import RSA_PUBLIC_DIR
-from config import RSA_PUBLIC_DIR
-from config import RSA_PRIVATE_DIR
-from config import TMP_DIR
-from config import SOAR_PATH
-
-
 
 def check_env():
     production_rsa_key()

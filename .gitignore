@@ -18,3 +18,5 @@ __pycache__
 tmp/*
 /data/*.rsa
 /static/data/*.rsa
+/data/*.rsa
+/static/data/*.rsa
