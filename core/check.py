@@ -28,7 +28,6 @@ def production_rsa_key():
     with open(RSA_PRIVATE_DIR, 'wb') as f:
         f.write(private_pem)
 
-
     public_pem = rsa.publickey().exportKey()
     with open(RSA_PUBLIC_DIR, 'wb') as f:
         f.write(public_pem)
