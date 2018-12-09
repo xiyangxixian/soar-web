@@ -10,7 +10,7 @@
 * Flask
 * pymysql
 * Crypto
-* pycrypto
+* pycrypto or pycryptodome
 
 python 环境未安装的可参考下面操作：
 ```
@@ -30,7 +30,7 @@ sudo yum install python36 python36-pip (如果两个包都有安装可跳过此�
 
 step 2 pip install Flask pymysql Crypto pycrypto
 ```
-注：Windows pycrypto 安装失败的安装 pycryptodome 库, Crypto 模块找不到的, 在 python 的依赖库目录 将 crypto 重命名为 Crypto
+**注**：python >= 3.6 的，请安装 pycryptodome 库, 若 Crypto 模块找不到, 则需要在 python 的依赖库目录 Lib\site-packages 中将 crypto 重命名为 Crypto 。
 
 ## 安装与使用
 ```
@@ -52,7 +52,7 @@ Linux or Mac： bash run.sh
 关闭服务：bash manage.sh stop
 重启服务：bash manage.sh restart
 ```
-注：当主机上存在多个 python 版本时, 需更改 run.sh, run.bat, manage.sh 中的 python 版本指定为 3.x 的版本运行。
+**注**：当主机上存在多个 python 版本时, 需更改 run.sh, run.bat, manage.sh 中的 python 版本指定为 3.x 的版本运行。
 
 ## docker 支持
 地址：https://hub.docker.com/r/becivells/soar-web/   
@@ -61,7 +61,7 @@ Dockerfile 见根目录 Dockerfile 文件
 docker pull becivells/soar-web
 docker run -d --name soar-web -p 5077:5077 becivells/soar-web
 ```
-**也可以是用 Dockerfile 自行构建**
+**也可以使用 Dockerfile 自行构建**
 ```
 docker build --no-cache -t soar-web .
 ```
