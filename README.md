@@ -13,7 +13,7 @@
 
 python 环境未安装的可参考下面操作：
 ```
-step 1 ：安装 python
+step 1：安装 python
 
 Windows：
 去 python 官网下载安装 python3 (已安装可跳过此步骤)
@@ -27,7 +27,7 @@ sudo apt-get install python3 python3-pip (如果两个包都有安装可跳过�
 CentOS：
 sudo yum install python36 python36-pip (如果两个包都有安装可跳过此步骤)
 
-step 2 ：pip install -r requirement.txt
+step 2：pip install -r requirement.txt
 ```
 **注**：若 Crypto 模块找不到, 则需要在 python 的依赖库目录 Lib\site-packages 中将 crypto 重命名为 Crypto 。
 
