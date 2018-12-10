@@ -77,7 +77,7 @@ docker build --no-cache -t soar-web .
 
 **关于加密：** 配置信息在发送给服务端前会进行 RSA 和 AES 加密，防止配置信息被窃取。
 
-**配置模板：** 可以添加多数据库连接实例及配置，方便在 sql 评估的相互切换使用，具体配置项详情见  [https://github.com/XiaoMi/soar/blob/master/doc/config.md](https://github.com/XiaoMi/soar/blob/master/doc/config.md)。
+**配置模板：** 可以添加多数据库连接实例及配置，方便在 sql 评估的相互切换使用，具体配置项详情见  [https://github.com/XiaoMi/soar/blob/master/doc/config.md](https://github.com/XiaoMi/soar/blob/master/doc/config.md) 。
 
 **数据库连接：** 数据库连接成功后，soar 可以通过表结构提供更正确优质的 sql 评估建议， 配置的正确性决定了 soar 的服务质量。
 
