@@ -9,7 +9,6 @@
 * python3.x
 * Flask
 * pymysql
-* Crypto
 * pycryptodome
 
 python 环境未安装的可参考下面操作：
