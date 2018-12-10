@@ -8,7 +8,6 @@
 
 import json
 import time
-import re
 import pymysql
 
 from flask import Flask
@@ -19,10 +18,12 @@ from flask import make_response
 from config import HOST
 from config import PORT
 from config import DEBUG
+from core.check import check_env
 from core.common import soar_result
 from core.common import soar_args_check
 from core.common import open_brower
 from core.common import parse_dsn
+from core.argcrypto import decrypt
 
 
 app = Flask(__name__)
@@ -30,8 +31,20 @@ app = Flask(__name__)
 
 @app.route('/soar-api',methods=['POST', 'GET'])
 def soar():
-    args = request.values.to_dict()
+    arg = request.json
+    if  'data' not in arg or 'key' not in arg:
+        return json.dumps({
+            "result": 'data or key is None',
+            "status": False
+        })
 
+    try:
+        args = json.loads(decrypt(arg['data'],arg['key']))
+    except Exception as e:
+        return json.dumps({
+            "result": str(e),
+            "status": False
+        })
     if DEBUG:
         print (args)
 
@@ -45,10 +58,22 @@ def soar():
 
 @app.route('/soar-download',methods=['POST', 'GET'])
 def soardownload():
-    args = request.values.to_dict()
+    arg = request.values.to_dict()
+    if 'data' not in arg or 'key' not in arg:
+        return json.dumps({
+            "result": 'data or key is None',
+            "status": False
+        })
 
+    try:
+        args = json.loads(decrypt(arg['data'], arg['key']))
+    except Exception as e:
+        return json.dumps({
+            "result": str(e),
+            "status": False
+        })
     if DEBUG:
-        print (args)
+        print(args)
 
     check = soar_args_check(args)
     if check:
@@ -56,19 +81,35 @@ def soardownload():
     result = soar_result(args)
     map = json.loads(result)
     resp = make_response(map['result'])
+    # 设置时间戳
     nowTime = time.time()
     timeArray = time.localtime(nowTime)
     otherStyleTime = time.strftime("%Y%m%d%H%M%S", timeArray)
-    resp.headers['Content-Type'] = 'application/force-download'
+    # 后缀名
     suffixMap = {'html' : 'html', 'json' : 'json', 'markdown' : 'md'}
     suffix = 'html'
+    # 设置 http 头
+    resp.headers['Content-Type'] = 'application/force-download'
     if 'report-type' in args and args['report-type'] in suffixMap : suffix = suffixMap[args['report-type']]
     resp.headers['Content-Disposition'] = 'filename=soar_%s.%s' % (otherStyleTime, suffix)
     return resp
 
 @app.route('/test-connect',methods=['POST', 'GET'])
 def testconnect():
-    dsn = request.values.get('dsn')
+    arg = request.json
+    if  'data' not in arg or 'key' not in arg:
+        return json.dumps({
+            "result": 'data or key is None',
+            "status": False
+        })
+
+    try:
+        dsn = json.loads(decrypt(arg['data'],arg['key']))['dsn']
+    except Exception as e:
+        return json.dumps({
+            "result": str(e),
+            "status": False
+        })
     try:
         res = parse_dsn(dsn)
         pymysql.connect(
@@ -103,5 +144,6 @@ def error_info(error):
 
 if __name__ == '__main__':
     # TODO 初始环境检查,包括 tmp，soar 目录是否可读写 soar 不存在自动拉取
+    check_env()
     open_brower("http://127.0.0.1:%s"%(PORT))
     app.run(threaded=True,host=HOST,port=PORT)

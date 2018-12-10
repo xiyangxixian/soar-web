@@ -9,29 +9,27 @@
 * python3.x
 * Flask
 * pymysql
+* pycryptodome
 
 python 环境未安装的可参考下面操作：
 ```
+step 1 ：安装 python
+
 Windows：
-step 1 去 python 官网下载安装 python3 (已安装可跳过此步骤)
-setp 2 pip install Flask
-setp 3 pip install pymysql
+去 python 官网下载安装 python3 (已安装可跳过此步骤)
 
 Mac：
-step 1 brew install python3 python3-pip (如果两个包都有安装可跳过此步骤)
-setp 2 pip install Flask
-setp 3 pip install pymysql
+brew install python3 python3-pip (如果两个包都有安装可跳过此步骤)
 
 Ubuntu：
-step 1 sudo apt-get install python3 python3-pip (如果两个包都有安装可跳过此步骤)
-setp 2 pip install Flask
-setp 3 pip install pymysql
+sudo apt-get install python3 python3-pip (如果两个包都有安装可跳过此步骤)
 
 CentOS：
-step 1 sudo yum install python36 python36-pip (如果两个包都有安装可跳过此步骤)
-setp 2 pip install Flask
-setp 3 pip install pymysql
+sudo yum install python36 python36-pip (如果两个包都有安装可跳过此步骤)
+
+step 2 ：pip install -r requirement.txt
 ```
+**注**：若 Crypto 模块找不到, 则需要在 python 的依赖库目录 Lib\site-packages 中将 crypto 重命名为 Crypto 。
 
 ## 安装与使用
 ```
@@ -52,9 +50,8 @@ Linux or Mac： bash run.sh
 启动服务：bash manage.sh start
 关闭服务：bash manage.sh stop
 重启服务：bash manage.sh restart
-
-注：当主机上存在多个 python 版本时, 需更改 run.sh, run.bat, manage.sh 中的 python 版本指定为 3.x 的版本运行。
 ```
+**注**：当主机上存在多个 python 版本时, 需更改 run.sh, run.bat, manage.sh 中的 python 版本指定为 3.x 的版本运行。
 
 ## docker 支持
 地址：https://hub.docker.com/r/becivells/soar-web/   
@@ -63,7 +60,7 @@ Dockerfile 见根目录 Dockerfile 文件
 docker pull becivells/soar-web
 docker run -d --name soar-web -p 5077:5077 becivells/soar-web
 ```
-**也可以是用 Dockerfile 自行构建**
+**也可以使用 Dockerfile 自行构建**
 ```
 docker build --no-cache -t soar-web .
 ```
@@ -77,7 +74,9 @@ docker build --no-cache -t soar-web .
 ## 功能相关
 **关于存储：** 所有的配置都是保存在浏览器 Local Storage 中的，多人之间使用是互不影响的，自己只能看到自己的配置，更换浏览器或者清除浏览器会造成配置丢失。
 
-**配置模板：** 可以添加多数据库连接实例及配置，方便在 sql 评估的相互切换使用，具体配置项详情见  [https://github.com/XiaoMi/soar/blob/master/doc/config.md](https://github.com/XiaoMi/soar/blob/master/doc/config.md)。
+**关于加密：** 配置信息在发送给服务端前会进行 RSA 和 AES 加密，防止配置信息被窃取。
+
+**配置模板：** 可以添加多数据库连接实例及配置，方便在 sql 评估的相互切换使用，具体配置项详情见  [https://github.com/XiaoMi/soar/blob/master/doc/config.md](https://github.com/XiaoMi/soar/blob/master/doc/config.md) 。
 
 **数据库连接：** 数据库连接成功后，soar 可以通过表结构提供更正确优质的 sql 评估建议， 配置的正确性决定了 soar 的服务质量。
 

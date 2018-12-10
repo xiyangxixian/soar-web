@@ -8,13 +8,17 @@
 import os
 import json
 import uuid
+import codecs
+import base64
 import platform
 import subprocess
 import webbrowser
 import tempfile
-import codecs
-
 from collections import OrderedDict
+
+
+from Crypto.Cipher import AES
+
 
 from config import TMP_DIR
 from config import SOAR_ARGS
@@ -24,10 +28,12 @@ from config import IS_OPEN_BROWESER
 from config import DEBUG
 from config import SOAR_NOT_USE_ARGS
 
+
 try:
     from urllib.parse import urlparse
 except ImportError:
     from urlparse import urlparse
+
 
 
 def select_soar_for_os_version():
