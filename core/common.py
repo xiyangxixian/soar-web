@@ -9,16 +9,12 @@ import os
 import json
 import uuid
 import codecs
-import base64
 import platform
 import subprocess
 import webbrowser
 import tempfile
+
 from collections import OrderedDict
-
-
-from Crypto.Cipher import AES
-
 
 from config import TMP_DIR
 from config import SOAR_ARGS
