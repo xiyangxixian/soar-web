@@ -154,9 +154,9 @@ def soar_result(args):
     # 黑名单列表
     if 'blacklist' in args:
         save_tmp_blacklist(args, blacklist_tmp_file)
-        args['blacklist'] = blacklist_tmp_file.replace('\\', '\\\\')
+        args['blacklist'] = blacklist_tmp_file
     if 'log-level' in args:
-        args['log-output']=log_tmp_file.replace('\\', '\\\\')
+        args['log-output'] = log_tmp_file
 
     cmd_args['config'] = conf_tmp_file # soar 规定 -config 必须作为第一个参数
     cmd_args['query'] = args['query']
