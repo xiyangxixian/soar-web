@@ -42,7 +42,7 @@ sudo -y apt-get install unzip 或者 sudo yum -y install unzip
 unzip soar-web.zip
 cd soar-web-matster
 
-运行启动脚本
+运行启动脚本：
 Windows： run.bat
 Linux or Mac： bash run.sh
 
