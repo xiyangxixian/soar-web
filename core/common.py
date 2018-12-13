@@ -226,7 +226,10 @@ def soar_args_check(args):
 # 打开浏览器
 def open_brower(url):
     if IS_OPEN_BROWESER:
-        webbrowser.open(url)
+        try:
+            webbrowser.open(url)
+        except:
+            pass
 
 # 解析dsn
 def parse_dsn(host):
