@@ -551,6 +551,7 @@
               if (this.logLevel != 0) data['log-level'] = this.logLevel;
               return data;
             },
+            //加载公钥
             loadPublicKey : function(callback){
               $.get('data/public.rsa?t=' + new Date().getTime(), function (data){
                 encrypt.setPublicKey(data);
@@ -568,6 +569,7 @@
               }
               return str;
             },
+            //加密数据
             encryptData(data){
               var key = this.randomKey();
               var Keycode = CryptoJS.enc.Utf8.parse(key);
