@@ -346,9 +346,6 @@
           hintOptions: {completeSingle : false, completeOnSingleClick : true} //sql 自动完成配置
         };
         
-        //RSA加密
-        var encrypt = new JSEncrypt();
-        
         //弹窗
         layer.openMsg = function (msg, type, timeout){
           type = type || 'info';
@@ -415,6 +412,9 @@
         //初始化sql编辑器
         var converter = new showdown.Converter();
         converter.setOption('tables', true);
+        
+        //RSA加密
+        var encrypt = new JSEncrypt();
               
         var vueApp = new Vue({
           el : '#vue-app',
@@ -562,14 +562,14 @@
             randomKey : function (){
               var str = '';
               var arr = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-              // 随机产生
+              //随机产生 32 为字母和数字
               for(var i = 0; i < 32; i++){
                 var pos = Math.round(Math.random() * (arr.length - 1));
                 str += arr[pos];
               }
               return str;
             },
-            //加密数据
+            //数据加密
             encryptData(data){
               var key = this.randomKey();
               var Keycode = CryptoJS.enc.Utf8.parse(key);
@@ -613,8 +613,10 @@
             request : function(config, success, error){
               var _this = this;
               this.loadPublicKey(function (){
+                //数据加密
                 var data = _this.encryptData(config.data);
                 var loadIndex;
+                //是否显示加载动画
                 if (config.isLoading) loadIndex = layer.load(2, {offset:'30%'});  //打开加载动画
                 $.ajax({
                   url : config.url,  //请求url
@@ -878,7 +880,7 @@
           //sql 编辑器
           editorOption.readOnly = false;
           _this.sqlEditor = CodeMirror.fromTextArea($('#sql-edit')[0], editorOption);
-          //代码自动完成
+          //sql 自动完成
           _this.sqlEditor.on('inputRead', function (instance){
             var sqlAutocomplete = false;
             var sqlAutocompleteInProgress = false;
@@ -899,7 +901,6 @@
             if (token.string.match(/^[a-zA-Z]+$/)) string = token.string;
             if (string.length > 0) CodeMirror.commands.autocomplete(instance);
           });
-          
           //点击空白出时, 关闭展开按钮
           $(document).click(function (e){
             for(var i in _this.menuOpen){
