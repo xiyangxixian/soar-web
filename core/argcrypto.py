@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import base64
 from Crypto.Cipher import AES
 from Crypto.PublicKey import RSA
