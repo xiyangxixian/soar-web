@@ -499,6 +499,7 @@
             }
           },
           methods : {
+            //启动时回调
             run : function (callback){
               if ($.isFunction(callback)) callback.call(this);
               return this;
@@ -545,6 +546,16 @@
             saveSoarConfig : function (configs){
               localStorage.setItem(cacheKey.soar, JSON.stringify(configs));
             },
+            //去除空格
+            trimObj : function (obj) {
+              if (typeof obj == 'object'){
+                for (var i in obj) {
+                  if (typeof obj[i] == 'string') obj[i] = obj[i].trim();
+                }
+              }
+              return obj;
+            },
+            //特殊字符编码
             scEncode : function (str) {
               if (!str) return str;
               this.pwdSpecialChr.forEach(function (item){
@@ -582,8 +593,8 @@
                 callback(_this);
                 setTimeout(function (){
                   $(event.target).setCurPos(pos,pos); 
-                });
-              }, 50);
+                }, 10);
+              }, 10);
             },
             //当 online-dsn 聚焦时触发
             onOnlineDsnFocus : function (event){
@@ -688,6 +699,7 @@
             //请求封装
             request : function(config, success, error){
               var _this = this;
+              config.data = _this.trimObj(config.data);
               this.loadPublicKey(function (){
                 //数据加密
                 var data = _this.encryptData(config.data);
@@ -862,6 +874,7 @@
                 var configs = vueApp.getSoarConfig();
                 if (vueApp.importConfig.cover == 1) configs = [];
                 arr.forEach(function (item){
+                  item = vueApp.trimObj(item);
                   configs.push(item);
                 });
                 vueApp.saveSoarConfig(configs);
@@ -919,6 +932,7 @@
                   return false;
                 }
               }
+              this.itemConfig = this.trimObj(this.itemConfig);
               if (this.editId < 0) {
                 this.configs.push(this.itemConfig);
               } else {
