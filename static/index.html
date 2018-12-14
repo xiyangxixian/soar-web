@@ -147,8 +147,8 @@
             <tr v-for="(item, index) in configs">
               <td class="text-center">{{index+1}}</td>
               <td class="text-center">{{item.name||'-'}}</td>
-              <td class="text-center">{{item['online-dsn']||'--'}}</td>
-              <td class="text-center">{{item['test-dsn']||'--'}}</td>
+              <td class="text-center">{{filterDsn(item['online-dsn'])||'--'}}</td>
+              <td class="text-center">{{filterDsn(item['test-dsn'])||'--'}}</td>
               <td class="text-center">
                 <span class="glyphicon glyphicon-pencil ponter" v-on:click="soarEdit(index)"></span>
                 <span v-show="index!=0||configs.length>1" class="ml-5 glyphicon glyphicon-trash ponter" v-on:click="soarDel(index)"></span>
@@ -174,14 +174,14 @@
             <div class="form-group">
               <label class="col-xs-4 control-label">线上环境 (online-dsn)</label>
               <div class="col-xs-7">
-                <input type="text" class="form-control" placeholder="user:password@host:port/database（密码中特殊字符需用 \ 转义）" v-model="itemConfig['online-dsn']">
+                <input v-on:focus="onOnlineDsnFocus($event)" v-on:blur="showOnlineDsn=false" type="text" class="form-control" placeholder="user:password@host:port/database（密码中特殊字符需用 \ 转义）" v-model="onlineDsnFilter">
               </div>
               <div class="col-xs-1"><span v-on:click="testConnect(itemConfig['online-dsn'])" class="glyphicon glyphicon-refresh ponter" style="line-height:32px;" title="点击测试数据库链接"></span></div>
             </div>
             <div class="form-group">
               <label class="col-xs-4 control-label">测试环境 (test-dsn)</label>
               <div class="col-xs-7">
-                <input type="text" class="form-control" placeholder="user:password@host:port/database（密码中特殊字符需用 \ 转义）" v-model="itemConfig['test-dsn']">
+                <input v-on:focus="onTestDsnFocus($event)" v-on:blur="showTestDsn=false" type="text" class="form-control" placeholder="user:password@host:port/database（密码中特殊字符需用 \ 转义）" v-model="testDsnFilter">
               </div>
               <div class="col-xs-1"><span v-on:click="testConnect(itemConfig['test-dsn'])" class="glyphicon glyphicon-refresh ponter" style="line-height:32px;" title="点击测试数据库链接"></span></div>
             </div>
@@ -313,6 +313,7 @@
     <script type="text/javascript" src="./js/sql-hint.js"></script>
     <script type="text/javascript" src="./js/jsencrypt.js"></script>
     <script type="text/javascript" src="./lib/crypto-js/crypto-js.js"></script>
+    <script type="text/javascript" src="./js/cursor-position.js"></script>
     <script>
       (function (){
         // 设置soar 配置默认选项
@@ -458,6 +459,9 @@
                 'rewrite' : false, //是否展开重写按钮
                 'export' : false  //是否展开导出
               },
+              showOnlineDsn : false,  //是否完整显示 online-dsn
+              showTestDsn : false,  //是否完整显示 test-dsn
+              pwdSpecialChr : ['\\', '@', ':', '/'],
               label : {
                 defaultResult : '<span class="placegolder">SOAR 结果展示 ...</span>'  //右侧结果 placeholder
               },
@@ -472,6 +476,26 @@
             },
             logLevel : function(level) {
               localStorage.setItem(cacheKey.logLevel, level);
+            }
+          },
+          computed : {
+            //密码显示与隐藏
+            onlineDsnFilter : {
+              get : function () {
+                return this.showOnlineDsn ? this.itemConfig['online-dsn'] : this.filterDsn(this.itemConfig['online-dsn']);
+              },
+              set : function (newValue) {
+                this.itemConfig['online-dsn'] = newValue;
+              }
+            },
+            //密码显示与隐藏
+            testDsnFilter : {
+              get : function () {
+                return this.showTestDsn ? this.itemConfig['test-dsn'] : this.filterDsn(this.itemConfig['test-dsn']);
+              },
+              set : function (newValue) {
+                this.itemConfig['test-dsn'] = newValue;
+              }
             }
           },
           methods : {
@@ -520,6 +544,58 @@
             //存储soar配置项列表
             saveSoarConfig : function (configs){
               localStorage.setItem(cacheKey.soar, JSON.stringify(configs));
+            },
+            scEncode : function (str) {
+              if (!str) return str;
+              this.pwdSpecialChr.forEach(function (item){
+                var oldStr = '\\' + item;
+                var newStr = '\\{'+ item.charCodeAt() +'}';
+                str = str.replace(oldStr, newStr);
+              });
+              return str;
+            },
+            //特殊字符解码
+            scDecode : function (str) {
+              if (!str) return str;
+              for (var i = this.pwdSpecialChr.length - 1; i >= 0; i --) {
+                var item = this.pwdSpecialChr[i];
+                var oldStr = '\\{' + item.charCodeAt() + '}';
+                var newStr = '\\' + item;
+                str = str.replace(oldStr, newStr);
+              }
+              return str;
+            },
+            //隐藏密码
+            filterDsn : function (dsn){
+              if (!dsn) return dsn;
+              dsn = this.scEncode(dsn);
+              var regex = /^[^:]+:([^@]+)/g;
+              var res = regex.test(dsn);
+              if (res) dsn = dsn.replace(RegExp.$1, '*'.repeat(this.scDecode(RegExp.$1).length));
+              return dsn;
+            },
+            //设置 input 光标位置
+            onDsnFocus : function (event, callback){
+              var _this = this;
+              setTimeout(function (){
+                var pos = $(event.target).getCurPos();
+                callback(_this);
+                setTimeout(function (){
+                  $(event.target).setCurPos(pos,pos); 
+                });
+              }, 50);
+            },
+            //当 online-dsn 聚焦时触发
+            onOnlineDsnFocus : function (event){
+              this.onDsnFocus(event, function (_this){
+                _this.showOnlineDsn = true;
+              });
+            },
+            //当 test-dsn 聚焦时触发
+            onTestDsnFocus : function (event){
+              this.onDsnFocus(event, function (_this){
+                _this.showTestDsn = true;
+              });
             },
             //默认显示
             curFormat:function (res){
