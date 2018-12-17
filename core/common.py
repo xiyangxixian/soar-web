@@ -7,6 +7,7 @@
 
 import os
 import json
+import re
 import uuid
 import codecs
 import platform
@@ -24,13 +25,10 @@ from config import IS_OPEN_BROWESER
 from config import DEBUG
 from config import SOAR_NOT_USE_ARGS
 
-
 try:
     from urllib.parse import urlparse
 except ImportError:
     from urlparse import urlparse
-
-
 
 def select_soar_for_os_version():
     '''
@@ -117,7 +115,6 @@ def yaml_str(str):
     except:
         return  "'%s'" % (str.replace("'", "''"))
 
-
 def save_tmp_blacklist(args,blacklist_tmp_file):
     '''
     临时黑名单文件
@@ -129,8 +126,6 @@ def save_tmp_blacklist(args,blacklist_tmp_file):
         for black in args['blacklist'].split('\n'):
             f.write(black)
             f.write('\n')
-
-
 
 def soar_result(args):
     '''
@@ -232,56 +227,37 @@ def open_brower(url):
             pass
 
 # 解析dsn
-def parse_dsn(host):
+def parse_dsn(dsn):
     try :
-        host = sc_encode(host)
-        res = urlparse('http://%s' % host)
-        arr = res.netloc.split('@')
-        user = 'root'
-        pwd = ''
-        port = 3306
-        db = res.path.strip('/')
-        if len(arr) == 2:
-            arr2 = arr[0].split(':')
-            host = arr[1]
-            user = arr2[0]
-            if len(arr2) == 2 : pwd = arr2[1]
-        else:
-            host = arr[0]
-        hostArr = host.split(':')
-        host = hostArr[0]
-        query = parse_query(res.query)
+        r = r'^(.+)@(.+?)/(.+?)($|\?)(.*)'
+        m = re.match(r, dsn)
+        if m == None : raise RuntimeError('DSN 解析错误')
+        user_info = m.group(1)
+        user = user_info.split(':')[0]
+
+        # 为了兼容以前转义的做法, 替换 \
+        pwd = re.sub(r'^%s' % user, '', user_info).lstrip(':')\
+            .replace('\\\\', '\\').replace('\\@', '@').replace('\\:', ':').replace('\\/', '/')
+        host_info = m.group(2)
+        host = host_info.split(':')[0]
+        port = re.sub(r'^%s' % host, '', host_info).lstrip(':')
+        db = m.group(3)
+        query = parse_query(m.group(5))
         charset = 'utf8'
-        if 'charset' in query.keys() : charset = sc_decode(query['charset'])
-        if (len(hostArr) == 2) : port = int(hostArr[1])
+
+        if port == '': port = 3306
+        if 'charset' in query : charset = query['charset']
+        port = int(port)
     except:
-        raise RuntimeError('数据库连接错误')
+        raise RuntimeError('DSN 解析错误')
     return {
-        'host' : sc_decode(host),
-        'user' : sc_decode(user),
-        'pwd' : sc_decode(pwd),
-        'db' : sc_decode(db),
+        'host' : host,
+        'user' : user,
+        'pwd' : pwd,
+        'db' : db,
         'port' : port,
         'charset' : charset
     }
-
-# 特殊字符, 从左往右编码
-schars = ['\\', '@', ':', '/']
-    
-# dsn 特殊字符编码
-def sc_encode(str):
-    for val in schars:
-        old_str = '\\%s' % val
-        new_str = '\\{%d}' % ord(val)
-        str = str.replace(old_str, new_str)
-    return str
-
-# dsn 特殊字符解码
-def sc_decode(str):
-    for val in schars[::-1]:
-        old_str = '\\{%d}' % ord(val)
-        str = str.replace(old_str, val)
-    return str
 
 # 查询字符串解析
 def parse_query(query):
