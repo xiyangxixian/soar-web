@@ -174,14 +174,14 @@
             <div class="form-group">
               <label class="col-xs-4 control-label">线上环境 (online-dsn)</label>
               <div class="col-xs-7">
-                <input v-on:focus="onOnlineDsnFocus($event)" v-on:blur="showOnlineDsn=false" type="text" class="form-control" placeholder="user:password@host:port/database（密码中特殊字符需用 \ 转义）" v-model="onlineDsnFilter">
+                <input v-on:focus="onOnlineDsnFocus($event)" v-on:blur="showOnlineDsn=false" type="text" class="form-control" placeholder="user:password@host:port/database" v-model="onlineDsnFilter">
               </div>
               <div class="col-xs-1"><span v-on:click="testConnect(itemConfig['online-dsn'])" class="glyphicon glyphicon-refresh ponter" style="line-height:32px;" title="点击测试数据库链接"></span></div>
             </div>
             <div class="form-group">
               <label class="col-xs-4 control-label">测试环境 (test-dsn)</label>
               <div class="col-xs-7">
-                <input v-on:focus="onTestDsnFocus($event)" v-on:blur="showTestDsn=false" type="text" class="form-control" placeholder="user:password@host:port/database（密码中特殊字符需用 \ 转义）" v-model="testDsnFilter">
+                <input v-on:focus="onTestDsnFocus($event)" v-on:blur="showTestDsn=false" type="text" class="form-control" placeholder="user:password@host:port/database" v-model="testDsnFilter">
               </div>
               <div class="col-xs-1"><span v-on:click="testConnect(itemConfig['test-dsn'])" class="glyphicon glyphicon-refresh ponter" style="line-height:32px;" title="点击测试数据库链接"></span></div>
             </div>
@@ -555,34 +555,12 @@
               }
               return obj;
             },
-            //特殊字符编码
-            scEncode : function (str) {
-              if (!str) return str;
-              this.pwdSpecialChr.forEach(function (item){
-                var oldStr = '\\' + item;
-                var newStr = '\\{'+ item.charCodeAt() +'}';
-                str = str.replace(oldStr, newStr);
-              });
-              return str;
-            },
-            //特殊字符解码
-            scDecode : function (str) {
-              if (!str) return str;
-              for (var i = this.pwdSpecialChr.length - 1; i >= 0; i --) {
-                var item = this.pwdSpecialChr[i];
-                var oldStr = '\\{' + item.charCodeAt() + '}';
-                var newStr = '\\' + item;
-                str = str.replace(oldStr, newStr);
-              }
-              return str;
-            },
             //隐藏密码
             filterDsn : function (dsn){
               if (!dsn) return dsn;
-              dsn = this.scEncode(dsn);
-              var regex = /^[^:]+:([^@]+)/g;
+              var regex = /^([^:]+:)(.+)@/g;
               var res = regex.test(dsn);
-              if (res) dsn = dsn.replace(RegExp.$1, '*'.repeat(this.scDecode(RegExp.$1).length));
+              if (res) dsn = dsn.replace(/^([^:]+:)(.+)@/g, '$1' + '*'.repeat(RegExp.$2.length) + '@');
               return dsn;
             },
             //设置 input 光标位置
