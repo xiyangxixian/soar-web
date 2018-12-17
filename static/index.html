@@ -546,6 +546,15 @@
             saveSoarConfig : function (configs){
               localStorage.setItem(cacheKey.soar, JSON.stringify(configs));
             },
+            //去除空格
+            trimObj : function (obj) {
+              if (typeof obj == 'object'){
+                for (var i in obj) {
+                  if (typeof obj[i] == 'string') obj[i] = obj[i].trim();
+                }
+              }
+              return obj;
+            },
             //隐藏密码
             filterDsn : function (dsn){
               if (!dsn) return dsn;
