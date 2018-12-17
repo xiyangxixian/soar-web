@@ -558,9 +558,9 @@
             //隐藏密码
             filterDsn : function (dsn){
               if (!dsn) return dsn;
-              var regex = /^[^:]+:(.+)@/g;
+              var regex = /^([^:]+:)(.+)@/g;
               var res = regex.test(dsn);
-              if (res) dsn = dsn.replace(RegExp.$1, '*'.repeat(RegExp.$1.length));
+              if (res) dsn = dsn.replace(/^([^:]+:)(.+)@/g, '$1' + '*'.repeat(RegExp.$2.length) + '@');
               return dsn;
             },
             //设置 input 光标位置
