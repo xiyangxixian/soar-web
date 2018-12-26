@@ -23,11 +23,11 @@ from core.common import soar_result
 from core.common import soar_args_check
 from core.common import open_brower
 from core.common import parse_dsn
+from core.common import runcmd
+from core.common import req_parse2cmd_parse
 from core.argcrypto import decrypt
 
-
 app = Flask(__name__)
-
 
 @app.route('/soar-api',methods=['POST', 'GET'])
 def soar():
@@ -125,6 +125,11 @@ def testconnect():
         status = False
         result = str(e)
     return json.dumps({'result':result, 'status':status})
+
+@app.route('/soar-version',methods=['POST', 'GET'])
+def soarcmd():
+    result = runcmd(req_parse2cmd_parse({'version' : 'true'}))
+    return json.dumps({'result': result, 'status': True})
 
 @app.route('/',methods=['POST', 'GET'])
 def index():
