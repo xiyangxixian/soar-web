@@ -325,7 +325,8 @@
         var api = {
          soar : '/soar-api',  //soar sql 分析优化接口 
          testConnect : '/test-connect',  //测试数据库连接
-         download : '/soar-download'  //导出接口
+         download : '/soar-download',  //导出接口
+         version : '/soar-version'  //获取版本信息
         };
         //路由
         var r = {
@@ -984,6 +985,19 @@
             }, 200);
           });
         });
+        
+        window.soarVersion = function (){
+          //输出 soar 版本信息
+          $.get(api.version, function(json){
+            if (typeof json == 'string') {
+              try {
+                  json = JSON.parse(json);
+              } catch (e) {}
+            }
+            if (json) console.log('soar -version\n' + json.result);
+          });
+        };
+        window.soarVersion();
         
         //监听路由
         Router({
