@@ -638,7 +638,7 @@
             //数据加密
             encryptData(data){
               var key = this.randomKey();
-              var Keycode = CryptoJS.enc.Utf8.parse(key);
+              var keyCode = CryptoJS.enc.Utf8.parse(key);
               var jsonData = JSON.stringify(data || {});
               var iv = CryptoJS.enc.Utf8.parse(key.substring(0, 16));
               console.log('key: ' + key);
@@ -646,7 +646,7 @@
               //数据加密
               return {
                 key : encrypt.encrypt(key),
-                data : CryptoJS.AES.encrypt(jsonData, Keycode,{
+                data : CryptoJS.AES.encrypt(jsonData, keyCode,{
                   iv: iv,
                   mode : CryptoJS.mode.CBC,
                   padding : CryptoJS.pad.ZeroPadding
