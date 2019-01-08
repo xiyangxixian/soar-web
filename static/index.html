@@ -52,6 +52,10 @@
       .show-markdown table th {padding: 4px 8px;background: #E2E2E2;}
       .show-markdown table td {padding: 8px;vertical-align:top;}
       
+      /* 打印分割样式 */
+      .show-markdown .sql-split.no-print{margin-top:30px;}
+      .show-markdown .print-split{page-break-after:always;}
+      
       /*列表样式*/
       .content-soar-list table tbody tr td{vertical-align: middle;}
       .content-soar-list table thead th{background-color: #f5fafe;border-bottom: none;}
@@ -314,6 +318,7 @@
     <script type="text/javascript" src="./js/jsencrypt.js"></script>
     <script type="text/javascript" src="./lib/crypto-js/crypto-js.js"></script>
     <script type="text/javascript" src="./js/cursor-position.js"></script>
+    <script type="text/javascript" src="./js/jquery.print.js"></script>
     <script>
       (function (){
         // 设置soar 配置默认选项
@@ -442,8 +447,7 @@
             //导出下拉选项
             dropdown['export'] = [
               {val : 'html', text : 'html'},
-              {val : 'markdown', text : 'markdown'},
-              {val : 'json', text : 'json'}
+              {val : 'pdf', text : 'pdf'}
             ];
             return {
               curRouter : '',   //当前路由
@@ -597,6 +601,9 @@
               dom.find('pre code').each(function(i, code) {
                 hljs.highlightBlock(code);
               });
+              dom.find('[id^="query"]').not(':first')
+                .before('<div class="no-print sql-split"></div>')
+                .before('<div style="page-break-after:always;"></div>');
               $('#soar-content').html(dom[0].outerHTML);
             },
             //用富文本框展示sql 并且高亮显示
@@ -787,13 +794,17 @@
             },
             //html导出
             exportSoar : function(type){
-              var query = this.sqlEditor.getValue();
-              if (!query) return layer.errorMsg('SQL 不能为空');
-              var data = {};
-              data.query = query;
-              data['report-type'] = type || '';
-              data = this.mergeConfig(data);
-              this.postDownload(api.download, data);
+              if (type == 'pdf') {
+                $('.sql-analysis-show').print({'title' : 'SQL 评审', header:''});
+              } else {
+                var query = this.sqlEditor.getValue();
+                if (!query) return layer.errorMsg('SQL 不能为空');
+                var data = {};
+                data.query = query;
+                data['report-type'] = type || '';
+                data = this.mergeConfig(data);
+                this.postDownload(api.download, data);
+              }
             },
             //配置导出
             exportConfig : function (){
