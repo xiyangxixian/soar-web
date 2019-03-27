@@ -648,8 +648,6 @@
               var keyCode = CryptoJS.enc.Utf8.parse(key);
               var jsonData = JSON.stringify(data || {});
               var iv = CryptoJS.enc.Utf8.parse(key.substring(0, 16));
-              console.log('key: ' + key);
-              console.log(data);
               //数据加密
               return {
                 key : encrypt.encrypt(key),
