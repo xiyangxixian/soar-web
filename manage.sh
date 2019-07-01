@@ -3,7 +3,7 @@ dir=`dirname $0`
 pybin='python'
 
 function start(){
-  if [ $(checkPid) ]; then
+  if [[ "$(checkPid)" ]]; then
     echo 'soar web is running'
   else
     chmod -R a+x $dir/soar
@@ -17,7 +17,7 @@ function start(){
 
 function stop(){
   pid=$(checkPid)
-  if [ $pid ]; then
+  if [[ "$pid" ]]; then
     kill -9 $pid
   fi
   echo 'soar web stop ....... ok'
@@ -32,6 +32,6 @@ function checkPid(){
   ps ax | grep soar-web.py | grep -v grep  | awk '{print $1}'
 }
 
-if [ $1 ]; then
+if [[ "$1" ]]; then
   $1
 fi
