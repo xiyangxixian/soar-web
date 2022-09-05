@@ -43,7 +43,7 @@ func SoarRun(argsMap map[string]string) ([]byte, error) {
 	for key, arg := range argsMap {
 		key := "-" + strings.TrimSpace(key)
 		if rst, ok := SoarArgsAlowList[key]; !(ok && rst) {
-			errinfo := "soar-web 不允许的参数: " + arg
+			errinfo := "请检查soar程序是否可以正常运行，如果正常是soar-web 不允许的参数: " + arg
 			return []byte(errinfo), errors.New(errinfo)
 		} else {
 			if arg == "" {
