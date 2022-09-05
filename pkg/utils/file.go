@@ -57,7 +57,7 @@ func FileInListDir(file string, MulDir []string) bool {
 func GetSoarBin() (soarPath string) {
 	switch runtime.GOOS {
 	case GoOSWindows:
-		soarPath = "soar-bin/soar.windows-amd64"
+		soarPath = "soar-bin/soar.windows-amd64.exe"
 	case GoOSLinux:
 		soarPath = "soar-bin/soar.linux-amd64"
 	case GoOSDrawn:
@@ -67,6 +67,9 @@ func GetSoarBin() (soarPath string) {
 	}
 	if !FileExists(soarPath) {
 		soarPath = "soar-bin/soar"
+	}
+	if runtime.GOOS == GoOSWindows {
+		soarPath = "soar-bin/soar.exe"
 	}
 	return
 }
