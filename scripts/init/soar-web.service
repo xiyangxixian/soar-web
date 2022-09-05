@@ -1,0 +1,12 @@
+[Unit]
+Description="soar-web"
+After=rc-local.service nss-user-lookup.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+ExecStart=/usr/local/soar-web/soar-web
+
+[Install]
+WantedBy=multi-user.target

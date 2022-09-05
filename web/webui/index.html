@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <title>SOAR WEB</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--css库文件-->
+    <link rel="stylesheet" href="css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="css/codemirror.css"/>
+    <link rel="stylesheet" href="css/show-hint.css"/>
+    <style>
+      /*公共样式*/
+      .w-100{width: 100px !important;}
+      .w-150{width: 150px !important;}
+      .w-200{width: 200px !important;}
+      .minw-200{min-width: 200px !important;}
+      .maxw-360{max-width: 360px !important;}
+      .maxw-400{max-width: 400px !important;}
+      .maxw-500{max-width: 500px !important;}
+      .float-left{float:left;}
+      .float-right{float:right;}
+      
+      .ml-5{margin-left:5px !important;}
+      .mr-5{margin-right:5px !important;}
+      .ml-20{margin-left:20px !important;}
+      .mt-20{margin-top:20px !important;}
+      .mb-20{margin-bottom:20px !important;}
+      .CodeMirror{height:100%; padding:10px;}
+      .show-content{height:100%;border:1px solid #ddd;}
+      .placegolder,pre.CodeMirror-placeholder{color: #999;font-size:14px;}
+      .placegolder{font-family: monospace;display:inline-block;padding:4px 0px;margin:10px;}
+      .ponter{cursor: pointer}
+      [v-cloak]{display:none;}
+      
+      /*markdown 样式*/
+      .sql-analysis-show{padding:10px;}
+      
+      .show-markdown h1, .show-markdown h2, .show-markdown h3{margin-top:0px !important;margin-bottom:0px !important;}
+      .show-markdown h2{font-size:16px !important;margin:24px 0px 16px 0px !important;padding-bottom: 5px;border-bottom: 1px solid #919699;}
+      .show-markdown h1{font-size:20px !important;margin:10px 0px !important;}
+      .show-markdown h3{font-size:15px !important;margin:16px 0px !important;}
+      .show-markdown h4{font-size:14px !important;}
+      .show-markdown p{margin-bottom: 10px !important;}
+      
+      .show-markdown h1,.show-markdown h2,.show-markdown h3,.show-markdown h4,.show-markdown h5,.show-markdown h6 {
+        font-family: "Myriad Pro","Lucida Grande",Lucida,Verdana,sans-serif;
+      }
+      
+      .show-markdown{overflow-x:auto;}
+      .show-markdown table td, .show-markdown table th {font-size: 12px;border-bottom: 1px solid #919699;border-right: 1px solid #919699;}
+      .show-markdown table{width:100%;display:block;overflow:auto;border-top: 1px solid #919699;border-left: 1px solid #919699;border-spacing: 0;}
+      .show-markdown table th {padding: 4px 8px;background: #E2E2E2;}
+      .show-markdown table td {padding: 8px;vertical-align:top;}
+      
+      /* 打印分割样式 */
+      .show-markdown .sql-split.no-print{margin-top:30px;}
+      .show-markdown .print-split{page-break-after:always;}
+      
+      /*列表样式*/
+      .content-soar-list table tbody tr td{vertical-align: middle;}
+      .content-soar-list table thead th{background-color: #f5fafe;border-bottom: none;}
+      .hljs-keyword{color: #d73a49}
+      
+      /*弹窗样式*/
+      .alert.soarweb-alert{align-items:center; position:fixed;font-size:14px;text-align: center;padding:10px 20px 10px 15px !important;min-width:300px;z-index:100000000;justify-content:center;left:50%;transform:translateX(-50%);}
+      .alert.soarweb-alert .glyphicon{display:inline-block;margin-right:10px;vertical-align:-1.5px;font-size:16px;}
+    </style>
+  </head>
+  <body>
+    <div style="width:1200px;margin:auto;" id="vue-app" v-cloak>
+      <!--导航-->
+      <header style="margin:20px 0px;">
+        <ul class="nav nav-tabs">
+          <li role="presentation" v-bind:class="{active:curRouter==router.analysis}"><a href="#/analysis">SQL分析</a></li>
+          <li role="presentation" v-bind:class="{active:curRouter==router.config}"><a href="#/config">SOAR配置</a></li>
+        </ul>
+      </header>
+      <!--导航-->
+      <!--sql 分析页面-->
+      <div class="content" v-show="curRouter==router.analysis">
+        <div class=" form-inline">
+          <div class="form-group">
+            <label>配置模板：</label>
+            <select class="form-control minw-200 maxw-360" v-model="curId">
+              <option v-for="(item, index) in configs" v-bind:value="index">{{item.name}}</option>
+            </select>
+          </div>
+          <!--sql 选项菜单-->
+          <div class="form-group ml-20">
+            <span class="btn btn-primary" v-on:click="sqlAnalysis(1)">SQL评估</span>
+            <span class="btn btn-primary" v-on:click="sqlAnalysis(2)">美化</span>
+            <span class="btn btn-primary" v-on:click="sqlAnalysis(3)">压缩</span>
+            <span class="btn btn-primary" v-on:click="sqlAnalysis(4)">指纹</span>
+            <span class="btn btn-primary" v-on:click="sqlAnalysis(5)">语法检查</span>
+            <div class="btn-group" v-bind:class="{open:menuOpen.rewrite}" v-on:click.stop="toggleMenu('rewrite')">
+              <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">SQL改写 <span class="caret"></span></button>
+              <ul class="dropdown-menu">
+                <li v-for="item in dropdown.rewrite"><a href="javascript:;" v-on:click="rewrite(item.val)">{{item.text}}</a></li>
+              </ul>
+            </div>
+            <span class="btn btn-danger ml-20" v-on:click="clear()">清空</span>
+            <div v-if="showExport" class="btn-group" v-bind:class="{open:menuOpen['export']}" v-on:click.stop="toggleMenu('export')">
+              <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">导出 <span class="caret"></span></button>
+              <ul class="dropdown-menu">
+                <li v-for="item in dropdown['export']"><a href="javascript:;" v-on:click="exportSoar(item.val)">{{item.text}}</a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="form-group float-right">
+            <label>日志等级：</label>
+            <select class="form-control" v-model="logLevel">
+              <option v-for="item in [0,1,2,3,4,5,6,7]" v-bind:value="item">{{item}}</option>
+            </select>
+          </div>
+        </div>
+        <div class="mt-20 container" v-bind:style="{height:editorHeight}" style="margin-left:0px;margin-right:0px;width: 100%;">
+          <div class="row" style="height:100%;">
+            <!--sql 语句输入-->
+            <div class="col-xs-5" style="width:46%;padding-left:0px;height:100%;">
+              <div class="show-content"><textarea placeholder="输入 SQL 语句 ..." id="sql-edit" style="display:none"></textarea></div>
+            </div>
+            <!--服务器返回展示-->
+            <div class="col-xs-7" style="width:54%;padding-right:0px;height:100%;">
+              <div class="show-content show-markdown" style="height:100%;" id="soar-content" v-html="label.defaultResult"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!--sql 分析页面-->
+      <!--soar 配置页面-->
+      <div class="content content-soar-list" v-show="curRouter==router.config">
+        <div class=" form-inline mb-20">
+          <div class="form-group">
+            <span class="btn btn-primary" v-on:click="soarEdit(-1)">添加配置</span>
+            <span class="btn btn-primary" v-on:click="exportConfig()">导出配置</span>
+            <span class="btn btn-primary" v-on:click="showImportConfig()">导入配置</span>
+          </div>
+        </div>
+        <!--soar 配置列表-->
+        <table class="table table-bordered table-hover">
+          <thead>
+            <tr>
+              <th class="text-center" width="11%">编号</th>
+              <th class="text-center" width="22%">配置名称</th>
+              <th class="text-center" width="25%">线上环境</th>
+              <th class="text-center" width="25%">测试环境</th>
+              <th class="text-center" width="17%">操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item, index) in configs">
+              <td class="text-center">{{index+1}}</td>
+              <td class="text-center">{{item.name||'-'}}</td>
+              <td class="text-center">{{filterDsn(item['online-dsn'])||'--'}}</td>
+              <td class="text-center">{{filterDsn(item['test-dsn'])||'--'}}</td>
+              <td class="text-center">
+                <span class="glyphicon glyphicon-pencil ponter" v-on:click="soarEdit(index)"></span>
+                <span v-show="index!=0||configs.length>1" class="ml-5 glyphicon glyphicon-trash ponter" v-on:click="soarDel(index)"></span>
+                <span class="ml-5 glyphicon glyphicon-copy ponter"v-on:click="soarCopy(index)" title="点击复制"></span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <!--soar 配置列表-->
+      </div>
+      <!--soar 配置页面-->
+      <!--soar 配置编辑弹窗-->
+      <div id="soar-edit-tpl" style="display:none;padding:20px;">
+        <div style="overflow-x:hidden;">
+          <form class="form-horizontal">
+            <div class="form-group">
+              <label class="col-xs-4 control-label">配置名称</label>
+              <div class="col-xs-7">
+                <input type="text" class="form-control" v-model="itemConfig['name']">
+              </div>
+              <div class="col-xs-1"></div>
+            </div>
+            <div class="form-group">
+              <label class="col-xs-4 control-label">线上环境 (online-dsn)</label>
+              <div class="col-xs-7">
+                <input v-on:focus="onOnlineDsnFocus($event)" v-on:blur="showOnlineDsn=false" type="text" class="form-control" placeholder="user:password@tcp(host:port)/database" v-model="onlineDsnFilter">
+              </div>
+              <div class="col-xs-1"><span v-on:click="testConnect(itemConfig['online-dsn'])" class="glyphicon glyphicon-refresh ponter" style="line-height:32px;" title="点击测试数据库链接"></span></div>
+            </div>
+            <div class="form-group">
+              <label class="col-xs-4 control-label">测试环境 (test-dsn)</label>
+              <div class="col-xs-7">
+                <input v-on:focus="onTestDsnFocus($event)" v-on:blur="showTestDsn=false" type="text" class="form-control" placeholder="user:password@tcp(host:port)/database" v-model="testDsnFilter">
+              </div>
+              <div class="col-xs-1"><span v-on:click="testConnect(itemConfig['test-dsn'])" class="glyphicon glyphicon-refresh ponter" style="line-height:32px;" title="点击测试数据库链接"></span></div>
+            </div>
+            <div class="form-group">
+              <label class="col-xs-4 control-label">线上环境作为测试环境
+                <br><span style="margin-top:10px;display:inline-block">(allow-online-as-test)</span></label>
+              <div class="col-xs-7">
+                <label class="radio-inline">
+                  <input type="radio" name="allow-online-as-test" value="" v-model="itemConfig['allow-online-as-test']"> 默认
+                </label>
+                <label class="radio-inline">
+                  <input type="radio" name="allow-online-as-test" value="true" v-model="itemConfig['allow-online-as-test']"> 是
+                </label>
+                <label class="radio-inline">
+                  <input type="radio" name="allow-online-as-test" value="false" v-model="itemConfig['allow-online-as-test']"> 否
+                </label>
+                <br><span style="color:#666;margin-top:10px;display:inline-block">注：线上环境和测试环境配置相同时， 该参数为 “是”，才会返回 explain 信息</span>
+              </div>
+              <div class="col-xs-1"></div>
+            </div>
+            <div class="form-group">
+              <label class="col-xs-4 control-label">黑名单列表 (blacklist)</label>
+              <div class="col-xs-7">
+                <textarea rows="3" class="form-control" placeholder="blacklist中的SQL不会被评审，可以是指纹，也可以是正则， 一行一个" v-model="itemConfig['blacklist']"></textarea>
+              </div>
+              <div class="col-xs-1">
+                <span v-on:click="showHelp('blacklist')" class="glyphicon glyphicon-question-sign ponter" style="color:#f0ad4e"></span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-xs-4 control-label">数据采样 (sampling)</label>
+              <div class="col-xs-7">
+                <label class="radio-inline">
+                  <input type="radio" name="only-syntax-check" value="" v-model="itemConfig['sampling']"> 默认
+                </label>
+                <label class="radio-inline">
+                  <input type="radio" name="only-syntax-check" value="true" v-model="itemConfig['sampling']"> 是
+                </label>
+                <label class="radio-inline">
+                  <input type="radio" name="only-syntax-check" value="false" v-model="itemConfig['sampling']"> 否
+                </label>
+              </div>
+              <div class="col-xs-1"></div>
+            </div>
+            <div class="form-group">
+              <label class="col-xs-4 control-label">数据库引擎 (table-allow-engines)</label>
+              <div class="col-xs-7">
+                <input type="text" class="form-control" placeholder="默认为 InnoDB">
+              </div>
+              <div class="col-xs-1"></div>
+            </div>
+            <div class="form-group">
+              <div class="col-xs-offset-4 col-xs-8">
+                <span v-on:click="soarSave()" class="btn btn-primary">提&nbsp;&nbsp;&nbsp;&nbsp;交</span>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <!--soar 配置编辑弹窗-->
+      <!--soar 配置导出弹窗-->
+      <div id="soar-export-tpl" style="display:none;padding:20px;">
+        <textarea v-model="exportConfigJson" style="width:100%;height:320px;"></textarea>
+      </div>
+      <!--soar 配置导出弹窗-->
+      <!--soar 配置导入弹窗-->
+      <div id="soar-import-tpl" style="display:none;padding:20px;height:260px;">
+        <div style="overflow-x:hidden;padding-left:16px;">
+          <form class="form-horizontal">
+            <div class="form-group">
+              <label class="col-xs-4 control-label">导入类型</label>
+              <div class="col-xs-7">
+                <label class="radio-inline">
+                  <input type="radio" name="type" value="1" v-model="importConfig.type"> 文本
+                </label>
+                <label class="radio-inline">
+                  <input type="radio" name="type" value="2" v-model="importConfig.type"> 文件
+                </label>
+              </div>
+              <div class="col-xs-1"></div>
+            </div>
+            <div class="form-group">
+              <label class="col-xs-4 control-label">是否覆盖原有配置</label>
+              <div class="col-xs-7">
+                <label class="radio-inline">
+                  <input type="radio" name="cover" value="0" v-model="importConfig.cover"> 否
+                </label>
+                <label class="radio-inline">
+                  <input type="radio" name="cover" value="1" v-model="importConfig.cover"> 是
+                </label>
+              </div>
+              <div class="col-xs-1"></div>
+            </div>
+            <div v-if="importConfig.type==1" class="form-group">
+              <label class="col-xs-4 control-label">导入内容</label>
+                <div class="col-xs-7">
+                  <textarea rows="3" class="form-control" v-model="importConfig.content"></textarea>
+                </div>
+              <div class="col-xs-1"></div>
+            </div>
+            <div v-if="importConfig.type==2" class="form-group">
+              <label class="col-xs-4 control-label">导入内容</label>
+              <div class="col-xs-7">
+                <input type="file" class="form-control" id="import-file" style="padding-top:4px;">
+              </div>
+              <div class="col-xs-1"></div>
+            </div>
+            <div class="form-group">
+              <div class="col-xs-offset-4 col-xs-8">
+                <span v-on:click="importSave()" class="btn btn-primary">提&nbsp;&nbsp;&nbsp;&nbsp;交</span>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <!--soar 配置导入弹窗-->
+    </div>
+    <!--js 库文件-->
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/director.min.js"></script>
+    <script type="text/javascript" src="lib/layui/layui.all.js"></script>
+    <script type="text/javascript" src="js/vue.min.js"></script>
+    <script type="text/javascript" src="js/codemirror.js"></script>
+    <script type="text/javascript" src="js/sql.js"></script>
+    <script type="text/javascript" src="js/showdown.js"></script>
+    <script type="text/javascript" src="js/placeholder.js"></script>
+    <script type="text/javascript" src="js/highlight.pack.js"></script>
+    <script type="text/javascript" src="js/show-hint.js"></script>
+    <script type="text/javascript" src="js/sql-hint.js"></script>
+    <script type="text/javascript" src="js/jsencrypt.js"></script>
+    <script type="text/javascript" src="lib/crypto-js/crypto-js.js"></script>
+    <script type="text/javascript" src="js/cursor-position.js"></script>
+    <script type="text/javascript" src="js/jquery.print.js"></script>
+    <script>
+      (function (){
+        // 设置soar 配置默认选项
+        var defaultConfig = {
+          'allow-online-as-test' : '',  //是否允许显示环境作为测试环境
+          'sampling' : ''  //是否开启数据采样
+        };
+        //请求的 api
+        var api = {
+         soar : '../api/soar-api',  //soar sql 分析优化接口
+         testConnect : '../api/test-connect',  //测试数据库连接
+         download : '../api/soar-download',  //导出接口
+         version : '../api/soar-version'  //获取版本信息
+        };
+        //路由
+        var r = {
+          analysis : '/analysis', //sql 分析页面
+          config : '/config'  //soar 配置页面
+        };
+        //存储key
+        var cacheKey = {
+          soar : 'soar_config',  //soar 配置缓存 key
+          configSelect : 'config_select',  //当前选择的配置模板缓存 key
+          logLevel : 'log_level'  //日志等级缓存 key
+        };
+        //sql 编辑器配置
+        var editorOption = {
+          mode : 'text/x-mysql',  //sql 编辑模式
+          styleActiveLine : true,  //高亮显示
+          lineWrapping : true,  //换行显示
+          extraKeys: {'Alt-Enter' : 'autocomplete'},  //快捷键打开提示
+          hintOptions: {completeSingle : false, completeOnSingleClick : true} //sql 自动完成配置
+        };
+        
+        //弹窗
+        layer.openMsg = function (msg, type, timeout){
+          type = type || 'info';
+          timeout = timeout || 3000;
+          //弹窗样式
+          var classMap = {
+            info : 'alert-info',
+            warning : 'alert-warning',
+            success : 'alert-success', 
+            error : 'alert-danger'
+          };
+          //弹窗 icon 样式
+          var iconMap = {
+            info : 'glyphicon-info-sign',
+            warning : 'glyphicon-exclamation-sign',
+            success : 'glyphicon-ok-sign',
+            error : 'glyphicon-remove-sign'
+          };
+          var curClass = classMap[type] || 'alert-info';
+          var curIconClass = iconMap[type] || 'glyphicon-info-sign';
+          //弹窗组件html
+          var dom = $('<div class="alert soarweb-alert" role="alert"><span class="glyphicon"></span><span class="alert-msg"></span></div>');
+          //设置类样式
+          dom.addClass(curClass).find('.alert-msg').text(msg);
+          dom.find('.glyphicon').addClass(curIconClass);
+          //设置初始 css
+          dom.css('top','-20px').css('opacity',0);
+          //加入页面
+          $('body').append(dom);
+          //淡入淡出时间
+          var showtime = 250;
+          //淡入
+          dom.animate({
+            top:'16px',
+            opacity:'1'
+          }, showtime, function (){
+            //显示一段时间然后淡出
+            setTimeout(function(){
+              dom.animate({
+                top:'-20px',
+                opacity:'0'
+              }, showtime, function (){
+                this.remove();
+              });
+            }, timeout);
+          });
+        };
+        
+        //错误信息弹窗
+        layer.errorMsg = function(msg){
+          layer.openMsg(msg, 'error');
+        };
+        
+        //成功信息弹窗
+        layer.successMsg = function(msg){
+          layer.openMsg(msg, 'success');
+        };
+        
+        //成功信息弹窗
+        layer.warnMsg = function(msg){
+          layer.openMsg(msg, 'warning');
+        };
+        
+        //初始化sql编辑器
+        var converter = new showdown.Converter();
+        converter.setOption('tables', true);
+        
+        //RSA加密
+        var encrypt = new JSEncrypt();
+              
+        var vueApp = new Vue({
+          el : '#vue-app',
+          data : function (){
+            //初始化配置
+            var configs = this.getSoarConfig();
+            var curId = Number(localStorage.getItem(cacheKey.configSelect)) || 0;
+            var logLevel = Number(localStorage.getItem(cacheKey.logLevel)) || 0;
+            var editorHeight = this.resizeEditor() + 'px';
+            var dropdown = {};
+            //SQL 改写下拉选项
+            dropdown['rewrite'] = [
+              {val : 'mergealter', text : 'ALTER 合并'},
+              {val : 'countstar', text : 'COUNT(col) 转 COUNT(*)'},
+              {val : 'star2columns', text : '* 转全字段'},
+              {val : 'dml2select', text : '删除 转 查询'},
+              {val : 'insertcolumns', text : 'INSERT 补全'},
+              {val : 'having', text : 'HAVING 转 WHERE'},
+              {val : 'or2in', text : 'OR 转 IN'},
+              {val : 'standard', text : '关键字 转 小写'},
+              {val : 'alwaystrue', text : '删除无用条件'}
+            ];
+            //导出下拉选项
+            dropdown['export'] = [
+              {val : 'html', text : 'html'},
+              {val : 'pdf', text : 'pdf'}
+            ];
+            return {
+              curRouter : '',   //当前路由
+              configs : configs,    //soar 配置列表
+              curId : curId,    //当前选择的配置项
+              editorHeight : editorHeight,  //编辑器高度
+              itemConfig : {},  //当前编辑配置详情
+              editId : -1,  //当前编辑配置id
+              exportConfigJson : '', //导出的json
+              importConfig : {},  //导入的配置
+              dropdown : dropdown, //下拉按钮组件
+              showExport : false, //是否展开导出按钮
+              menuOpen : {
+                'rewrite' : false, //是否展开重写按钮
+                'export' : false  //是否展开导出
+              },
+              showOnlineDsn : false,  //是否完整显示 online-dsn
+              showTestDsn : false,  //是否完整显示 test-dsn
+              pwdSpecialChr : ['\\', '@', ':', '/'],
+              label : {
+                defaultResult : '<span class="placegolder">SOAR 结果展示 ...</span>'  //右侧结果 placeholder
+              },
+              router : r, // 路由配置
+              logLevel : logLevel //日志等级
+            };
+          },
+          watch : {
+            //监听当前配置项, 发生变化时存储到 localStorage
+            curId : function(newId) {
+              localStorage.setItem(cacheKey.configSelect, newId);
+            },
+            logLevel : function(level) {
+              localStorage.setItem(cacheKey.logLevel, level);
+            }
+          },
+          computed : {
+            //密码显示与隐藏
+            onlineDsnFilter : {
+              get : function () {
+                return this.showOnlineDsn ? this.itemConfig['online-dsn'] : this.filterDsn(this.itemConfig['online-dsn']);
+              },
+              set : function (newValue) {
+                this.itemConfig['online-dsn'] = newValue;
+              }
+            },
+            //密码显示与隐藏
+            testDsnFilter : {
+              get : function () {
+                return this.showTestDsn ? this.itemConfig['test-dsn'] : this.filterDsn(this.itemConfig['test-dsn']);
+              },
+              set : function (newValue) {
+                this.itemConfig['test-dsn'] = newValue;
+              }
+            }
+          },
+          methods : {
+            //启动时回调
+            run : function (callback){
+              if ($.isFunction(callback)) callback.call(this);
+              return this;
+            },
+            //初始化路由
+            initRouter : function (router){
+              this.curRouter = router;
+              this.curId = (this.curId < 0 || this.curId >= vueApp.configs.length) ? 0 : this.curId;
+            },
+            //下拉按钮切换
+            toggleMenu : function (key){
+              for(var i in this.menuOpen){
+                if (i != key) this.menuOpen[i] = false;
+              }
+              this.menuOpen[key] = !this.menuOpen[key];
+            },
+            //计算编辑器高度
+            resizeEditor : function (){
+              var textHeght = 500 + ($(window).height() -657);
+              if (textHeght < 400) textHeght = 400;
+              if (textHeght > 600) textHeght = 600;
+              return textHeght;
+            },
+            //获取 soar 配置项列表， 如果没有则初始化一条默认，配置
+            getSoarConfig : function (){
+              var configs = localStorage.getItem(cacheKey.soar);
+              try {
+                if (configs) configs = JSON.parse(configs);
+              } catch (e) {
+                configs = null;
+              }
+              if (!$.isArray(configs) || configs.length == 0) {
+                configs = []; 
+                configs.push({
+                  'name': '默认配置',
+                  'online-dsn':'',
+                  'test-dsn':''
+                });
+                localStorage.setItem(cacheKey.soar, JSON.stringify(configs));
+              }
+              return configs;
+            },
+            //存储soar配置项列表
+            saveSoarConfig : function (configs){
+              localStorage.setItem(cacheKey.soar, JSON.stringify(configs));
+            },
+            //去除空格
+            trimObj : function (obj) {
+              if (typeof obj == 'object'){
+                for (var i in obj) {
+                  if (typeof obj[i] == 'string') obj[i] = obj[i].trim();
+                }
+              }
+              return obj;
+            },
+            //隐藏密码
+            filterDsn : function (dsn){
+              if (!dsn) return dsn;
+              var regex = /^([^:]+:)(.+)@/g;
+              var res = regex.test(dsn);
+              if (res) dsn = dsn.replace(/^([^:]+:)(.+)@/g, '$1' + '*'.repeat(RegExp.$2.length) + '@');
+              return dsn;
+            },
+            //设置 input 光标位置
+            onDsnFocus : function (event, callback){
+              var _this = this;
+              setTimeout(function (){
+                var pos = $(event.target).getCurPos();
+                callback(_this);
+                setTimeout(function (){
+                  $(event.target).setCurPos(pos,pos); 
+                }, 10);
+              }, 10);
+            },
+            //当 online-dsn 聚焦时触发
+            onOnlineDsnFocus : function (event){
+              this.onDsnFocus(event, function (_this){
+                _this.showOnlineDsn = true;
+              });
+            },
+            //当 test-dsn 聚焦时触发
+            onTestDsnFocus : function (event){
+              this.onDsnFocus(event, function (_this){
+                _this.showTestDsn = true;
+              });
+            },
+            //默认显示
+            curFormat:function (res){
+              $('#soar-content').html(res);
+            },
+            //markdown转html展示
+            markdownFormat : function (res){
+              var dom = $('<div class="sql-analysis-show">' + converter.makeHtml(res) + '</div>');
+              dom.find('pre code').each(function(i, code) {
+                hljs.highlightBlock(code);
+              });
+              dom.find('[id^="query"]').not(':first')
+                .before('<div class="no-print sql-split"></div>')
+                .before('<div style="page-break-after:always;"></div>');
+              $('#soar-content').html(dom[0].outerHTML);
+            },
+            //用富文本框展示sql 并且高亮显示
+            textEditFormat : function(res){
+              $('#soar-content').html('<textarea id="sql-show"></textarea>');
+              editorOption.readOnly = true;
+              var editor = CodeMirror.fromTextArea($('#soar-content #sql-show')[0], editorOption);
+              editor.setValue(res.trim());
+            },
+            //将 soar 配置合并到请求中
+            mergeConfig : function (data){
+              var config = this.configs[this.curId] || this.configs[0] || {};
+              for (var i in config) {
+                if (i == 'name') continue;
+                if (!config[i] || !config[i].trim || (config[i].trim()) == '') continue;
+                data[i] = config[i];
+              }
+              if (this.logLevel != 0) data['log-level'] = this.logLevel;
+              return data;
+            },
+            //加载公钥
+            loadPublicKey : function(callback){
+              $.get('../data/public.rsa?t=' + new Date().getTime(), function (data){
+                encrypt.setPublicKey(data);
+                if ($.isFunction(callback)) callback();
+              });
+            },
+            //随机生成 AES KEY
+            randomKey : function (){
+              var str = '';
+              var arr = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+              //随机产生 32 为字母和数字
+              for(var i = 0; i < 32; i++){
+                var pos = Math.round(Math.random() * (arr.length - 1));
+                str += arr[pos];
+              }
+              return str;
+            },
+            //数据加密
+            encryptData(data){
+              var key = this.randomKey();
+              var keyCode = CryptoJS.enc.Utf8.parse(key);
+              var jsonData = JSON.stringify(data || {});
+              var iv = CryptoJS.enc.Utf8.parse(key.substring(0, 16));
+              //数据加密
+              return {
+                key : encrypt.encrypt(key),
+                data : CryptoJS.AES.encrypt(jsonData, keyCode,{
+                  iv: iv,
+                  mode : CryptoJS.mode.CBC,
+                  padding : CryptoJS.pad.ZeroPadding
+                }).toString()
+              };
+            },
+            //通过 post 方法下载
+            postDownload : function (url, data){
+              var _this = this;
+              this.loadPublicKey(function (){
+                data = _this.encryptData(data);
+                var form = $('<form>');   //定义一个form表单
+                form.attr('style', 'display:none');  //隐藏表单 
+                form.attr('method', 'post'); //post 方法
+                form.attr('action', url);  //设置url
+                // form 表单中添加查询参数
+                for(var i in data){
+                  var inputDom = $('<input>'); 
+                  inputDom.attr('type', 'hidden'); 
+                  inputDom.attr('name', i); 
+                  inputDom.attr('value', data[i]);
+                  $('body').append(form);  //将表单放入页面中
+                  form.append(inputDom);
+                }
+                form.submit();  //提交
+                form.remove();  //移除元素
+              });
+            },
+            //请求封装
+            request : function(config, success, error){
+              var _this = this;
+              config.data = _this.trimObj(config.data);
+              this.loadPublicKey(function (){
+                //数据加密
+                var data = _this.encryptData(config.data);
+                var loadIndex;
+                //是否显示加载动画
+                if (config.isLoading) loadIndex = layer.load(2, {offset:'30%'});  //打开加载动画
+                $.ajax({
+                  url : config.url,  //请求url
+                  dataType : 'json',  //数据格式
+                  contentType : 'application/json;charset=UTF-8',  //设置 Content-Type
+                  data : JSON.stringify(data), //请求数据
+                  method : config.method || 'POST',  //默认 POST 请求
+                  timeout : (config.timeout || 30) * 1000,  //默认 30 秒超时
+                  success: function (json) {
+                    if (config.isLoading) layer.close(loadIndex);  //关闭加载动画
+                    if (json.status) {
+                      if($.isFunction(success)) success(json);  //成功回调处理
+                    } else {
+                      layer.errorMsg(json.result);
+                      if ($.isFunction(error)) error(json);
+                    }
+                    if (json.log) console.log(json.log);  //如果有日志, 则打印至控制台
+                  },
+                  error: function () {
+                    if (config.isLoading) layer.close(loadIndex);  //关闭弹窗
+                    if($.isFunction(error)) error();  //错误回调处理
+                  }
+                });
+              });
+            },
+            //根据sql分析选项， 进行补贴的展示
+            sqlAnalysis:function(type){
+              var query = this.sqlEditor.getValue();
+              if (!query) return layer.errorMsg('SQL 不能为空');
+              var data = {};
+              var curFormat = this.curFormat;
+              switch(type){
+                case 1://sql 分析评估
+                  curFormat = this.markdownFormat;
+                  break;
+                case 2://sql 美化
+                  curFormat = this.textEditFormat;
+                  data['report-type'] = 'pretty';
+                  break;
+                case 3://压缩
+                  curFormat = this.textEditFormat;
+                  data['report-type'] = 'compress';
+                  break;
+                case 4://指纹
+                  curFormat = this.textEditFormat;
+                  data['report-type'] = 'fingerprint';
+                  break;
+                case 5://语法检查
+                  curFormat = this.textEditFormat;
+                  data['only-syntax-check'] = 'true';
+                  break;
+              }
+              data.query = query;
+              data = this.mergeConfig(data);
+              //提交请求， 根据具体api酌情修改
+              this.request({url:api.soar, data:data, isLoading:true}, function(json){
+                if (type == 5) {
+                  var checkMsg = '语法正确';
+                  if (json.result == checkMsg) json.result = null;
+                  if (json.result) {
+                    curFormat(json.result);
+                  } else {
+                    layer.successMsg(checkMsg);
+                    vueApp.textEditFormat(data.query);
+                  };
+                } else {
+                  json.result ? curFormat(json.result) : vueApp.textEditFormat(data.query);
+                  if(!json.result) layer.errorMsg('SQL 执行错误，请检查字段，表是否存在');
+                }
+                vueApp.showExport = type == 1 && json.result;
+              }, function (json){
+                if(!json) layer.errorMsg('请求失败');
+              });
+            },
+            //sql 改写功能
+            rewrite:function (rule){
+              var query = this.sqlEditor.getValue();
+              if (!query) return layer.errorMsg('SQL 不能为空');
+              var data = {};
+              data.query = query;
+              data['report-type'] = 'rewrite';
+              data['rewrite-rules'] = rule;
+              data = this.mergeConfig(data);
+              this.request({url:api.soar, data:data, isLoading:true}, function(json){
+                vueApp.textEditFormat(json.result || data.query);
+                if(!json.result) layer.errorMsg('SQL 执行错误请，检查字段，表是否存在');
+              }, function (json){
+                if(!json) layer.errorMsg('请求失败');
+              });
+              this.showExport = false;
+            },
+            //数据库连接测试
+            testConnect : function(dsn){
+              dsn = dsn ? dsn.trim() : '';
+              if (!dsn) return layer.errorMsg('数据库连接不能为空');
+              this.request({url:api.testConnect,data:{dsn:dsn}, isLoading:true, timeout:5}, function(json){
+                layer.successMsg(json.result);
+              }, function (json){
+                if(!json) layer.errorMsg('连接失败');
+              });
+            },
+            //html导出
+            exportSoar : function(type){
+              if (type == 'pdf') {
+                $('.sql-analysis-show').print({'title' : 'SQL 评审', header:''});
+              } else {
+                var query = this.sqlEditor.getValue();
+                if (!query) return layer.errorMsg('SQL 不能为空');
+                var data = {};
+                data.query = query;
+                data['report-type'] = type || '';
+                data = this.mergeConfig(data);
+                this.postDownload(api.download, data);
+              }
+            },
+            //配置导出
+            exportConfig : function (){
+              this.exportConfigJson = JSON.stringify(this.getSoarConfig());
+              layer.open({
+                type: 1,
+                title: 'SOAR 配置导出',
+                area : ['600px'],
+                content: $('#soar-export-tpl'),
+                cancel:function (){
+                  $('#soar-export-tpl').hide();
+                }
+              });
+            },
+            //配置导入
+            showImportConfig : function (){
+              this.importConfig = {type:'1',cover:'0'};
+              layer.open({
+                type: 1,
+                title: 'SOAR 配置导入',
+                area : ['600px'],
+                content: $('#soar-import-tpl'),
+                cancel:function (){
+                  $('#soar-import-tpl').hide();
+                }
+              });
+            },
+            //配置导入保存
+            importSave : function (){
+              var content = '';
+              //文本导入
+              if (this.importConfig.type == 1) {
+                content = this.importConfig.content;
+                handleContent();
+              } else { //文件的导入
+                if (!window.FileReader) return layer.errorMsg('浏览器不支持文件导入，请使用文本导入');
+                var reader = new FileReader();
+                var file = $('#import-file')[0].files[0];
+                if (!file) return layer.errorMsg('文件内容不能为空');
+                //读取文件内容
+                var reader = new FileReader();
+                reader.readAsText(file);
+                reader.onload = function(){
+                  content = this.result;
+                  handleContent();
+                };
+              }
+              //导入配置
+              function handleContent(){
+                var arr = [];
+                try {
+                   arr = JSON.parse(content);
+                   if (!$.isArray(arr)) throw new Error('');
+                } catch (e) {
+                  return layer.errorMsg('导入内容格式不正确');
+                }
+                var configs = vueApp.getSoarConfig();
+                if (vueApp.importConfig.cover == 1) configs = [];
+                arr.forEach(function (item){
+                  item = vueApp.trimObj(item);
+                  configs.push(item);
+                });
+                vueApp.saveSoarConfig(configs);
+                vueApp.configs = configs;
+                layer.successMsg('导入成功',{time:1000});
+              }
+            },
+            //清除结果展示
+            clear : function(){
+              $('#soar-content').html(this.label.defaultResult);
+              this.showExport = false;
+            },
+            //初始化配置
+            initConfig : function (){
+              for(var i in defaultConfig){
+                if (!this.itemConfig[i]) this.itemConfig[i] = defaultConfig[i];
+              }
+            },
+            //soar 编辑弹窗打开
+            soarEdit : function (id){
+              this.itemConfig = {};
+              if (id >= 0) this.itemConfig = $.extend(this.itemConfig, this.configs[id]);
+              this.initConfig();
+              layer.open({
+                type: 1,
+                title: 'SOAR 配置编辑',
+                area : ['1000px'],
+                content: $('#soar-edit-tpl'),
+                cancel:function (){
+                  $('#soar-edit-tpl').hide();
+                }
+              });
+              this.editId = id;
+            },
+            //soar 配置编辑帮助提示弹窗打开
+            showHelp : function(key){
+              switch(key) {
+                case 'blacklist':
+                  layer.open({
+                    'content' :'# 这是一个黑名单例子\n## 不评审常见的SET， SHOW， SELECT CONST等完美请求\n^set.*\n^show.*\n^select \?$\n^\/\*.*\*\/$\n^drop.*\n^lock.*\n^unlock.*'.replace(/\n/g,'<br>')
+                  });
+                  break
+              }
+            },
+            //保存配置
+            soarSave : function(){
+              if (!this.itemConfig['name']) {
+                layer.errorMsg('配置名称不能为空');
+                return false;
+              }
+              for(var i=0;i<this.configs.length;i++){
+                var item = this.configs[i];
+                if (item.name == this.itemConfig['name'] && this.editId != i) {
+                  layer.errorMsg('配置名称不能重复');
+                  return false;
+                }
+              }
+              this.itemConfig = this.trimObj(this.itemConfig);
+              if (this.editId < 0) {
+                this.configs.push(this.itemConfig);
+              } else {
+                Vue.set(this.configs, this.editId, $.extend({}, this.itemConfig));
+              }
+              this.saveSoarConfig(this.configs);
+              layer.successMsg('保存成功');
+              return true;
+            },
+            //删除配置
+            soarDel : function(id){
+              layer.confirm('确定删除？', function(index){
+                vueApp.configs.splice(id, 1);
+                vueApp.saveSoarConfig(vueApp.configs);
+                layer.close(index);
+                layer.warnMsg('删除成功');
+              });
+            },
+            //复制配置项
+            soarCopy : function(id){
+              var config = vueApp.configs[id];
+              layer.prompt({title:'请输入新的模板名称', value:config.name+' - 副本'},function(value, index){
+                vueApp.editId = -1;
+                vueApp.itemConfig = {};
+                vueApp.itemConfig = $.extend(vueApp.itemConfig, config);
+                vueApp.initConfig();
+                vueApp.itemConfig.name = value;
+                if (vueApp.soarSave()) layer.close(index);
+                layer.successMsg('复制成功');
+              });
+            }
+          }
+        }).run(function (){
+          var _this = this;
+          //sql 编辑器
+          editorOption.readOnly = false;
+          _this.sqlEditor = CodeMirror.fromTextArea($('#sql-edit')[0], editorOption);
+          //sql 自动完成
+          _this.sqlEditor.on('inputRead', function (instance){
+            var sqlAutocomplete = false;
+            var sqlAutocompleteInProgress = false;
+            if (!sqlAutocompleteInProgress && (!instance.options.hintOptions.tables || !sqlAutocomplete)) {
+              if (!sqlAutocomplete) {
+                instance.options.hintOptions.tables = false;
+                instance.options.hintOptions.defaultTable = '';
+                sqlAutocompleteInProgress = true;
+              } else {
+                instance.options.hintOptions.tables = sqlAutocomplete;
+                instance.options.hintOptions.defaultTable = '';
+              }
+            }
+            if (instance.state.completionActive) return;
+            var cur = instance.getCursor();
+            var token = instance.getTokenAt(cur);
+            var string = '';
+            if (token.string.match(/^[a-zA-Z]+$/)) string = token.string;
+            if (string.length > 0) CodeMirror.commands.autocomplete(instance);
+          });
+          //点击空白出时, 关闭展开按钮
+          $(document).click(function (e){
+            for(var i in _this.menuOpen){
+              _this.menuOpen[i] = false;
+            }
+          });
+          //监听窗口大小变化
+          var timer = null;
+          $(window).resize(function(){
+            if (timer) clearTimeout(timer); 
+            timer = setTimeout(function (){
+              _this.editorHeight = _this.resizeEditor() + 'px';
+            }, 200);
+          });
+        });
+        
+        window.soarVersion = function (){
+          //输出 soar 版本信息
+          $.get(api.version, function(json){
+            if (typeof json == 'string') {
+              try {
+                  json = JSON.parse(json);
+              } catch (e) {}
+            }
+            if (json) console.log('soar -version\n\n' + json.result);
+          });
+        };
+        window.soarVersion();
+        
+        //监听路由
+        Router({
+          //sql 分享页面
+          '/analysis': function (){
+            vueApp.initRouter(r.analysis);
+          },
+          //soar 配置分享页面
+          '/config': function (){
+            vueApp.initRouter(r.config);
+          }
+        }).init(r.analysis);
+      })();
+    </script>
+  </body>
+</html>

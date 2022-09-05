@@ -1,0 +1,52 @@
+# This is an example goreleaser.yaml file with some sane defaults.
+# Make sure to check the documentation at http://goreleaser.com
+# https://goreleaser.com/customization/build/
+project_name: soar-web
+#gomod:
+#  proxy: true
+builds:
+  - env: [CGO_ENABLED=1]
+    binary: soar-web
+    main: ./main.go
+    ldflags:
+      - -s -w -X soar-web/config.Version={{.Version}} -X soar-web/config.Commit={{.ShortCommit}} -X soar-web/config.Release={{.Date}} -X soar-web/config.Branch={{.Branch}}
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+      - 386
+      - arm64
+    ignore:
+      - goos: darwin
+        goarch: 386
+archives:
+  -
+    format_overrides:
+      - goos: windows
+        format: zip
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ .Tag }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+#dockers:
+#  - image_templates: ["soar-web/soar-web:{{ .Version }}"]
+#    dockerfile: ./scripts/build/Dockerfile
+#    build_flag_templates:
+#      - --label=org.opencontainers.image.title={{ .ProjectName }}
+#      - --label=org.opencontainers.image.description={{ .ProjectName }}
+#      - --label=org.opencontainers.image.url=https://soar-web.vip
+#      - --label=org.opencontainers.image.source=https://soar-web.vip/
+#      - --label=org.opencontainers.image.versionctl={{ .Version }}
+#      - --label=org.opencontainers.image.created={{ time "2006-01-02T15:04:05Z07:00" }}
+#      - --label=org.opencontainers.image.revision={{ .FullCommit }}
+#      - --label=org.opencontainers.image.licenses=MIT
+
+# https://nfpm.goreleaser.com/configuration/
