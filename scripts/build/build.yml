@@ -5,7 +5,7 @@ project_name: soar-web
 #gomod:
 #  proxy: true
 builds:
-  - env: [CGO_ENABLED=1]
+  - env: [CGO_ENABLED=0]
     binary: soar-web
     main: ./main.go
     ldflags:
@@ -16,7 +16,6 @@ builds:
       - darwin
     goarch:
       - amd64
-      - 386
       - arm64
     ignore:
       - goos: darwin

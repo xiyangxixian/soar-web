@@ -2,13 +2,11 @@ package config
 
 import (
 	"fmt"
+	"github.com/spf13/pflag"
+	"github.com/spf13/viper"
 	"os"
 	"soar-web/pkg/utils"
 	"strings"
-	"syscall"
-
-	"github.com/spf13/pflag"
-	"github.com/spf13/viper"
 )
 
 const (
@@ -119,7 +117,6 @@ func SetupConfig() (*Config, error) {
 func check() {
 
 	if utils.FileExist(utils.GetSoarBin()) {
-		syscall.Umask(0)
 		os.Chmod(utils.GetSoarBin(), 0755)
 
 	} else {
