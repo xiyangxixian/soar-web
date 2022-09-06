@@ -100,8 +100,6 @@ SOAR_ARGS = {
     "profiling": None,
     "query": str,
     "query-time-out": int,
-    "report-css": str,
-    "report-javascript": str,
     "report-title": str,
     "report-type": str,
     "rewrite-rules": str,

@@ -156,6 +156,12 @@ def soar_result(args):
     cmd_args['config'] = conf_tmp_file # soar 规定 -config 必须作为第一个参数
     cmd_args['query'] = args['query']
     args.pop('query')
+    if os.path.exists(cmd_args['query']):
+        return json.dumps({
+            "result": '不允许的操作',
+            "status": False,
+            "log":"",
+        })
 
     save_tmp_conf(args, conf_tmp_file)
     cmd_line = req_parse2cmd_parse(cmd_args)
