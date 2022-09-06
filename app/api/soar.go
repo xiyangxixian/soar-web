@@ -103,7 +103,6 @@ func getParams(c *gin.Context) (map[string]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(string(jsonData))
 	v := make(map[string]string)
 	err = json.Unmarshal(bytes.Replace(jsonData, []byte{'\x00'}, []byte{' '}, -1), &v)
 	if err != nil {

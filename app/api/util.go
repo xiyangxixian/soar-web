@@ -39,10 +39,8 @@ func init() {
 	}
 
 	for _, arg := range config.GCfg.SoarArgsDenyList {
-		fmt.Println(arg)
 		if _, ok := SoarArgsAlowList[arg]; ok {
 			SoarArgsAlowList[arg] = false
-			fmt.Println(arg)
 		}
 	}
 }
@@ -119,7 +117,6 @@ func SoarRun(argsMap map[string]string) (stdout, loginfo []byte, err error) {
 	argsList = append(argsList, fmt.Sprintf("%s=%s", "-log-output", logfilename))
 
 	ecmd := exec.Command(utils.GetSoarBin(), argsList...)
-	fmt.Println(ecmd.String())
 	stdout, err = ecmd.CombinedOutput()
 	loginfo, err = ioutil.ReadFile(logfilename)
 	if err != nil {
@@ -159,7 +156,6 @@ func RSA_Decrypt(cipherText []byte, path string) ([]byte, error) {
 func PKCS5UnPadding(origData []byte) []byte {
 	length := len(origData)
 	unpadding := int(origData[length-1])
-	fmt.Printf("origData:%s,origData_len:%d,unpadding:%v,length:%vl-u:%d,\n", origData, len(origData), unpadding, length, length-unpadding)
 	if unpadding > length {
 		return origData
 	}
