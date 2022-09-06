@@ -8,7 +8,7 @@
 *.dll
 *.so
 *.dylib
-
+soar
 bin/
 release/
 iconhash
