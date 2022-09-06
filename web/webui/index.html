@@ -109,7 +109,7 @@
           <div class="form-group float-right">
             <label>日志等级：</label>
             <select class="form-control" v-model="logLevel">
-              <option v-for="item in [0,1,2,3,4,5,6,7]" v-bind:value="item">{{item}}</option>
+              <option v-for="item in ['0','1','2','3','4','5','6','7']" v-bind:value="item">{{item}}</option>
             </select>
           </div>
         </div>
@@ -429,7 +429,7 @@
             //初始化配置
             var configs = this.getSoarConfig();
             var curId = Number(localStorage.getItem(cacheKey.configSelect)) || 0;
-            var logLevel = Number(localStorage.getItem(cacheKey.logLevel)) || 0;
+            var logLevel = localStorage.getItem(cacheKey.logLevel) || '0';
             var editorHeight = this.resizeEditor() + 'px';
             var dropdown = {};
             //SQL 改写下拉选项

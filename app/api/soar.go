@@ -15,19 +15,21 @@ type SoarParams struct {
 
 func Version(c *gin.Context) {
 
-	bs, err := SoarRun(map[string]string{"version": ""})
+	bs, loginfo, err := SoarRun(map[string]string{"version": ""})
 	if err != nil {
-		Fail(c, err.Error())
+		errinfo := err.Error()
+		Fail(c, errinfo, string(loginfo))
 		return
 	}
-	Success(c, string(bs), "")
+	Success(c, string(bs), string(loginfo))
 	return
 }
 
 func TestConnect(c *gin.Context) {
 	params, err := getParams(c)
 	if err != nil {
-		Fail(c, err.Error())
+		errinfo := err.Error()
+		Fail(c, err.Error(), errinfo)
 		return
 	}
 	if dsn, ok := params["dsn"]; ok {
@@ -36,16 +38,18 @@ func TestConnect(c *gin.Context) {
 			Success(c, "测试成功", "")
 			return
 		}
-		Fail(c, "测试失败,golang 版本的格式请参考 https://github.com/go-sql-driver/mysql"+err.Error())
+		errinfo := "测试失败,golang 版本的格式请参考 https://github.com/go-sql-driver/mysql" + err.Error()
+		Fail(c, errinfo, errinfo)
 	}
-	Fail(c, "测试失败,golang 版本的格式请参考 https://github.com/go-sql-driver/mysql"+err.Error())
+	errinfo := "测试失败,golang 版本的格式请参考 https://github.com/go-sql-driver/mysql" + err.Error()
+	Fail(c, errinfo, errinfo)
 	return
 }
 
 func SoarDownload(c *gin.Context) {
 	params, err := getParams(c)
 	if err != nil {
-		Fail(c, err.Error())
+		Fail(c, err.Error(), "")
 		return
 	}
 	extMap := map[string]string{
@@ -55,15 +59,15 @@ func SoarDownload(c *gin.Context) {
 	}
 
 	if _, ok := params["report-type"]; !ok {
-		Fail(c, "report-type not found")
+		Fail(c, "report-type not found", "")
 	}
 	if _, ok := extMap[params["report-type"]]; !ok {
-		Fail(c, "report-type type is error")
+		Fail(c, "report-type type is error", "")
 	}
 
-	rst, err := SoarRun(params)
+	rst, logfile, err := SoarRun(params)
 	if err != nil {
-		Fail(c, string(rst))
+		Fail(c, string(rst), string(logfile))
 		return
 	}
 
@@ -75,16 +79,17 @@ func SoarDownload(c *gin.Context) {
 func SoarAPI(c *gin.Context) {
 	params, err := getParams(c)
 	if err != nil {
-		Fail(c, err.Error())
+		errinfo := err.Error()
+		Fail(c, err.Error(), errinfo)
 		return
 	}
-	rst, err := SoarRun(params)
+	rst, loginfo, err := SoarRun(params)
 	if err != nil {
-		Fail(c, string(rst))
+		Fail(c, string(rst), string(loginfo))
 		return
 	}
 
-	Success(c, string(rst), "")
+	Success(c, string(rst), string(loginfo))
 	return
 }
 
@@ -99,6 +104,7 @@ func getParams(c *gin.Context) (map[string]string, error) {
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println(string(jsonData))
 	v := make(map[string]string)
 	err = json.Unmarshal(bytes.Replace(jsonData, []byte{'\x00'}, []byte{' '}, -1), &v)
 	if err != nil {

@@ -27,15 +27,16 @@ var YamlVersionList = []string{"v0.1", "v0.2"}
 var Debug = false
 
 type Config struct {
-	Debug           bool
-	Addr            string
-	Cert            string
-	Key             string
-	Domain          string
-	Proxy           *ReverseProxy
-	LogFile         string
-	AdminPathPrefix string
-	BinDir          string
+	Debug            bool
+	Addr             string
+	Cert             string
+	Key              string
+	Domain           string
+	Proxy            *ReverseProxy
+	LogFile          string
+	AdminPathPrefix  string
+	BinDir           string
+	SoarArgsDenyList []string
 }
 
 // ReverseProxy  反向代理配置
@@ -58,6 +59,7 @@ func SetupConfig() (*Config, error) {
 
 	pflag.StringArray("proxy.proxy_header", []string{"X-Forwarded-For", "X-Real-IP"}, "proxy")
 	pflag.StringArray("proxy.trusted_proxies", []string{"127.0.0.1"}, "proxy")
+	pflag.StringArray("soar_args_deny_list", []string{"-report-javascript", "-report-css", "-check-config", "-config", "-log-output"}, "deny")
 
 	pflag.Parse()
 
@@ -109,6 +111,11 @@ func SetupConfig() (*Config, error) {
 			IPHeader:       viper.GetStringSlice("proxy.proxy_header"),
 			TrustedProxies: viper.GetStringSlice("proxy.trusted_proxies"),
 		},
+		SoarArgsDenyList: viper.GetStringSlice("soar_args_deny_list"),
+	}
+
+	if strings.HasSuffix(config.AdminPathPrefix, "/") {
+		config.AdminPathPrefix = strings.TrimRight(config.AdminPathPrefix, "/")
 	}
 
 	return config, nil

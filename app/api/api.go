@@ -27,10 +27,10 @@ func NotFound(c *gin.Context, message string) {
 	})
 }
 
-func Fail(c *gin.Context, message string) {
+func Fail(c *gin.Context, message, loginfo string) {
 	c.JSON(http.StatusOK, gin.H{
 		"status": false,
 		"result": message,
-		"log":    message,
+		"log":    loginfo,
 	})
 }

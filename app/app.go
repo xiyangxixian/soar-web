@@ -75,7 +75,7 @@ func Run() {
 	StaticFile, _ := fs.Sub(web.WebUI, "webui")
 	r.StaticFS(serverCfg.AdminPathPrefix+"/webui", http.FS(StaticFile))
 
-	fmt.Printf("[URL] you can access url %s%swebui/\n", appURL, serverCfg.AdminPathPrefix)
+	fmt.Printf("[URL] you can access url %s%s/webui/\n", appURL, serverCfg.AdminPathPrefix)
 
 	//r.GET(serverCfg.AdminPathPrefix, func(ctx *gin.Context) {
 	//	ctx.Redirect(302, serverCfg.AdminPathPrefix+"/webui")

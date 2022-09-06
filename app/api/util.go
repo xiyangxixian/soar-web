@@ -12,9 +12,11 @@ import (
 	"errors"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"regexp"
+	"soar-web/config"
 	"soar-web/pkg/utils"
 	"strings"
 )
@@ -35,27 +37,76 @@ func init() {
 	for _, arg := range argsList {
 		SoarArgsAlowList[strings.TrimSpace(arg)] = true
 	}
+
+	for _, arg := range config.GCfg.SoarArgsDenyList {
+		fmt.Println(arg)
+		if _, ok := SoarArgsAlowList[arg]; ok {
+			SoarArgsAlowList[arg] = false
+			fmt.Println(arg)
+		}
+	}
 }
 
-func SoarRun(argsMap map[string]string) ([]byte, error) {
+func SoarRun(argsMap map[string]string) (stdout, loginfo []byte, err error) {
 
 	var argsList = []string{}
+
+	if bcontent, ok := argsMap["blacklist"]; ok {
+
+		// blacklistfile
+		bfile, err := ioutil.TempFile("", "tmpfile")
+		if err != nil {
+			errinfo := "无法创建临时文件"
+			return []byte(errinfo), []byte(errinfo), errors.New(errinfo)
+		}
+		if _, err := bfile.Write([]byte(bcontent)); err != nil {
+			errinfo := "无法写入文件"
+			return []byte(errinfo), []byte(errinfo), errors.New(errinfo)
+		}
+
+		blfilename := bfile.Name()
+		bfile.Close()
+		argsMap["blacklist"] = blfilename
+
+	}
+
+	if utils.FileExist(argsMap["query"]) {
+		return []byte("不允许读取文件操作"), []byte("不允许读取文件操作"), errors.New("不允许读取文件操作")
+	}
+
 	for key, arg := range argsMap {
 		key := "-" + strings.TrimSpace(key)
 		if rst, ok := SoarArgsAlowList[key]; !(ok && rst) {
 			errinfo := "请检查soar程序是否可以正常运行，如果正常是soar-web 不允许的参数: " + arg
-			return []byte(errinfo), errors.New(errinfo)
+			return []byte(errinfo), []byte(errinfo), errors.New(errinfo)
 		} else {
 			if arg == "" {
 				argsList = append(argsList, fmt.Sprintf("%s", key))
 			} else {
 				argsList = append(argsList, fmt.Sprintf("%s=%s", key, arg))
 			}
-
 		}
 	}
+
+	//output
+	logfile, err := ioutil.TempFile("", "tmpfile")
+	if err != nil {
+		errinfo := "无法创建临时文件"
+		return []byte(errinfo), []byte(errinfo), errors.New(errinfo)
+	}
+	logfilename := logfile.Name()
+	defer logfile.Close()
+	defer os.Remove(logfilename)
+	argsList = append(argsList, fmt.Sprintf("%s=%s", "-log-output", logfilename))
+
 	ecmd := exec.Command(utils.GetSoarBin(), argsList...)
-	return ecmd.CombinedOutput()
+	stdout, err = ecmd.CombinedOutput()
+	loginfo, err = ioutil.ReadFile(logfilename)
+	if err != nil {
+		return stdout, []byte(""), err
+	}
+	return
+
 }
 
 func RSA_Decrypt(cipherText []byte, path string) ([]byte, error) {
