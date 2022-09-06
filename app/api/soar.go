@@ -88,7 +88,6 @@ func SoarAPI(c *gin.Context) {
 		Fail(c, string(rst), string(loginfo))
 		return
 	}
-
 	Success(c, string(rst), string(loginfo))
 	return
 }

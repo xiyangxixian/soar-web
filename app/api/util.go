@@ -66,13 +66,32 @@ func SoarRun(argsMap map[string]string) (stdout, loginfo []byte, err error) {
 
 		blfilename := bfile.Name()
 		bfile.Close()
+		defer os.Remove(blfilename)
 		argsMap["blacklist"] = blfilename
 
 	}
 
-	if utils.FileExist(argsMap["query"]) {
-		return []byte("不允许读取文件操作"), []byte("不允许读取文件操作"), errors.New("不允许读取文件操作")
+	//query file
+	if qcontent, ok := argsMap["query"]; ok {
+		qfile, err := ioutil.TempFile("", "tmpfile")
+		if err != nil {
+			errinfo := "无法创建临时文件"
+			return []byte(errinfo), []byte(errinfo), errors.New(errinfo)
+		}
+		if _, err := qfile.Write([]byte(qcontent)); err != nil {
+			errinfo := "无法写入文件"
+			return []byte(errinfo), []byte(errinfo), errors.New(errinfo)
+		}
+
+		qfilename := qfile.Name()
+		qfile.Close()
+		defer os.Remove(qfilename)
+		argsMap["query"] = qfilename
 	}
+
+	//if utils.FileExist(argsMap["query"]) {
+	//	return []byte("不允许读取文件操作"), []byte("不允许读取文件操作"), errors.New("不允许读取文件操作")
+	//}
 
 	for key, arg := range argsMap {
 		key := "-" + strings.TrimSpace(key)
@@ -100,6 +119,7 @@ func SoarRun(argsMap map[string]string) (stdout, loginfo []byte, err error) {
 	argsList = append(argsList, fmt.Sprintf("%s=%s", "-log-output", logfilename))
 
 	ecmd := exec.Command(utils.GetSoarBin(), argsList...)
+	fmt.Println(ecmd.String())
 	stdout, err = ecmd.CombinedOutput()
 	loginfo, err = ioutil.ReadFile(logfilename)
 	if err != nil {

@@ -127,7 +127,7 @@ func check() {
 		os.Chmod(utils.GetSoarBin(), 0755)
 
 	} else {
-		fmt.Println("soar bin not exist,please install https://github.com/XiaoMi/soar")
+		fmt.Println("soar bin not found in soar-bin,please install https://github.com/XiaoMi/soar")
 		os.Exit(1)
 	}
 
